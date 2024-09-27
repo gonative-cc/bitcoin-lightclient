@@ -28,6 +28,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
+				{
+					RpcMethod:      "InsertHeaders",
+					Use:            "insert-headers [header]",
+					Short:          "Send a insert-headers tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "header"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
