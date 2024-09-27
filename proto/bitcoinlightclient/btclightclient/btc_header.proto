@@ -1,0 +1,7 @@
+syntax = "proto3";
+package bitcoinlightclient.btclightclient;
+
+option go_package = "bitcoin-lightclient/x/btclightclient/types";
+
+message Btcheader {
+}
