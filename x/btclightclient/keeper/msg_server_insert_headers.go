@@ -14,5 +14,6 @@ func (k msgServer) InsertHeaders(goCtx context.Context, msg *types.MsgInsertHead
 	// TODO: Handling the message
 	_ = ctx
 
+	k.Keeper.InsertHeader()
 	return &types.MsgInsertHeadersResponse{}, nil
 }
