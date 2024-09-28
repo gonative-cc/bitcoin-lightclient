@@ -12,7 +12,7 @@ func NewMsgInsertHeaders(creator string, header string, other string) *MsgInsert
 	return &MsgInsertHeaders{
 		Creator: creator,
 		Header:  header,
-		Other: other,
+		Other:   other,
 	}
 }
 

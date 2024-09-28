@@ -55,8 +55,7 @@ func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-
-func (k Keeper) InsertHeader(ctx context.Context, headers []*types.Btcheader) bool{
+func (k Keeper) InsertHeader(ctx context.Context, headers []*types.Btcheader) bool {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
 	store.Set([]byte("header"), []byte("header"))

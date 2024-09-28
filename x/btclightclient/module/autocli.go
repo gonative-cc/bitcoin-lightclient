@@ -17,6 +17,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:       "params",
 					Short:     "Shows the parameters of the module",
 				},
+				{
+					RpcMethod:      "GetHeader",
+					Use:            "get-header [height]",
+					Short:          "Query get-header",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "height"}},
+				},
+
 				// this line is used by ignite scaffolding # autocli/query
 			},
 		},
