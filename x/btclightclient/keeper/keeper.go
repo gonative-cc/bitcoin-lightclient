@@ -1,11 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
+	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"bitcoin-lightclient/x/btclightclient/types"
@@ -53,6 +56,9 @@ func (k Keeper) Logger() log.Logger {
 }
 
 
-func (k Keeper) InsertHeader() {
-	
+func (k Keeper) InsertHeader(ctx context.Context, headers []*types.Btcheader) bool{
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte{})
+	store.Set([]byte("header"), []byte("header"))
+	return true
 }

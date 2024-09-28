@@ -44,5 +44,7 @@ message MsgInsertHeaders {
   string other   = 3;
 }
 
-message MsgInsertHeadersResponse {}
+message MsgInsertHeadersResponse {
+  string restule = 1;
+}
 
