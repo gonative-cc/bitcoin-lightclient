@@ -1,0 +1,6 @@
+package types
+
+
+func NewBlockHeaderFromByteTest() {
+	
+}
