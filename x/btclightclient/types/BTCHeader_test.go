@@ -51,3 +51,11 @@ func TestByteFromBlockHeader(t *testing.T) {
 	}
 
 }
+
+func TestNewBlockHeaderFromByteFail(t *testing.T) {
+	data := []byte(`abcd`)
+	_, err := NewBlockHeaderFromBytes(data)
+	if err == nil {
+		t.Fatalf("Should failed")
+	}
+}

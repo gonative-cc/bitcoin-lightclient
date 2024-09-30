@@ -871,19 +871,63 @@ func (x *fastReflection_MsgUpdateParamsResponse) ProtoMethods() *protoiface.Meth
 	}
 }
 
+var _ protoreflect.List = (*_MsgInsertHeaders_2_list)(nil)
+
+type _MsgInsertHeaders_2_list struct {
+	list *[]string
+}
+
+func (x *_MsgInsertHeaders_2_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_MsgInsertHeaders_2_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_MsgInsertHeaders_2_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_MsgInsertHeaders_2_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_MsgInsertHeaders_2_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message MsgInsertHeaders at list field Headers as it is not of Message kind"))
+}
+
+func (x *_MsgInsertHeaders_2_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_MsgInsertHeaders_2_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_MsgInsertHeaders_2_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
 	md_MsgInsertHeaders         protoreflect.MessageDescriptor
 	fd_MsgInsertHeaders_creator protoreflect.FieldDescriptor
-	fd_MsgInsertHeaders_header  protoreflect.FieldDescriptor
-	fd_MsgInsertHeaders_other   protoreflect.FieldDescriptor
+	fd_MsgInsertHeaders_headers protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_bitcoinlightclient_btclightclient_tx_proto_init()
 	md_MsgInsertHeaders = File_bitcoinlightclient_btclightclient_tx_proto.Messages().ByName("MsgInsertHeaders")
 	fd_MsgInsertHeaders_creator = md_MsgInsertHeaders.Fields().ByName("creator")
-	fd_MsgInsertHeaders_header = md_MsgInsertHeaders.Fields().ByName("header")
-	fd_MsgInsertHeaders_other = md_MsgInsertHeaders.Fields().ByName("other")
+	fd_MsgInsertHeaders_headers = md_MsgInsertHeaders.Fields().ByName("headers")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgInsertHeaders)(nil)
@@ -957,15 +1001,9 @@ func (x *fastReflection_MsgInsertHeaders) Range(f func(protoreflect.FieldDescrip
 			return
 		}
 	}
-	if x.Header != "" {
-		value := protoreflect.ValueOfString(x.Header)
-		if !f(fd_MsgInsertHeaders_header, value) {
-			return
-		}
-	}
-	if x.Other != "" {
-		value := protoreflect.ValueOfString(x.Other)
-		if !f(fd_MsgInsertHeaders_other, value) {
+	if len(x.Headers) != 0 {
+		value := protoreflect.ValueOfList(&_MsgInsertHeaders_2_list{list: &x.Headers})
+		if !f(fd_MsgInsertHeaders_headers, value) {
 			return
 		}
 	}
@@ -986,10 +1024,8 @@ func (x *fastReflection_MsgInsertHeaders) Has(fd protoreflect.FieldDescriptor) b
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.creator":
 		return x.Creator != ""
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.header":
-		return x.Header != ""
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.other":
-		return x.Other != ""
+	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.headers":
+		return len(x.Headers) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeaders"))
@@ -1008,10 +1044,8 @@ func (x *fastReflection_MsgInsertHeaders) Clear(fd protoreflect.FieldDescriptor)
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.creator":
 		x.Creator = ""
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.header":
-		x.Header = ""
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.other":
-		x.Other = ""
+	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.headers":
+		x.Headers = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeaders"))
@@ -1031,12 +1065,12 @@ func (x *fastReflection_MsgInsertHeaders) Get(descriptor protoreflect.FieldDescr
 	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.creator":
 		value := x.Creator
 		return protoreflect.ValueOfString(value)
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.header":
-		value := x.Header
-		return protoreflect.ValueOfString(value)
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.other":
-		value := x.Other
-		return protoreflect.ValueOfString(value)
+	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.headers":
+		if len(x.Headers) == 0 {
+			return protoreflect.ValueOfList(&_MsgInsertHeaders_2_list{})
+		}
+		listValue := &_MsgInsertHeaders_2_list{list: &x.Headers}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeaders"))
@@ -1059,10 +1093,10 @@ func (x *fastReflection_MsgInsertHeaders) Set(fd protoreflect.FieldDescriptor, v
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.creator":
 		x.Creator = value.Interface().(string)
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.header":
-		x.Header = value.Interface().(string)
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.other":
-		x.Other = value.Interface().(string)
+	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.headers":
+		lv := value.List()
+		clv := lv.(*_MsgInsertHeaders_2_list)
+		x.Headers = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeaders"))
@@ -1083,12 +1117,14 @@ func (x *fastReflection_MsgInsertHeaders) Set(fd protoreflect.FieldDescriptor, v
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgInsertHeaders) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.headers":
+		if x.Headers == nil {
+			x.Headers = []string{}
+		}
+		value := &_MsgInsertHeaders_2_list{list: &x.Headers}
+		return protoreflect.ValueOfList(value)
 	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.creator":
 		panic(fmt.Errorf("field creator of message bitcoinlightclient.btclightclient.MsgInsertHeaders is not mutable"))
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.header":
-		panic(fmt.Errorf("field header of message bitcoinlightclient.btclightclient.MsgInsertHeaders is not mutable"))
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.other":
-		panic(fmt.Errorf("field other of message bitcoinlightclient.btclightclient.MsgInsertHeaders is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeaders"))
@@ -1104,10 +1140,9 @@ func (x *fastReflection_MsgInsertHeaders) NewField(fd protoreflect.FieldDescript
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.creator":
 		return protoreflect.ValueOfString("")
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.header":
-		return protoreflect.ValueOfString("")
-	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.other":
-		return protoreflect.ValueOfString("")
+	case "bitcoinlightclient.btclightclient.MsgInsertHeaders.headers":
+		list := []string{}
+		return protoreflect.ValueOfList(&_MsgInsertHeaders_2_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeaders"))
@@ -1181,13 +1216,11 @@ func (x *fastReflection_MsgInsertHeaders) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Header)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		l = len(x.Other)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
+		if len(x.Headers) > 0 {
+			for _, s := range x.Headers {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -1218,19 +1251,14 @@ func (x *fastReflection_MsgInsertHeaders) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.Other) > 0 {
-			i -= len(x.Other)
-			copy(dAtA[i:], x.Other)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Other)))
-			i--
-			dAtA[i] = 0x1a
-		}
-		if len(x.Header) > 0 {
-			i -= len(x.Header)
-			copy(dAtA[i:], x.Header)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Header)))
-			i--
-			dAtA[i] = 0x12
+		if len(x.Headers) > 0 {
+			for iNdEx := len(x.Headers) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.Headers[iNdEx])
+				copy(dAtA[i:], x.Headers[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Headers[iNdEx])))
+				i--
+				dAtA[i] = 0x12
+			}
 		}
 		if len(x.Creator) > 0 {
 			i -= len(x.Creator)
@@ -1322,7 +1350,7 @@ func (x *fastReflection_MsgInsertHeaders) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Header", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Headers", wireType)
 				}
 				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
@@ -1350,39 +1378,7 @@ func (x *fastReflection_MsgInsertHeaders) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Header = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
-			case 3:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Other", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Other = string(dAtA[iNdEx:postIndex])
+				x.Headers = append(x.Headers, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -1420,14 +1416,12 @@ func (x *fastReflection_MsgInsertHeaders) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_MsgInsertHeadersResponse         protoreflect.MessageDescriptor
-	fd_MsgInsertHeadersResponse_restule protoreflect.FieldDescriptor
+	md_MsgInsertHeadersResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_bitcoinlightclient_btclightclient_tx_proto_init()
 	md_MsgInsertHeadersResponse = File_bitcoinlightclient_btclightclient_tx_proto.Messages().ByName("MsgInsertHeadersResponse")
-	fd_MsgInsertHeadersResponse_restule = md_MsgInsertHeadersResponse.Fields().ByName("restule")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgInsertHeadersResponse)(nil)
@@ -1495,12 +1489,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) Interface() protoreflect.Proto
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_MsgInsertHeadersResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Restule != "" {
-		value := protoreflect.ValueOfString(x.Restule)
-		if !f(fd_MsgInsertHeadersResponse_restule, value) {
-			return
-		}
-	}
 }
 
 // Has reports whether a field is populated.
@@ -1516,8 +1504,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) Range(f func(protoreflect.Fiel
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_MsgInsertHeadersResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "bitcoinlightclient.btclightclient.MsgInsertHeadersResponse.restule":
-		return x.Restule != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeadersResponse"))
@@ -1534,8 +1520,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) Has(fd protoreflect.FieldDescr
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgInsertHeadersResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "bitcoinlightclient.btclightclient.MsgInsertHeadersResponse.restule":
-		x.Restule = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeadersResponse"))
@@ -1552,9 +1536,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) Clear(fd protoreflect.FieldDes
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_MsgInsertHeadersResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "bitcoinlightclient.btclightclient.MsgInsertHeadersResponse.restule":
-		value := x.Restule
-		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeadersResponse"))
@@ -1575,8 +1556,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) Get(descriptor protoreflect.Fi
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgInsertHeadersResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "bitcoinlightclient.btclightclient.MsgInsertHeadersResponse.restule":
-		x.Restule = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeadersResponse"))
@@ -1597,8 +1576,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) Set(fd protoreflect.FieldDescr
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_MsgInsertHeadersResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "bitcoinlightclient.btclightclient.MsgInsertHeadersResponse.restule":
-		panic(fmt.Errorf("field restule of message bitcoinlightclient.btclightclient.MsgInsertHeadersResponse is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeadersResponse"))
@@ -1612,8 +1589,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) Mutable(fd protoreflect.FieldD
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_MsgInsertHeadersResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "bitcoinlightclient.btclightclient.MsgInsertHeadersResponse.restule":
-		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.MsgInsertHeadersResponse"))
@@ -1683,10 +1658,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) ProtoMethods() *protoiface.Met
 		var n int
 		var l int
 		_ = l
-		l = len(x.Restule)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -1715,13 +1686,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) ProtoMethods() *protoiface.Met
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.Restule) > 0 {
-			i -= len(x.Restule)
-			copy(dAtA[i:], x.Restule)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Restule)))
-			i--
-			dAtA[i] = 0xa
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -1772,38 +1736,6 @@ func (x *fastReflection_MsgInsertHeadersResponse) ProtoMethods() *protoiface.Met
 				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgInsertHeadersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
-			case 1:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Restule", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Restule = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1931,9 +1863,8 @@ type MsgInsertHeaders struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Header  string `protobuf:"bytes,2,opt,name=header,proto3" json:"header,omitempty"`
-	Other   string `protobuf:"bytes,3,opt,name=other,proto3" json:"other,omitempty"`
+	Creator string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Headers []string `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
 }
 
 func (x *MsgInsertHeaders) Reset() {
@@ -1963,26 +1894,17 @@ func (x *MsgInsertHeaders) GetCreator() string {
 	return ""
 }
 
-func (x *MsgInsertHeaders) GetHeader() string {
+func (x *MsgInsertHeaders) GetHeaders() []string {
 	if x != nil {
-		return x.Header
+		return x.Headers
 	}
-	return ""
-}
-
-func (x *MsgInsertHeaders) GetOther() string {
-	if x != nil {
-		return x.Other
-	}
-	return ""
+	return nil
 }
 
 type MsgInsertHeadersResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
-	Restule string `protobuf:"bytes,1,opt,name=restule,proto3" json:"restule,omitempty"`
 }
 
 func (x *MsgInsertHeadersResponse) Reset() {
@@ -2003,13 +1925,6 @@ func (*MsgInsertHeadersResponse) ProtoMessage() {}
 // Deprecated: Use MsgInsertHeadersResponse.ProtoReflect.Descriptor instead.
 func (*MsgInsertHeadersResponse) Descriptor() ([]byte, []int) {
 	return file_bitcoinlightclient_btclightclient_tx_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *MsgInsertHeadersResponse) GetRestule() string {
-	if x != nil {
-		return x.Restule
-	}
-	return ""
 }
 
 var File_bitcoinlightclient_btclightclient_tx_proto protoreflect.FileDescriptor
@@ -2044,52 +1959,49 @@ var file_bitcoinlightclient_btclightclient_tx_proto_rawDesc = []byte{
 	0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x4d,
 	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x22, 0x19,
 	0x0a, 0x17, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x68, 0x0a, 0x10, 0x4d, 0x73, 0x67,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x54, 0x0a, 0x10, 0x4d, 0x73, 0x67,
 	0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x12, 0x18, 0x0a,
 	0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
-	0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x16, 0x0a, 0x06, 0x68, 0x65, 0x61, 0x64, 0x65,
-	0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12,
-	0x14, 0x0a, 0x05, 0x6f, 0x74, 0x68, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
-	0x6f, 0x74, 0x68, 0x65, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61,
-	0x74, 0x6f, 0x72, 0x22, 0x34, 0x0a, 0x18, 0x4d, 0x73, 0x67, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74,
-	0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x18, 0x0a, 0x07, 0x72, 0x65, 0x73, 0x74, 0x75, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x72, 0x65, 0x73, 0x74, 0x75, 0x6c, 0x65, 0x32, 0x90, 0x02, 0x0a, 0x03, 0x4d, 0x73,
-	0x67, 0x12, 0x7e, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x12, 0x32, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74,
-	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63,
-	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50,
-	0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x3a, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c,
-	0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69,
-	0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64,
-	0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x81, 0x01, 0x0a, 0x0d, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x48, 0x65, 0x61, 0x64,
-	0x65, 0x72, 0x73, 0x12, 0x33, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x68, 0x65, 0x61, 0x64, 0x65,
+	0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72,
+	0x73, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22,
+	0x1a, 0x0a, 0x18, 0x4d, 0x73, 0x67, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x48, 0x65, 0x61, 0x64,
+	0x65, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x90, 0x02, 0x0a, 0x03,
+	0x4d, 0x73, 0x67, 0x12, 0x7e, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72,
+	0x61, 0x6d, 0x73, 0x12, 0x32, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67,
 	0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68,
-	0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d, 0x73, 0x67, 0x49, 0x6e, 0x73, 0x65, 0x72,
-	0x74, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x1a, 0x3b, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f,
-	0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74,
-	0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d, 0x73, 0x67,
-	0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0x90, 0x02, 0x0a,
-	0x25, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68,
-	0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74,
-	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x39, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x2d, 0x6c, 0x69, 0x67, 0x68, 0x74,
-	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x74, 0x63, 0x6f,
-	0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x62, 0x74,
-	0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xa2, 0x02, 0x03, 0x42,
-	0x42, 0x58, 0xaa, 0x02, 0x21, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68,
-	0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74,
-	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xca, 0x02, 0x21, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e,
-	0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x42, 0x74, 0x63, 0x6c,
-	0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xe2, 0x02, 0x2d, 0x42, 0x69, 0x74,
-	0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c,
-	0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x47,
-	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x22, 0x42, 0x69, 0x74,
-	0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x3a,
-	0x3a, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x3a, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69,
+	0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63,
+	0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d, 0x73, 0x67, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x81, 0x01, 0x0a, 0x0d, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x48, 0x65,
+	0x61, 0x64, 0x65, 0x72, 0x73, 0x12, 0x33, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c,
+	0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69,
+	0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d, 0x73, 0x67, 0x49, 0x6e, 0x73,
+	0x65, 0x72, 0x74, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x1a, 0x3b, 0x2e, 0x62, 0x69, 0x74,
+	0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e,
+	0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x4d,
+	0x73, 0x67, 0x49, 0x6e, 0x73, 0x65, 0x72, 0x74, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0x90,
+	0x02, 0x0a, 0x25, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69,
+	0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67,
+	0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0x5a, 0x39, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x2d, 0x6c, 0x69, 0x67,
+	0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x74,
+	0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f,
+	0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xa2, 0x02,
+	0x03, 0x42, 0x42, 0x58, 0xaa, 0x02, 0x21, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69,
+	0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67,
+	0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xca, 0x02, 0x21, 0x42, 0x69, 0x74, 0x63, 0x6f,
+	0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x42, 0x74,
+	0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xe2, 0x02, 0x2d, 0x42,
+	0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e,
+	0x74, 0x5c, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x22, 0x42,
+	0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e,
+	0x74, 0x3a, 0x3a, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e,
+	0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

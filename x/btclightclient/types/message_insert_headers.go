@@ -8,11 +8,10 @@ import (
 
 var _ sdk.Msg = &MsgInsertHeaders{}
 
-func NewMsgInsertHeaders(creator string, header string, other string) *MsgInsertHeaders {
+func NewMsgInsertHeaders(creator string, headers []string) *MsgInsertHeaders {
 	return &MsgInsertHeaders{
 		Creator: creator,
-		Header:  header,
-		Other:   other,
+		Headers:  headers,
 	}
 }
 

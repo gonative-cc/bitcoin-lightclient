@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"cosmossdk.io/core/store"
@@ -56,9 +57,23 @@ func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) bool {
+func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
-	store.Set([]byte("header"), []byte("header"))
-	return true
+	
+	// check hash chain
+	prevHeader := headers[0];
+	for _, header := range headers[1:] {
+		prevBlockHash := prevHeader.BlockHash()
+		if header.PrevBlock != prevBlockHash{
+			return errors.New("Header not equal")
+		}
+		prevHeader = header
+	}
+	
+	for _, header := range headers {
+		headerBytes, _ := types.ByteFromBlockHeader(header)
+		store.Set([]byte("header"), headerBytes)		
+	}
+	return nil
 }

@@ -40,11 +40,9 @@ message MsgUpdateParamsResponse {}
 message MsgInsertHeaders {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
-  string header  = 2;
-  string other   = 3;
+  repeated string headers = 2;
 }
 
 message MsgInsertHeadersResponse {
-  string restule = 1;
 }
 

@@ -39,7 +39,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod:      "InsertHeaders",
 					Use:            "insert-headers [header]",
 					Short:          "Send a insert-headers tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "header"}, {ProtoField: "other"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "headers"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
