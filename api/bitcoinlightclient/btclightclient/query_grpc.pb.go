@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName    = "/bitcoinlightclient.btclightclient.Query/Params"
-	Query_GetHeader_FullMethodName = "/bitcoinlightclient.btclightclient.Query/GetHeader"
+	Query_Params_FullMethodName      = "/bitcoinlightclient.btclightclient.Query/Params"
+	Query_GetHeader_FullMethodName   = "/bitcoinlightclient.btclightclient.Query/GetHeader"
+	Query_LatestBlock_FullMethodName = "/bitcoinlightclient.btclightclient.Query/LatestBlock"
 )
 
 // QueryClient is the client API for Query service.
@@ -31,6 +32,8 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a list of GetHeader items.
 	GetHeader(ctx context.Context, in *QueryGetHeaderRequest, opts ...grpc.CallOption) (*QueryGetHeaderResponse, error)
+	// Queries a list of LatestBlock items.
+	LatestBlock(ctx context.Context, in *QueryLatestBlockRequest, opts ...grpc.CallOption) (*QueryLatestBlockResponse, error)
 }
 
 type queryClient struct {
@@ -59,6 +62,15 @@ func (c *queryClient) GetHeader(ctx context.Context, in *QueryGetHeaderRequest, 
 	return out, nil
 }
 
+func (c *queryClient) LatestBlock(ctx context.Context, in *QueryLatestBlockRequest, opts ...grpc.CallOption) (*QueryLatestBlockResponse, error) {
+	out := new(QueryLatestBlockResponse)
+	err := c.cc.Invoke(ctx, Query_LatestBlock_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
@@ -67,6 +79,8 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a list of GetHeader items.
 	GetHeader(context.Context, *QueryGetHeaderRequest) (*QueryGetHeaderResponse, error)
+	// Queries a list of LatestBlock items.
+	LatestBlock(context.Context, *QueryLatestBlockRequest) (*QueryLatestBlockResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -79,6 +93,9 @@ func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*Q
 }
 func (UnimplementedQueryServer) GetHeader(context.Context, *QueryGetHeaderRequest) (*QueryGetHeaderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetHeader not implemented")
+}
+func (UnimplementedQueryServer) LatestBlock(context.Context, *QueryLatestBlockRequest) (*QueryLatestBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LatestBlock not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -129,6 +146,24 @@ func _Query_GetHeader_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_LatestBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryLatestBlockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).LatestBlock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_LatestBlock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).LatestBlock(ctx, req.(*QueryLatestBlockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -143,6 +178,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetHeader",
 			Handler:    _Query_GetHeader_Handler,
+		},
+		{
+			MethodName: "LatestBlock",
+			Handler:    _Query_LatestBlock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

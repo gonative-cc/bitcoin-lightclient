@@ -1,6 +1,4 @@
 package types
 
-
-type BTCLightClient struct{
-	
+type BTCLightClient struct {
 }

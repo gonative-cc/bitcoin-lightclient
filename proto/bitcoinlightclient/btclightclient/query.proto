@@ -24,6 +24,12 @@ service Query {
     option (google.api.http).get = "/bitcoin-lightclient/btclightclient/get_header/{height}";
   
   }
+  
+  // Queries a list of LatestBlock items.
+  rpc LatestBlock (QueryLatestBlockRequest) returns (QueryLatestBlockResponse) {
+    option (google.api.http).get = "/bitcoin-lightclient/btclightclient/latest_block";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -41,5 +47,11 @@ message QueryGetHeaderRequest {
 
 message QueryGetHeaderResponse {
   string btcheader = 1;
+}
+
+message QueryLatestBlockRequest {}
+
+message QueryLatestBlockResponse {
+  bytes btclightblock = 1 [(gogoproto.customtype) = "BTCLightBlock"];
 }
 

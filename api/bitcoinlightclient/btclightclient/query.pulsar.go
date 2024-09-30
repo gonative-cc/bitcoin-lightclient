@@ -1647,6 +1647,784 @@ func (x *fastReflection_QueryGetHeaderResponse) ProtoMethods() *protoiface.Metho
 	}
 }
 
+var (
+	md_QueryLatestBlockRequest protoreflect.MessageDescriptor
+)
+
+func init() {
+	file_bitcoinlightclient_btclightclient_query_proto_init()
+	md_QueryLatestBlockRequest = File_bitcoinlightclient_btclightclient_query_proto.Messages().ByName("QueryLatestBlockRequest")
+}
+
+var _ protoreflect.Message = (*fastReflection_QueryLatestBlockRequest)(nil)
+
+type fastReflection_QueryLatestBlockRequest QueryLatestBlockRequest
+
+func (x *QueryLatestBlockRequest) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryLatestBlockRequest)(x)
+}
+
+func (x *QueryLatestBlockRequest) slowProtoReflect() protoreflect.Message {
+	mi := &file_bitcoinlightclient_btclightclient_query_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_QueryLatestBlockRequest_messageType fastReflection_QueryLatestBlockRequest_messageType
+var _ protoreflect.MessageType = fastReflection_QueryLatestBlockRequest_messageType{}
+
+type fastReflection_QueryLatestBlockRequest_messageType struct{}
+
+func (x fastReflection_QueryLatestBlockRequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryLatestBlockRequest)(nil)
+}
+func (x fastReflection_QueryLatestBlockRequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryLatestBlockRequest)
+}
+func (x fastReflection_QueryLatestBlockRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryLatestBlockRequest
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_QueryLatestBlockRequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryLatestBlockRequest
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_QueryLatestBlockRequest) Type() protoreflect.MessageType {
+	return _fastReflection_QueryLatestBlockRequest_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_QueryLatestBlockRequest) New() protoreflect.Message {
+	return new(fastReflection_QueryLatestBlockRequest)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_QueryLatestBlockRequest) Interface() protoreflect.ProtoMessage {
+	return (*QueryLatestBlockRequest)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_QueryLatestBlockRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_QueryLatestBlockRequest) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockRequest"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockRequest) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockRequest"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_QueryLatestBlockRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockRequest"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockRequest does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockRequest"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockRequest"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_QueryLatestBlockRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockRequest"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_QueryLatestBlockRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in bitcoinlightclient.btclightclient.QueryLatestBlockRequest", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_QueryLatestBlockRequest) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockRequest) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_QueryLatestBlockRequest) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_QueryLatestBlockRequest) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*QueryLatestBlockRequest)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*QueryLatestBlockRequest)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*QueryLatestBlockRequest)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryLatestBlockRequest: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryLatestBlockRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_QueryLatestBlockResponse               protoreflect.MessageDescriptor
+	fd_QueryLatestBlockResponse_btclightblock protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_bitcoinlightclient_btclightclient_query_proto_init()
+	md_QueryLatestBlockResponse = File_bitcoinlightclient_btclightclient_query_proto.Messages().ByName("QueryLatestBlockResponse")
+	fd_QueryLatestBlockResponse_btclightblock = md_QueryLatestBlockResponse.Fields().ByName("btclightblock")
+}
+
+var _ protoreflect.Message = (*fastReflection_QueryLatestBlockResponse)(nil)
+
+type fastReflection_QueryLatestBlockResponse QueryLatestBlockResponse
+
+func (x *QueryLatestBlockResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryLatestBlockResponse)(x)
+}
+
+func (x *QueryLatestBlockResponse) slowProtoReflect() protoreflect.Message {
+	mi := &file_bitcoinlightclient_btclightclient_query_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_QueryLatestBlockResponse_messageType fastReflection_QueryLatestBlockResponse_messageType
+var _ protoreflect.MessageType = fastReflection_QueryLatestBlockResponse_messageType{}
+
+type fastReflection_QueryLatestBlockResponse_messageType struct{}
+
+func (x fastReflection_QueryLatestBlockResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryLatestBlockResponse)(nil)
+}
+func (x fastReflection_QueryLatestBlockResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryLatestBlockResponse)
+}
+func (x fastReflection_QueryLatestBlockResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryLatestBlockResponse
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_QueryLatestBlockResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryLatestBlockResponse
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_QueryLatestBlockResponse) Type() protoreflect.MessageType {
+	return _fastReflection_QueryLatestBlockResponse_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_QueryLatestBlockResponse) New() protoreflect.Message {
+	return new(fastReflection_QueryLatestBlockResponse)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_QueryLatestBlockResponse) Interface() protoreflect.ProtoMessage {
+	return (*QueryLatestBlockResponse)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_QueryLatestBlockResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if len(x.Btclightblock) != 0 {
+		value := protoreflect.ValueOfBytes(x.Btclightblock)
+		if !f(fd_QueryLatestBlockResponse_btclightblock, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_QueryLatestBlockResponse) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.btclightblock":
+		return len(x.Btclightblock) != 0
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockResponse"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockResponse) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.btclightblock":
+		x.Btclightblock = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockResponse"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_QueryLatestBlockResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.btclightblock":
+		value := x.Btclightblock
+		return protoreflect.ValueOfBytes(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockResponse"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockResponse does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.btclightblock":
+		x.Btclightblock = value.Bytes()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockResponse"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.btclightblock":
+		panic(fmt.Errorf("field btclightblock of message bitcoinlightclient.btclightclient.QueryLatestBlockResponse is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockResponse"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_QueryLatestBlockResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.btclightblock":
+		return protoreflect.ValueOfBytes(nil)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: bitcoinlightclient.btclightclient.QueryLatestBlockResponse"))
+		}
+		panic(fmt.Errorf("message bitcoinlightclient.btclightclient.QueryLatestBlockResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_QueryLatestBlockResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in bitcoinlightclient.btclightclient.QueryLatestBlockResponse", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_QueryLatestBlockResponse) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryLatestBlockResponse) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_QueryLatestBlockResponse) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_QueryLatestBlockResponse) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*QueryLatestBlockResponse)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Btclightblock)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*QueryLatestBlockResponse)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Btclightblock) > 0 {
+			i -= len(x.Btclightblock)
+			copy(dAtA[i:], x.Btclightblock)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Btclightblock)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*QueryLatestBlockResponse)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryLatestBlockResponse: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryLatestBlockResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Btclightblock", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Btclightblock = append(x.Btclightblock[:0], dAtA[iNdEx:postIndex]...)
+				if x.Btclightblock == nil {
+					x.Btclightblock = []byte{}
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -1794,6 +2572,67 @@ func (x *QueryGetHeaderResponse) GetBtcheader() string {
 	return ""
 }
 
+type QueryLatestBlockRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *QueryLatestBlockRequest) Reset() {
+	*x = QueryLatestBlockRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bitcoinlightclient_btclightclient_query_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryLatestBlockRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryLatestBlockRequest) ProtoMessage() {}
+
+// Deprecated: Use QueryLatestBlockRequest.ProtoReflect.Descriptor instead.
+func (*QueryLatestBlockRequest) Descriptor() ([]byte, []int) {
+	return file_bitcoinlightclient_btclightclient_query_proto_rawDescGZIP(), []int{4}
+}
+
+type QueryLatestBlockResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Btclightblock []byte `protobuf:"bytes,1,opt,name=btclightblock,proto3" json:"btclightblock,omitempty"`
+}
+
+func (x *QueryLatestBlockResponse) Reset() {
+	*x = QueryLatestBlockResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_bitcoinlightclient_btclightclient_query_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryLatestBlockResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryLatestBlockResponse) ProtoMessage() {}
+
+// Deprecated: Use QueryLatestBlockResponse.ProtoReflect.Descriptor instead.
+func (*QueryLatestBlockResponse) Descriptor() ([]byte, []int) {
+	return file_bitcoinlightclient_btclightclient_query_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *QueryLatestBlockResponse) GetBtclightblock() []byte {
+	if x != nil {
+		return x.Btclightblock
+	}
+	return nil
+}
+
 var File_bitcoinlightclient_btclightclient_query_proto protoreflect.FileDescriptor
 
 var file_bitcoinlightclient_btclightclient_query_proto_rawDesc = []byte{
@@ -1826,7 +2665,14 @@ var file_bitcoinlightclient_btclightclient_query_proto_rawDesc = []byte{
 	0x74, 0x22, 0x36, 0x0a, 0x16, 0x51, 0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x74, 0x48, 0x65, 0x61,
 	0x64, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x62,
 	0x74, 0x63, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
-	0x62, 0x74, 0x63, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x32, 0xf9, 0x02, 0x0a, 0x05, 0x51, 0x75,
+	0x62, 0x74, 0x63, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x22, 0x19, 0x0a, 0x17, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x4c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x22, 0x53, 0x0a, 0x18, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x61, 0x74,
+	0x65, 0x73, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x37, 0x0a, 0x0d, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x62, 0x6c, 0x6f, 0x63,
+	0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x11, 0xda, 0xde, 0x1f, 0x0d, 0x42, 0x54, 0x43,
+	0x4c, 0x69, 0x67, 0x68, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x0d, 0x62, 0x74, 0x63, 0x6c,
+	0x69, 0x67, 0x68, 0x74, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x32, 0xbc, 0x04, 0x0a, 0x05, 0x51, 0x75,
 	0x65, 0x72, 0x79, 0x12, 0xab, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x35,
 	0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69,
 	0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65,
@@ -1850,25 +2696,37 @@ var file_bitcoinlightclient_btclightclient_query_proto_rawDesc = []byte{
 	0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x2d, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65,
 	0x6e, 0x74, 0x2f, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e,
 	0x74, 0x2f, 0x67, 0x65, 0x74, 0x5f, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x2f, 0x7b, 0x68, 0x65,
-	0x69, 0x67, 0x68, 0x74, 0x7d, 0x42, 0x93, 0x02, 0x0a, 0x25, 0x63, 0x6f, 0x6d, 0x2e, 0x62, 0x69,
-	0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74,
-	0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x42,
-	0x0a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x39, 0x62,
-	0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x2d, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69,
-	0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67,
-	0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xa2, 0x02, 0x03, 0x42, 0x42, 0x58, 0xaa, 0x02,
-	0x21, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69,
-	0x65, 0x6e, 0x74, 0x2e, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0xca, 0x02, 0x21, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68,
-	0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74,
-	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xe2, 0x02, 0x2d, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e,
-	0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x42, 0x74, 0x63, 0x6c,
-	0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x22, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e,
-	0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x3a, 0x3a, 0x42, 0x74, 0x63,
-	0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x69, 0x67, 0x68, 0x74, 0x7d, 0x12, 0xc0, 0x01, 0x0a, 0x0b, 0x4c, 0x61, 0x74, 0x65, 0x73, 0x74,
+	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x3a, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c,
+	0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69,
+	0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c,
+	0x61, 0x74, 0x65, 0x73, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x3b, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74,
+	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x61, 0x74, 0x65, 0x73,
+	0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x38,
+	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x32, 0x12, 0x30, 0x2f, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e,
+	0x2d, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x62, 0x74, 0x63,
+	0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x6c, 0x61, 0x74, 0x65,
+	0x73, 0x74, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x93, 0x02, 0x0a, 0x25, 0x63, 0x6f, 0x6d,
+	0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69,
+	0x65, 0x6e, 0x74, 0x2e, 0x62, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65,
+	0x6e, 0x74, 0x42, 0x0a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
+	0x5a, 0x39, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x2d, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69,
+	0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x62, 0x74, 0x63,
+	0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xa2, 0x02, 0x03, 0x42, 0x42,
+	0x58, 0xaa, 0x02, 0x21, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74,
+	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0xca, 0x02, 0x21, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x6c,
+	0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x42, 0x74, 0x63, 0x6c, 0x69,
+	0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0xe2, 0x02, 0x2d, 0x42, 0x69, 0x74, 0x63,
+	0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x42,
+	0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5c, 0x47, 0x50,
+	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x22, 0x42, 0x69, 0x74, 0x63,
+	0x6f, 0x69, 0x6e, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x3a, 0x3a,
+	0x42, 0x74, 0x63, 0x6c, 0x69, 0x67, 0x68, 0x74, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1883,22 +2741,26 @@ func file_bitcoinlightclient_btclightclient_query_proto_rawDescGZIP() []byte {
 	return file_bitcoinlightclient_btclightclient_query_proto_rawDescData
 }
 
-var file_bitcoinlightclient_btclightclient_query_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_bitcoinlightclient_btclightclient_query_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_bitcoinlightclient_btclightclient_query_proto_goTypes = []interface{}{
-	(*QueryParamsRequest)(nil),     // 0: bitcoinlightclient.btclightclient.QueryParamsRequest
-	(*QueryParamsResponse)(nil),    // 1: bitcoinlightclient.btclightclient.QueryParamsResponse
-	(*QueryGetHeaderRequest)(nil),  // 2: bitcoinlightclient.btclightclient.QueryGetHeaderRequest
-	(*QueryGetHeaderResponse)(nil), // 3: bitcoinlightclient.btclightclient.QueryGetHeaderResponse
-	(*Params)(nil),                 // 4: bitcoinlightclient.btclightclient.Params
+	(*QueryParamsRequest)(nil),       // 0: bitcoinlightclient.btclightclient.QueryParamsRequest
+	(*QueryParamsResponse)(nil),      // 1: bitcoinlightclient.btclightclient.QueryParamsResponse
+	(*QueryGetHeaderRequest)(nil),    // 2: bitcoinlightclient.btclightclient.QueryGetHeaderRequest
+	(*QueryGetHeaderResponse)(nil),   // 3: bitcoinlightclient.btclightclient.QueryGetHeaderResponse
+	(*QueryLatestBlockRequest)(nil),  // 4: bitcoinlightclient.btclightclient.QueryLatestBlockRequest
+	(*QueryLatestBlockResponse)(nil), // 5: bitcoinlightclient.btclightclient.QueryLatestBlockResponse
+	(*Params)(nil),                   // 6: bitcoinlightclient.btclightclient.Params
 }
 var file_bitcoinlightclient_btclightclient_query_proto_depIdxs = []int32{
-	4, // 0: bitcoinlightclient.btclightclient.QueryParamsResponse.params:type_name -> bitcoinlightclient.btclightclient.Params
+	6, // 0: bitcoinlightclient.btclightclient.QueryParamsResponse.params:type_name -> bitcoinlightclient.btclightclient.Params
 	0, // 1: bitcoinlightclient.btclightclient.Query.Params:input_type -> bitcoinlightclient.btclightclient.QueryParamsRequest
 	2, // 2: bitcoinlightclient.btclightclient.Query.GetHeader:input_type -> bitcoinlightclient.btclightclient.QueryGetHeaderRequest
-	1, // 3: bitcoinlightclient.btclightclient.Query.Params:output_type -> bitcoinlightclient.btclightclient.QueryParamsResponse
-	3, // 4: bitcoinlightclient.btclightclient.Query.GetHeader:output_type -> bitcoinlightclient.btclightclient.QueryGetHeaderResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	4, // 3: bitcoinlightclient.btclightclient.Query.LatestBlock:input_type -> bitcoinlightclient.btclightclient.QueryLatestBlockRequest
+	1, // 4: bitcoinlightclient.btclightclient.Query.Params:output_type -> bitcoinlightclient.btclightclient.QueryParamsResponse
+	3, // 5: bitcoinlightclient.btclightclient.Query.GetHeader:output_type -> bitcoinlightclient.btclightclient.QueryGetHeaderResponse
+	5, // 6: bitcoinlightclient.btclightclient.Query.LatestBlock:output_type -> bitcoinlightclient.btclightclient.QueryLatestBlockResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -1959,6 +2821,30 @@ func file_bitcoinlightclient_btclightclient_query_proto_init() {
 				return nil
 			}
 		}
+		file_bitcoinlightclient_btclightclient_query_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryLatestBlockRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_bitcoinlightclient_btclightclient_query_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryLatestBlockResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1966,7 +2852,7 @@ func file_bitcoinlightclient_btclightclient_query_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_bitcoinlightclient_btclightclient_query_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

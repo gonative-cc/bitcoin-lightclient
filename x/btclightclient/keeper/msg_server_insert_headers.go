@@ -5,6 +5,7 @@ import (
 	// "errors"
 	// errorsmod "cosmossdk.io/errors"
 	"bitcoin-lightclient/x/btclightclient/types"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/btcsuite/btcd/wire"
@@ -20,7 +21,7 @@ func (k msgServer) InsertHeaders(goCtx context.Context, msg *types.MsgInsertHead
 
 	// transform string to wire.BlockHeader
 	for i, header := range headers {
-		blockHeader, err := types.NewBlockHeaderFromBytes([]byte(header))
+		blockHeader, err := types.NewBlockHeader([]byte(header))
 		// TODO: reorg this code more readable
 		if err != nil {
 			ctx.Logger().With("module", "x/btclightclient").Error("This is error when cover", "err", err)
