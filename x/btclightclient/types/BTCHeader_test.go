@@ -9,12 +9,9 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-func TestNewBlockHeaderFromByte(t *testing.T) {
 
-}
-
-func TestByteFromBlockHeader(t *testing.T) {
-  	prevHash, _ := chainhash.NewHashFromStr(fmt.Sprintf("%x", 10000))
+func sampleBlockHeader() wire.BlockHeader {
+	prevHash, _ := chainhash.NewHashFromStr(fmt.Sprintf("%x", 10000))
 	merketRoot, _ := chainhash.NewHashFromStr(fmt.Sprintf("%x", 10000))
 
 	timestamp := time.Unix(1727624087, 0)
@@ -27,7 +24,25 @@ func TestByteFromBlockHeader(t *testing.T) {
 		Bits: 20240924,
 		Nonce: 20000,
 	}
+	return blockHeader
+}
 
+func TestNewBlockHeaderFromByte(t *testing.T) {
+	blockHeaderBefore := sampleBlockHeader();
+	data, _ := ByteFromBlockHeader(&blockHeaderBefore)
+
+	blockHeaderAfter, err := NewBlockHeaderFromBytes(data)
+	if err != nil {
+		t.Fatalf("error")
+	} else {
+		if *blockHeaderAfter != blockHeaderBefore {
+			t.Fatalf("not equal")
+		}
+	}
+}
+
+func TestByteFromBlockHeader(t *testing.T) {
+	blockHeader := sampleBlockHeader()
 	data, err := ByteFromBlockHeader(&blockHeader)
 	if err == nil {
 		fmt.Println(data)		

@@ -1,6 +1,7 @@
 package types
 
 import (
+
 	"bytes"
 
 	"github.com/btcsuite/btcd/wire"
