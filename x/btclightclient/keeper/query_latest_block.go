@@ -32,6 +32,6 @@ func (k Keeper) LatestBlock(goCtx context.Context, req *types.QueryLatestBlockRe
 		var headerBytes types.BTCHeaderBytes
 
 		headerBytes, _ = types.ByteFromBlockHeader(latestBlock.Header)
-		return &types.QueryLatestBlockResponse{Height: int64(latestBlock.Height), HeaderHex: headerBytes.MarshalHex()}, nil
+		return &types.QueryLatestBlockResponse{Height: latestBlock.Height, HeaderHex: headerBytes.MarshalHex()}, nil
 	}
 }

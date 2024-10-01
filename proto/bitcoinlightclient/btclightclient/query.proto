@@ -53,7 +53,7 @@ message QueryGetHeaderResponse {
 message QueryLatestBlockRequest {}
 
 message QueryLatestBlockResponse {
-  int64 height = 1;
+  uint64 height = 1;
   string headerHex = 2;
 }
 

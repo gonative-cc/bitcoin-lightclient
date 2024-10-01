@@ -2113,8 +2113,8 @@ func (x *fastReflection_QueryLatestBlockResponse) Interface() protoreflect.Proto
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_QueryLatestBlockResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Height != int64(0) {
-		value := protoreflect.ValueOfInt64(x.Height)
+	if x.Height != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.Height)
 		if !f(fd_QueryLatestBlockResponse_height, value) {
 			return
 		}
@@ -2141,7 +2141,7 @@ func (x *fastReflection_QueryLatestBlockResponse) Range(f func(protoreflect.Fiel
 func (x *fastReflection_QueryLatestBlockResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.height":
-		return x.Height != int64(0)
+		return x.Height != uint64(0)
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.headerHex":
 		return x.HeaderHex != ""
 	default:
@@ -2161,7 +2161,7 @@ func (x *fastReflection_QueryLatestBlockResponse) Has(fd protoreflect.FieldDescr
 func (x *fastReflection_QueryLatestBlockResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.height":
-		x.Height = int64(0)
+		x.Height = uint64(0)
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.headerHex":
 		x.HeaderHex = ""
 	default:
@@ -2182,7 +2182,7 @@ func (x *fastReflection_QueryLatestBlockResponse) Get(descriptor protoreflect.Fi
 	switch descriptor.FullName() {
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.height":
 		value := x.Height
-		return protoreflect.ValueOfInt64(value)
+		return protoreflect.ValueOfUint64(value)
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.headerHex":
 		value := x.HeaderHex
 		return protoreflect.ValueOfString(value)
@@ -2207,7 +2207,7 @@ func (x *fastReflection_QueryLatestBlockResponse) Get(descriptor protoreflect.Fi
 func (x *fastReflection_QueryLatestBlockResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.height":
-		x.Height = value.Int()
+		x.Height = value.Uint()
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.headerHex":
 		x.HeaderHex = value.Interface().(string)
 	default:
@@ -2248,7 +2248,7 @@ func (x *fastReflection_QueryLatestBlockResponse) Mutable(fd protoreflect.FieldD
 func (x *fastReflection_QueryLatestBlockResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.height":
-		return protoreflect.ValueOfInt64(int64(0))
+		return protoreflect.ValueOfUint64(uint64(0))
 	case "bitcoinlightclient.btclightclient.QueryLatestBlockResponse.headerHex":
 		return protoreflect.ValueOfString("")
 	default:
@@ -2431,7 +2431,7 @@ func (x *fastReflection_QueryLatestBlockResponse) ProtoMethods() *protoiface.Met
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.Height |= int64(b&0x7F) << shift
+					x.Height |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -2689,7 +2689,7 @@ type QueryLatestBlockResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Height    int64  `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
+	Height    uint64 `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
 	HeaderHex string `protobuf:"bytes,2,opt,name=headerHex,proto3" json:"headerHex,omitempty"`
 }
 
@@ -2713,7 +2713,7 @@ func (*QueryLatestBlockResponse) Descriptor() ([]byte, []int) {
 	return file_bitcoinlightclient_btclightclient_query_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *QueryLatestBlockResponse) GetHeight() int64 {
+func (x *QueryLatestBlockResponse) GetHeight() uint64 {
 	if x != nil {
 		return x.Height
 	}
@@ -2765,7 +2765,7 @@ var file_bitcoinlightclient_btclightclient_query_proto_rawDesc = []byte{
 	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x50, 0x0a, 0x18,
 	0x51, 0x75, 0x65, 0x72, 0x79, 0x4c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b,
 	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x68, 0x65, 0x69, 0x67,
-	0x68, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74,
+	0x68, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74,
 	0x12, 0x1c, 0x0a, 0x09, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x48, 0x65, 0x78, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x09, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x48, 0x65, 0x78, 0x32, 0xbc,
 	0x04, 0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0xab, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72,
