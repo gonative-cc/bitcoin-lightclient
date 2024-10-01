@@ -18,18 +18,22 @@ func (k Keeper) LatestBlock(goCtx context.Context, req *types.QueryLatestBlockRe
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	
+
 	storeAdaptor := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdaptor, []byte{})
 
-	// TODO: set this key as constant in types package
-	value := store.Get(types.LatestBlockKey);
+
+	value := store.Get(types.LatestBlockKey)
 
 	var latestBlock types.BTCLightBlock
 
 	if err := latestBlock.Unmarshal(value); err != nil {
 		return nil, err
 	} else {
-		return &types.QueryLatestBlockResponse{Btclightblock: &latestBlock}, nil
+		// TODO: make logic more simple
+		var headerBytes types.BTCHeaderBytes
+
+		headerBytes, _ = types.ByteFromBlockHeader(latestBlock.Header)
+		return &types.QueryLatestBlockResponse{Height: int64(latestBlock.Height), HeaderHex: headerBytes.MarshalHex()}, nil
 	}
 }

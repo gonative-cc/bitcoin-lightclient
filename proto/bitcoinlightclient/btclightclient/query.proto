@@ -42,16 +42,18 @@ message QueryParamsResponse {
 }
 
 message QueryGetHeaderRequest {
-  string height = 1;
+  uint64 height = 1;
 }
 
 message QueryGetHeaderResponse {
-  string btcheader = 1;
+  int64 height = 1;
+  string headerHex = 2;
 }
 
 message QueryLatestBlockRequest {}
 
 message QueryLatestBlockResponse {
-  bytes btclightblock = 1 [(gogoproto.customtype) = "BTCLightBlock"];
+  int64 height = 1;
+  string headerHex = 2;
 }
 

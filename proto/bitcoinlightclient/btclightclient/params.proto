@@ -10,6 +10,4 @@ option go_package = "bitcoin-lightclient/x/btclightclient/types";
 message Params {
   option (amino.name) = "bitcoinlightclient/x/btclightclient/Params";
   option (gogoproto.equal) = true;
-
-  
 }

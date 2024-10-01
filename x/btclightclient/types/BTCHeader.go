@@ -107,3 +107,4 @@ func ByteFromBlockHeader(header *wire.BlockHeader) ([]byte, error) {
 
 	return data.Bytes(), err
 }
+

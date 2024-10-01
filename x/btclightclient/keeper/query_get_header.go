@@ -21,6 +21,19 @@ func (k Keeper) GetHeader(goCtx context.Context, req *types.QueryGetHeaderReques
 	storeAdaptor := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdaptor, []byte{})
 
-	value := store.Get([]byte("header"))
-	return &types.QueryGetHeaderResponse{Btcheader: string(value)}, nil
+	height := req.Height
+	key, _ := types.HeaderKey(height)
+	value := store.Get(key)
+
+	var lightblock types.BTCLightBlock
+	
+	if err := lightblock.Unmarshal(value); err == nil {
+		var headerBytes types.BTCHeaderBytes
+		headerBytes, _ = types.ByteFromBlockHeader(lightblock.Header)
+		
+		return &types.QueryGetHeaderResponse{Height: int64(lightblock.Height), HeaderHex: headerBytes.MarshalHex()}, nil
+	} else {
+		return nil, err
+	}
+
 }
