@@ -59,7 +59,7 @@ func (k Keeper) Logger() log.Logger {
 
 func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, []byte{})
+	store := prefix.NewStore(storeAdapter, []byte(types.StoreKey))
 	
 	// check hash chain
 	prevHeader := headers[0]
