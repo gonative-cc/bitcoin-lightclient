@@ -29,8 +29,8 @@ func sampleBlockHeader() wire.BlockHeader {
 func TestNewBlockHeaderFromByte(t *testing.T) {
 	blockHeaderBefore := sampleBlockHeader()
 	data, _ := ByteFromBlockHeader(&blockHeaderBefore)
+	blockHeaderAfter, err := NewBlockHeader(data)
 
-	blockHeaderAfter, err := NewBlockHeaderFromBytes(data)
 	if err != nil {
 		t.Fatalf("error")
 	} else {
@@ -42,27 +42,25 @@ func TestNewBlockHeaderFromByte(t *testing.T) {
 
 func TestByteFromBlockHeader(t *testing.T) {
 	blockHeader := sampleBlockHeader()
-	data, err := ByteFromBlockHeader(&blockHeader)
-	if err == nil {
-		fmt.Println(data)
-	} else {
+	_, err := ByteFromBlockHeader(&blockHeader)
+	if err != nil {
 		t.Fatalf("error")
 	}
 
 }
 
+func TestBlockHeaderHex(t *testing.T) {
+	headerHex := `00809c2cc58dd5bb09f12796b3c3a7d69b4901f857d274229ba00000000000000000000093ac838cd2308ba70827bc48bc0a8f62a4156a6e5cf9903ac478e1e44f035153971db164943805177722d461`
+	var btcHeaderBytes BTCHeaderBytes
+	btcHeaderBytes.UnmarshalHex(headerHex)
+	fmt.Println(btcHeaderBytes.NewBlockHeaderFromBytes())
+	
+}
+
 func TestNewBlockHeaderFromByteFail(t *testing.T) {
 	data := []byte(`abcd`)
-	_, err := NewBlockHeaderFromBytes(data)
+	_, err := NewBlockHeader(data)
 	if err == nil {
 		t.Fatalf("Should failed")
 	}
 }
-
-
-// func TestNewBTCLightBlock(t *testing.T) {
-// 	blockHeader := sampleBlockHeader()
-// 	lightBlock := NewBTCLightBlock(10, &blockHeader)
-
-
-// }

@@ -60,22 +60,28 @@ func (k Keeper) Logger() log.Logger {
 func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte{})
-
-	// latestBlock, _ := k.LatestBlock(ctx, &types.QueryLatestBlockRequest{});
 	
 	// check hash chain
 	prevHeader := headers[0]
 	for _, header := range headers[1:] {
 		prevBlockHash := prevHeader.BlockHash()
 		if header.PrevBlock != prevBlockHash {
-			return errors.New("Header not equal")
+			return errors.New("This is not hash chain")
 		}
 		prevHeader = header
 	}
 
-	for _, header := range headers {
+	for id, header := range headers {
 		headerBytes, _ := types.ByteFromBlockHeader(header)
-		store.Set([]byte("header"), headerBytes)
+		if key, err := types.HeaderKey(uint64(id)); err != nil {
+			return err;
+		} else {
+			store.Set(key, headerBytes)
+		}
 	}
+
+	lightBlock  := types.NewBTCLightBlock(10, prevHeader)
+	lightBlockBytes, _ := lightBlock.Marshal()
+	store.Set(types.LatestBlockKey, lightBlockBytes)
 	return nil
 }

@@ -23,11 +23,10 @@ func (k Keeper) LatestBlock(goCtx context.Context, req *types.QueryLatestBlockRe
 	store := prefix.NewStore(storeAdaptor, []byte{})
 
 	// TODO: set this key as constant in types package
-	value := store.Get([]byte(`lastBlock`));
+	value := store.Get(types.LatestBlockKey);
 
 	var latestBlock types.BTCLightBlock
 
-	
 	if err := latestBlock.Unmarshal(value); err != nil {
 		return nil, err
 	} else {
