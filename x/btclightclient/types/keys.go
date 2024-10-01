@@ -18,7 +18,7 @@ const (
 
 var (
 	ParamsKey = []byte("p_btclightclient")
-	LatestBlockKey = []byte{0x01}
+	LatestBlockKey = []byte("lastBlock")
 )
 
 func KeyPrefix(p string) []byte {
@@ -33,5 +33,10 @@ func HeaderKey(height uint64) ([]byte, error) {
 	if  err := binary.Write(buf, binary.BigEndian, height); err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+
+	key := make([]byte, 1)
+	key[0] = 1;
+	
+	value := append(key, buf.Bytes()...)
+	return value, nil
 }

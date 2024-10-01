@@ -13,7 +13,8 @@ func TestHeaderKey(t *testing.T) {
 	if err != nil {
 		t.Fatal("Shouldn't return error when transform header key")
 	} else {
-		if !bytes.Equal(headerKeyBytes, []byte{0, 0, 0, 0, 0, 0, 0, 0}) {
+		fmt.Println(headerKeyBytes)
+		if !bytes.Equal(headerKeyBytes, []byte{1, 0, 0, 0, 0, 0, 0, 0, 0}) {
 			t.Fatal("Wrong header key transform")
 		}
 	}

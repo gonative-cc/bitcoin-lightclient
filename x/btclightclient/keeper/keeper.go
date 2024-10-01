@@ -72,14 +72,17 @@ func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) e
 	}
 
 	for id, header := range headers {
-		headerBytes, _ := types.ByteFromBlockHeader(header)
+		headerBytesTMP, _ := types.ByteFromBlockHeader(header)
+		var headerBytes types.BTCHeaderBytes = headerBytesTMP
+
+		k.Logger().Debug(headerBytes.MarshalHex())
 		if key, err := types.HeaderKey(uint64(id)); err != nil {
 			return err;
 		} else {
 			store.Set(key, headerBytes)
 		}
 	}
-
+	
 	lightBlock  := types.NewBTCLightBlock(10, prevHeader)
 	lightBlockBytes, _ := lightBlock.Marshal()
 	store.Set(types.LatestBlockKey, lightBlockBytes)
