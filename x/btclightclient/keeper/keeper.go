@@ -57,12 +57,14 @@ func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+
 func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) error {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte(types.StoreKey))
 	
 	// check hash chain
 	prevHeader := headers[0]
+	
 	for _, header := range headers[1:] {
 		prevBlockHash := prevHeader.BlockHash()
 		if header.PrevBlock != prevBlockHash {
@@ -71,11 +73,11 @@ func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) e
 		prevHeader = header
 	}
 
+
 	for id, header := range headers {
 		headerBytesTMP, _ := types.ByteFromBlockHeader(header)
 		var headerBytes types.BTCHeaderBytes = headerBytesTMP
 
-		k.Logger().Debug(headerBytes.MarshalHex())
 		if key, err := types.HeaderKey(uint64(id)); err != nil {
 			return err;
 		} else {
@@ -86,5 +88,23 @@ func (k Keeper) InsertHeader(ctx context.Context, headers []*wire.BlockHeader) e
 	lightBlock  := types.NewBTCLightBlock(10, prevHeader)
 	lightBlockBytes, _ := lightBlock.Marshal()
 	store.Set(types.LatestBlockKey, lightBlockBytes)
+	return nil
+}
+
+
+func (k Keeper) InitGenesisBTCBlock(ctx context.Context, height uint64, headerStr string) error {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte(types.StoreKey))
+
+	var headerBytes types.BTCHeaderBytes
+	_ = headerBytes.UnmarshalHex(headerStr)
+	header, _ := headerBytes.NewBlockHeaderFromBytes()
+	
+	lightBlock := types.NewBTCLightBlock(height, header)
+	value, err := lightBlock.Marshal()
+	if err != nil {
+		return err
+	}
+	store.Set(types.LatestBlockKey, value)
 	return nil
 }
