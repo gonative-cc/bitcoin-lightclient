@@ -8,7 +8,7 @@ import (
 type LightBlock struct {
 	height int32
 	header *wire.BlockHeader
-	store  BTCLightClientStorage
+	lcStore  BTCLightClientStorage
 }
 
 func (lb LightBlock) Height() int32 {
@@ -24,14 +24,14 @@ func (lb LightBlock) TimeStamp() int64 {
 }
 
 func (lb LightBlock) Parent() blockchain.HeaderCtx {
-	if lb.height > 0 {
-		parentHeight := lb.height - 1
-		return lb.store.LightBlockAtHeight(parentHeight)
-	}
-	return nil
+	return lb.RelativeAncestorCtx(1)
 }
 
-func (l *LightBlock) RelativeAncestorCtx(
+func (lb *LightBlock) RelativeAncestorCtx(
 	distance int32) blockchain.HeaderCtx {
+	if (distance <= lb.Height()) {
+		ancestorHeight := lb.Height() - distance
+		return lb.lcStore.LightBlockAtHeight(ancestorHeight)
+	}
 	return nil
 }
