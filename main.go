@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import "github.com/btcsuite/btcd/chaincfg"
+
 
 func main() {
-	fmt.Println("Hello World")
+	btcLC := NewBTCLightClient(chaincfg.MainNetParams)
+	btcLC.Status()
 }
