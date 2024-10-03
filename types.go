@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 )
@@ -13,7 +15,20 @@ type BTCLightClient struct {
 }
 
 func (lc *BTCLightClient) InsertHeaders(headers []*wire.BlockHeader) error {
+	// check hash chain
+	latestHeader := lc.LatestHeader()
+	for _, header := range headers {
+		prevBlockHash := latestHeader.BlockHash()
+		if !header.PrevBlock.IsEqual(&prevBlockHash) {
+			return errors.New("Invalid Headers")
+		}
+		latestHeader = header
+	}
 	return nil
+}
+
+func (lc *BTCLightClient) LatestHeader() *wire.BlockHeader {
+	return lc.headers[lc.latestHeight]
 }
 
 func NewBTCLightClient(params chaincfg.Params) *BTCLightClient {
