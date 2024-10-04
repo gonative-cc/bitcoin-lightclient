@@ -1,16 +1,19 @@
 package main
 
-import "github.com/btcsuite/btcd/wire"
+import (
+	"bytes"
 
-type BTCHeaderBytes []byte
+	"github.com/btcsuite/btcd/wire"
+)
 
-const BTCHeaderSize = 80
+// type BTCHeaderBytes []byte
+// const BTCHeaderSize = 80
 
-func NewBlockHeader(btcHeaderBytes BTCHeaderBytes) (*wire.BlockHeader, error) {
-	return nil, nil
+func NewBlockHeader(data []byte) (*wire.BlockHeader, error) {
+	var header wire.BlockHeader
+	reader := bytes.NewReader(data)
+	err := header.Deserialize(reader)
+
+	return &header, err
 }
-
-
-
-
 

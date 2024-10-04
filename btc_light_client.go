@@ -106,3 +106,16 @@ func (lc BTCLightClient) Status() {
 	fmt.Println(lc.params.Name)
 	fmt.Println("Status of BTC light client")
 }
+
+func NewBTCLightClientWithData(params *chaincfg.Params, headers []*wire.BlockHeader) *BTCLightClient{
+	lcStore := NewLCStorage()
+
+	lc := &BTCLightClient {
+		params: params,
+			btc_storage: lcStore,
+		}
+	for id, header := range headers {
+		lc.AddHeader(int64(id), header)
+	}
+	return lc
+}
