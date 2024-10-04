@@ -91,7 +91,8 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(header *wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	if err := blockchain.CheckBlockHeaderContext(header, lc.btc_storage.LatestLightBlock(), noFlag, lc, false); err != nil {
+	// var noFlag blockchain.BehaviorFlags
+	if err := blockchain.CheckBlockHeaderContext(header, lc.btc_storage.LatestLightBlock(), noFlag, lc, true); err != nil {
 		return err
 	}
 
@@ -107,7 +108,7 @@ func (lc BTCLightClient) Status() {
 	fmt.Println("Status of BTC light client")
 }
 
-func NewBTCLightClientWithData(params *chaincfg.Params, headers []*wire.BlockHeader) *BTCLightClient{
+func NewBTCLightClientWithData(params *chaincfg.Params, headers []*wire.BlockHeader, start int) *BTCLightClient{
 	lcStore := NewLCStorage()
 
 	lc := &BTCLightClient {
@@ -115,7 +116,7 @@ func NewBTCLightClientWithData(params *chaincfg.Params, headers []*wire.BlockHea
 			btc_storage: lcStore,
 		}
 	for id, header := range headers {
-		lc.AddHeader(int64(id), header)
+		lc.AddHeader(int64(id + start) , header)
 	}
 	return lc
 }
