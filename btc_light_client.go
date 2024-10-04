@@ -47,7 +47,22 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 	return nil, nil
 }
 
+func (lc *BTCLightClient) AddHeader(height int64, header *wire.BlockHeader) error {
+	return lc.btc_storage.AddHeader(height, header)
+}
+
+// We assume we always insert valid header. Acctually, Cosmos can revert a state
+// when module return error so this assumtion is reasonable 
 func (lc *BTCLightClient) InsertHeaders(headers []*wire.BlockHeader) error {
+	latestHeight := lc.btc_storage.LatestHeight()
+	for _, header := range headers {
+		if err := lc.CheckHeader(header); err != nil {
+			return err
+		}
+
+		latestHeight = latestHeight + 1 
+		lc.AddHeader(latestHeight, header)
+	}	
 	return nil
 }
 

@@ -1,6 +1,9 @@
 package main
 
-import "github.com/btcsuite/btcd/blockchain"
+import (
+	"github.com/btcsuite/btcd/blockchain"
+	"github.com/btcsuite/btcd/wire"
+)
 
 
 var _ blockchain.HeaderCtx = (*LightBlock)(nil)
@@ -9,6 +12,7 @@ type BTCLightClientStorage interface {
 	LightBlockAtHeight(int64) blockchain.HeaderCtx
 	LatestHeight() int64
 	LatestLightBlock() blockchain.HeaderCtx
+	AddHeader(height int64, header *wire.BlockHeader) error 
 }
 
 type LCStorage struct {
@@ -34,4 +38,11 @@ func (lcStore *LCStorage) LatestHeight() int64 {
 
 func (lcStore *LCStorage) LatestLightBlock() blockchain.HeaderCtx {
 	return lcStore.lightblockMap[lcStore.LatestHeight()]
+}
+
+func (lcStore *LCStorage) AddHeader(height int64, header *wire.BlockHeader) error {
+	lightBlock := NewLightBlock(int32(height), header, lcStore)
+	lcStore.latestHeight = height
+	lcStore.lightblockMap[height] = lightBlock
+	return nil
 }
