@@ -10,17 +10,25 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
+var _ blockchain.HeaderCtx = (*LightBlock)(nil)
+
 type BTCLightClient struct {
-	params       *chaincfg.Params
+	params      *chaincfg.Params
 	btc_storage BTCLightClientStorage
 }
 
+func NewBTCLightClient(params *chaincfg.Params) *BTCLightClient {
+	return &BTCLightClient{
+		params:      params,
+		btc_storage: NewLCStorage(),
+	}
+}
 func (lc BTCLightClient) ChainParams() *chaincfg.Params {
 	return lc.params
 }
 
 func (lc *BTCLightClient) BlocksPerRetarget() int32 {
-	return int32(lc.params.TargetTimespan/time.Second)
+	return int32(lc.params.TargetTimespan / time.Second)
 }
 
 func (lc *BTCLightClient) MinRetargetTimespan() int64 {
@@ -32,7 +40,7 @@ func (lc *BTCLightClient) MaxRetargetTimespan() int64 {
 }
 
 func (lc *BTCLightClient) VerifyCheckpoint(height int32, hash *chainhash.Hash) bool {
-	return false 
+	return false
 }
 
 func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error) {
@@ -43,11 +51,12 @@ func (lc *BTCLightClient) InsertHeaders(headers []*wire.BlockHeader) error {
 	return nil
 }
 
-type BlockMedianTimeSource struct{
+type BlockMedianTimeSource struct {
 	h *wire.BlockHeader
 }
-func newBlockMedianTimeSource(header *wire.BlockHeader) *BlockMedianTimeSource{
-	return &BlockMedianTimeSource {
+
+func newBlockMedianTimeSource(header *wire.BlockHeader) *BlockMedianTimeSource {
+	return &BlockMedianTimeSource{
 		h: header,
 	}
 }
@@ -62,12 +71,12 @@ func (b *BlockMedianTimeSource) AddTimeSample(_ string, _time time.Time) {
 
 func (b *BlockMedianTimeSource) Offset() time.Duration {
 	// don't need to update any
-	return 0 
+	return 0
 }
 
 func (lc *BTCLightClient) CheckHeader(header *wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	if err := blockchain.CheckBlockHeaderContext(header, lc.btc_storage.LatestLightBlock(), noFlag, lc, false) ; err != nil {
+	if err := blockchain.CheckBlockHeaderContext(header, lc.btc_storage.LatestLightBlock(), noFlag, lc, false); err != nil {
 		return err
 	}
 
@@ -76,7 +85,6 @@ func (lc *BTCLightClient) CheckHeader(header *wire.BlockHeader) error {
 	}
 	return nil
 }
-
 
 func (lc BTCLightClient) Status() {
 	fmt.Println(lc.params.Net)

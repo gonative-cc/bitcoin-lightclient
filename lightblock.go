@@ -19,7 +19,7 @@ func (lb LightBlock) Bits() uint32 {
 	return lb.header.Bits
 }
 
-func (lb LightBlock) TimeStamp() int64 {
+func (lb LightBlock) Timestamp() int64 {
 	return lb.header.Timestamp.Unix()
 }
 
@@ -31,7 +31,7 @@ func (lb *LightBlock) RelativeAncestorCtx(
 	distance int32) blockchain.HeaderCtx {
 	if (distance <= lb.Height()) {
 		ancestorHeight := lb.Height() - distance
-		return lb.lcStore.LightBlockAtHeight(ancestorHeight)
+		return lb.lcStore.LightBlockAtHeight(int64(ancestorHeight))
 	}
 	return nil
 }
