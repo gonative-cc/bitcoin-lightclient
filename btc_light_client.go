@@ -24,7 +24,7 @@ func NewBTCLightClient(params *chaincfg.Params) *BTCLightClient {
 	}
 }
 
-func (lc BTCLightClient) ChainParams() *chaincfg.Params {
+func (lc *BTCLightClient) ChainParams() *chaincfg.Params {
 	return lc.params
 }
 
@@ -103,7 +103,7 @@ func (lc *BTCLightClient) CheckHeader(header *wire.BlockHeader) error {
 }
 
 // query status, use for test
-func (lc BTCLightClient) Status() {
+func (lc *BTCLightClient) Status() {
 	fmt.Println(lc.params.Net)
 	latestBlock := lc.btcStore.LatestLightBlock()
 	fmt.Println(latestBlock.Height())

@@ -11,19 +11,19 @@ type LightBlock struct {
 	lcStore Store
 }
 
-func (lb LightBlock) Height() int32 {
+func (lb *LightBlock) Height() int32 {
 	return lb.height
 }
 
-func (lb LightBlock) Bits() uint32 {
+func (lb *LightBlock) Bits() uint32 {
 	return lb.header.Bits
 }
 
-func (lb LightBlock) Timestamp() int64 {
+func (lb *LightBlock) Timestamp() int64 {
 	return lb.header.Timestamp.Unix()
 }
 
-func (lb LightBlock) Parent() blockchain.HeaderCtx {
+func (lb *LightBlock) Parent() blockchain.HeaderCtx {
 	return lb.RelativeAncestorCtx(1)
 }
 
