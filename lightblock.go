@@ -38,8 +38,8 @@ func (lb *LightBlock) RelativeAncestorCtx(
 
 func NewLightBlock(height int32, header *wire.BlockHeader, lcStore Store) *LightBlock {
 	return &LightBlock{
-		height: height,
-		header: header,
+		height:  height,
+		header:  header,
 		lcStore: lcStore,
 	}
 }

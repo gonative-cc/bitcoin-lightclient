@@ -18,4 +18,3 @@ func BlockHeaderFromHex(hexStr string) (*wire.BlockHeader, error) {
 	err := header.Deserialize(reader)
 	return &header, err
 }
-

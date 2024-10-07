@@ -13,13 +13,13 @@ import (
 var _ blockchain.HeaderCtx = (*LightBlock)(nil)
 
 type BTCLightClient struct {
-	params      *chaincfg.Params
+	params   *chaincfg.Params
 	btcStore Store
 }
 
 func NewBTCLightClient(params *chaincfg.Params) *BTCLightClient {
 	return &BTCLightClient{
-		params:      params,
+		params:   params,
 		btcStore: NewMemStore(),
 	}
 }
@@ -53,7 +53,7 @@ func (lc *BTCLightClient) AddHeader(height int64, header *wire.BlockHeader) erro
 }
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
-// when module return error so this assumtion is reasonable 
+// when module return error so this assumtion is reasonable
 func (lc *BTCLightClient) InsertHeaders(headers []*wire.BlockHeader) error {
 	latestHeight := lc.btcStore.LatestHeight()
 	for _, header := range headers {
@@ -61,9 +61,9 @@ func (lc *BTCLightClient) InsertHeaders(headers []*wire.BlockHeader) error {
 			return err
 		}
 
-		latestHeight = latestHeight + 1 
+		latestHeight = latestHeight + 1
 		lc.AddHeader(latestHeight, header)
-	}	
+	}
 	return nil
 }
 
@@ -81,7 +81,7 @@ func (b *BlockMedianTimeSource) AdjustedTime() time.Time {
 	return b.h.Timestamp
 }
 
-func (b *BlockMedianTimeSource) AddTimeSample(_ string, _time time.Time) {
+func (b *BlockMedianTimeSource) AddTimeSample(string, time.Time) {
 	// We only verify header, so we don't need do anything here
 }
 
@@ -109,15 +109,15 @@ func (lc BTCLightClient) Status() {
 	fmt.Println(latestBlock.Height())
 }
 
-func NewBTCLightClientWithData(params *chaincfg.Params, headers []*wire.BlockHeader, start int) *BTCLightClient{
+func NewBTCLightClientWithData(params *chaincfg.Params, headers []*wire.BlockHeader, start int) *BTCLightClient {
 	lcStore := NewMemStore()
 
-	lc := &BTCLightClient {
-		params: params,
-			btcStore: lcStore,
-		}
+	lc := &BTCLightClient{
+		params:   params,
+		btcStore: lcStore,
+	}
 	for id, header := range headers {
-		lc.AddHeader(int64(id + start) , header)
+		lc.AddHeader(int64(id+start), header)
 	}
 	return lc
 }

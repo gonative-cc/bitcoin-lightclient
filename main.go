@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	start_height := 204100;
-	header_strings := []string{
+	startHeight := 204100
+	headerStrings := []string{
 		`020000004cdba1415b2c6e7808c1b3c18df1374238454f7104203475bf01000000000000c17ea9d06015dc83902911cd24837a8ba4bdc0c1d72b873f906d921e06e48d2f984a8250ef75051a72a8061a`,
 		`01000000a7e267eae437f7c99115682d3e104999b6b5b01f34f3f5d763030000000000004beb49a1caa3941adc853cd605dd030e5ab690fcd58ac76233397653c49f07ecdb4a8250ef75051a5e58c1fe`,
 		`0100000032e89326a365919ac08d1f0bd98d097240fd5c8dd21b7c38e5030000000000003d3645c6e6008583570d618041b2452497d55c0cb936529af92f8191e0dbdcc9764b8250ef75051ac733c738`,
@@ -24,19 +24,18 @@ func main() {
 		`01000000d19ffbe9a876f329acb05feadc90dae27578762e3f538f5a08050000000000005c8524057100e644fb3680b5b5af3d79f24fc4e51f374d9205e926e9b9cafd9c38648250ef75051a20379982`,
 	}
 
-	headers := make([]*wire.BlockHeader, len(header_strings))
+	headers := make([]*wire.BlockHeader, len(headerStrings))
 
-	for id, header_str := range header_strings {
-		h, _ := BlockHeaderFromHex(header_str)
-		headers[id] = h 
+	for id, headerStr := range headerStrings {
+		h, _ := BlockHeaderFromHex(headerStr)
+		headers[id] = h
 	}
 
-	header_insert, _ := BlockHeaderFromHex("02000000670ffede95831fb41c09d0d104285d6182ce1c8577da40506405000000000000e54435f50bfc776b8f3d9ac047963ee6bdddd8d40b69236b4d97acb52a1fdce41e678250ef75051a88842656")
+	headerInsert, _ := BlockHeaderFromHex("02000000670ffede95831fb41c09d0d104285d6182ce1c8577da40506405000000000000e54435f50bfc776b8f3d9ac047963ee6bdddd8d40b69236b4d97acb52a1fdce41e678250ef75051a88842656")
 
-	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, start_height)
+	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
 
-	
-	if err := btcLC.InsertHeaders([]*wire.BlockHeader{header_insert}); err != nil {
+	if err := btcLC.InsertHeaders([]*wire.BlockHeader{headerInsert}); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("Insert success")

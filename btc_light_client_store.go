@@ -5,14 +5,13 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-
 var _ blockchain.HeaderCtx = (*LightBlock)(nil)
 
 type Store interface {
 	LightBlockAtHeight(int64) blockchain.HeaderCtx
 	LatestHeight() int64
 	LatestLightBlock() blockchain.HeaderCtx
-	AddHeader(height int64, header *wire.BlockHeader) error 
+	AddHeader(height int64, header *wire.BlockHeader) error
 }
 
 type MemStore struct {
@@ -26,7 +25,6 @@ func NewMemStore() *MemStore {
 		lightblockMap: make(map[int64]*LightBlock),
 	}
 }
-
 
 func (lcStore *MemStore) LightBlockAtHeight(height int64) blockchain.HeaderCtx {
 	return lcStore.lightblockMap[height]
