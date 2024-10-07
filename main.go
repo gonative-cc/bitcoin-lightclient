@@ -27,12 +27,11 @@ func main() {
 	headers := make([]*wire.BlockHeader, len(header_strings))
 
 	for id, header_str := range header_strings {
-		h, _ := NewBlockHeader(header_str)
+		h, _ := BlockHeaderFromHex(header_str)
 		headers[id] = h 
 	}
 
-
-	header_insert, _ := NewBlockHeader("02000000670ffede95831fb41c09d0d104285d6182ce1c8577da40506405000000000000e54435f50bfc776b8f3d9ac047963ee6bdddd8d40b69236b4d97acb52a1fdce41e678250ef75051a88842656")
+	header_insert, _ := BlockHeaderFromHex("02000000670ffede95831fb41c09d0d104285d6182ce1c8577da40506405000000000000e54435f50bfc776b8f3d9ac047963ee6bdddd8d40b69236b4d97acb52a1fdce41e678250ef75051a88842656")
 
 	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, start_height)
 

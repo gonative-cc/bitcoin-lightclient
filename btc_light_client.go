@@ -14,15 +14,16 @@ var _ blockchain.HeaderCtx = (*LightBlock)(nil)
 
 type BTCLightClient struct {
 	params      *chaincfg.Params
-	btc_storage BTCLightClientStorage
+	btcStore Store
 }
 
 func NewBTCLightClient(params *chaincfg.Params) *BTCLightClient {
 	return &BTCLightClient{
 		params:      params,
-		btc_storage: NewLCStorage(),
+		btcStore: NewMemStore(),
 	}
 }
+
 func (lc BTCLightClient) ChainParams() *chaincfg.Params {
 	return lc.params
 }
@@ -48,13 +49,13 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 }
 
 func (lc *BTCLightClient) AddHeader(height int64, header *wire.BlockHeader) error {
-	return lc.btc_storage.AddHeader(height, header)
+	return lc.btcStore.AddHeader(height, header)
 }
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable 
 func (lc *BTCLightClient) InsertHeaders(headers []*wire.BlockHeader) error {
-	latestHeight := lc.btc_storage.LatestHeight()
+	latestHeight := lc.btcStore.LatestHeight()
 	for _, header := range headers {
 		if err := lc.CheckHeader(header); err != nil {
 			return err
@@ -91,8 +92,7 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(header *wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	// var noFlag blockchain.BehaviorFlags
-	if err := blockchain.CheckBlockHeaderContext(header, lc.btc_storage.LatestLightBlock(), noFlag, lc, true); err != nil {
+	if err := blockchain.CheckBlockHeaderContext(header, lc.btcStore.LatestLightBlock(), noFlag, lc, true); err != nil {
 		return err
 	}
 
@@ -102,18 +102,19 @@ func (lc *BTCLightClient) CheckHeader(header *wire.BlockHeader) error {
 	return nil
 }
 
+// query status, use for test
 func (lc BTCLightClient) Status() {
 	fmt.Println(lc.params.Net)
-	fmt.Println(lc.params.Name)
-	fmt.Println("Status of BTC light client")
+	latestBlock := lc.btcStore.LatestLightBlock()
+	fmt.Println(latestBlock.Height())
 }
 
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []*wire.BlockHeader, start int) *BTCLightClient{
-	lcStore := NewLCStorage()
+	lcStore := NewMemStore()
 
 	lc := &BTCLightClient {
 		params: params,
-			btc_storage: lcStore,
+			btcStore: lcStore,
 		}
 	for id, header := range headers {
 		lc.AddHeader(int64(id + start) , header)

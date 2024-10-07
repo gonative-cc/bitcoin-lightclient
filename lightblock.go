@@ -8,7 +8,7 @@ import (
 type LightBlock struct {
 	height  int32
 	header  *wire.BlockHeader
-	lcStore BTCLightClientStorage
+	lcStore Store
 }
 
 func (lb LightBlock) Height() int32 {
@@ -36,7 +36,7 @@ func (lb *LightBlock) RelativeAncestorCtx(
 	return nil
 }
 
-func NewLightBlock(height int32, header *wire.BlockHeader, lcStore BTCLightClientStorage) *LightBlock {
+func NewLightBlock(height int32, header *wire.BlockHeader, lcStore Store) *LightBlock {
 	return &LightBlock{
 		height: height,
 		header: header,
