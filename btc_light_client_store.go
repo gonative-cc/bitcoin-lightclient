@@ -4,7 +4,6 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-
 type Store interface {
 	LightBlockAtHeight(int64) *LightBlock
 	LatestHeight() int64
