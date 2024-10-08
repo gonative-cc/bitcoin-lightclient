@@ -11,10 +11,10 @@ import (
 // type BTCHeaderBytes []byte
 // const BTCHeaderSize = 80
 
-func BlockHeaderFromHex(hexStr string) (*wire.BlockHeader, error) {
+func BlockHeaderFromHex(hexStr string) (wire.BlockHeader, error) {
 	data, _ := hex.DecodeString(hexStr)
 	var header wire.BlockHeader
 	reader := bytes.NewReader(data)
 	err := header.Deserialize(reader)
-	return &header, err
+	return header, err
 }

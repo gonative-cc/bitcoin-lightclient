@@ -11,7 +11,7 @@ type Store interface {
 	LightBlockAtHeight(int64) blockchain.HeaderCtx
 	LatestHeight() int64
 	LatestLightBlock() blockchain.HeaderCtx
-	AddHeader(height int64, header *wire.BlockHeader) error
+	AddHeader(height int64, header wire.BlockHeader) error
 }
 
 type MemStore struct {
@@ -38,7 +38,7 @@ func (lcStore *MemStore) LatestLightBlock() blockchain.HeaderCtx {
 	return lcStore.lightblockMap[lcStore.LatestHeight()]
 }
 
-func (lcStore *MemStore) AddHeader(height int64, header *wire.BlockHeader) error {
+func (lcStore *MemStore) AddHeader(height int64, header wire.BlockHeader) error {
 	lightBlock := NewLightBlock(int32(height), header, lcStore)
 	lcStore.latestHeight = height
 	lcStore.lightblockMap[height] = lightBlock

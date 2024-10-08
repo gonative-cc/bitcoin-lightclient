@@ -24,7 +24,7 @@ func main() {
 		`01000000d19ffbe9a876f329acb05feadc90dae27578762e3f538f5a08050000000000005c8524057100e644fb3680b5b5af3d79f24fc4e51f374d9205e926e9b9cafd9c38648250ef75051a20379982`,
 	}
 
-	headers := make([]*wire.BlockHeader, len(headerStrings))
+	headers := make([]wire.BlockHeader, len(headerStrings))
 
 	for id, headerStr := range headerStrings {
 		h, _ := BlockHeaderFromHex(headerStr)
@@ -35,7 +35,7 @@ func main() {
 
 	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
 
-	if err := btcLC.InsertHeaders([]*wire.BlockHeader{headerInsert}); err != nil {
+	if err := btcLC.InsertHeaders([]wire.BlockHeader{headerInsert}); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("Insert success")
