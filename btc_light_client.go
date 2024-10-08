@@ -65,6 +65,15 @@ func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
 	return nil
 }
 
+func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error{
+	// find the light block match with first header
+	firstHeader := headers[0]
+	if lightBlock := lc.btcStore.LightBlockByHash(firstHeader.BlockHash()); lightBlock != nil {
+		latestBlock := lc.btcStore.LatestLightBlock()
+	}
+	return nil
+}
+
 type BlockMedianTimeSource struct {
 	h *wire.BlockHeader
 }
