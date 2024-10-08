@@ -10,7 +10,6 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-
 type BTCLightClient struct {
 	params   *chaincfg.Params
 	btcStore Store
@@ -92,7 +91,7 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 func (lc *BTCLightClient) CheckHeader(header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
 	latestLightBlock := lc.btcStore.LatestLightBlock()
-	
+
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore), noFlag, lc, true); err != nil {
 		return err
 	}
