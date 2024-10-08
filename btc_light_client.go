@@ -10,7 +10,6 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-var _ blockchain.HeaderCtx = (*LightBlock)(nil)
 
 type BTCLightClient struct {
 	params   *chaincfg.Params
@@ -92,7 +91,9 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	if err := blockchain.CheckBlockHeaderContext(&header, lc.btcStore.LatestLightBlock(), noFlag, lc, true); err != nil {
+	latestLightBlock := lc.btcStore.LatestLightBlock()
+	
+	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore), noFlag, lc, true); err != nil {
 		return err
 	}
 
@@ -106,7 +107,7 @@ func (lc *BTCLightClient) CheckHeader(header wire.BlockHeader) error {
 func (lc *BTCLightClient) Status() {
 	fmt.Println(lc.params.Net)
 	latestBlock := lc.btcStore.LatestLightBlock()
-	fmt.Println(latestBlock.Height())
+	fmt.Println(latestBlock.Height)
 }
 
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHeader, start int) *BTCLightClient {

@@ -1,16 +1,14 @@
 package main
 
 import (
-	"github.com/btcsuite/btcd/blockchain"
 	"github.com/btcsuite/btcd/wire"
 )
 
-var _ blockchain.HeaderCtx = (*LightBlock)(nil)
 
 type Store interface {
-	LightBlockAtHeight(int64) blockchain.HeaderCtx
+	LightBlockAtHeight(int64) *LightBlock
 	LatestHeight() int64
-	LatestLightBlock() blockchain.HeaderCtx
+	LatestLightBlock() *LightBlock
 	AddHeader(height int64, header wire.BlockHeader) error
 }
 
@@ -26,7 +24,7 @@ func NewMemStore() *MemStore {
 	}
 }
 
-func (lcStore *MemStore) LightBlockAtHeight(height int64) blockchain.HeaderCtx {
+func (lcStore *MemStore) LightBlockAtHeight(height int64) *LightBlock {
 	return lcStore.lightblockMap[height]
 }
 
@@ -34,12 +32,12 @@ func (lcStore *MemStore) LatestHeight() int64 {
 	return lcStore.latestHeight
 }
 
-func (lcStore *MemStore) LatestLightBlock() blockchain.HeaderCtx {
+func (lcStore *MemStore) LatestLightBlock() *LightBlock {
 	return lcStore.lightblockMap[lcStore.LatestHeight()]
 }
 
 func (lcStore *MemStore) AddHeader(height int64, header wire.BlockHeader) error {
-	lightBlock := NewLightBlock(int32(height), header, lcStore)
+	lightBlock := NewLightBlock(int32(height), header)
 	lcStore.latestHeight = height
 	lcStore.lightblockMap[height] = lightBlock
 	return nil
