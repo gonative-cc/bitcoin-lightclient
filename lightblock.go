@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math/big"
+
 	"github.com/btcsuite/btcd/blockchain"
 	"github.com/btcsuite/btcd/wire"
 )
@@ -10,6 +12,11 @@ var _ blockchain.HeaderCtx = (*HeaderContext)(nil)
 type LightBlock struct {
 	Height int32
 	Header wire.BlockHeader
+	TotalWork *big.Int
+}
+
+func (lb LightBlock) CalcWork() *big.Int{
+	return blockchain.CalcWork(lb.Header.Bits)
 }
 
 type HeaderContext struct {
@@ -47,6 +54,7 @@ func NewLightBlock(height int32, header wire.BlockHeader) *LightBlock {
 	return &LightBlock{
 		Height: height,
 		Header: header,
+		TotalWork: blockchain.CalcWork(header.Bits),
 	}
 }
 
