@@ -55,17 +55,16 @@ func (lc *BTCLightClient) AddHeader(height int64, header wire.BlockHeader) error
 // when module return error so this assumtion is reasonable
 func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
 	latestHeight := lc.btcStore.LatestHeight()
-	
+
 	return lc.insertHeadersWithPosition(uint64(latestHeight), headers)
 }
 
 func (lc *BTCLightClient) insertHeadersWithPosition(height uint64, headers []wire.BlockHeader) error {
-	insertHeight := height + 1;
+	insertHeight := height + 1
 	for _, header := range headers {
 		if err := lc.CheckHeader(header); err != nil {
 			return err
 		}
-		
 
 		lc.AddHeader(int64(insertHeight), header)
 		insertHeight = insertHeight + 1
@@ -88,8 +87,8 @@ func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
 		} else {
 			return errors.New("Invalid fork")
 		}
-	} 
-	return  errors.New("Header not belong to chain")
+	}
+	return errors.New("Header not belong to chain")
 
 }
 
