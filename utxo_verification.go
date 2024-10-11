@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
+
+	"github.com/btcsuite/btcd/btcutil"
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
 type Hash256Digest [32]byte
-
 
 // We copy logic from bitcoin-spv. The main reason is bitcoin-spv is not maintain anymore.
 // https://github.com/summa-tx/bitcoin-spv/
@@ -20,17 +22,14 @@ func Hash256MerkleStep(a []byte, b []byte) Hash256Digest {
 	return Hash256(c)
 }
 
-
 func Hash256(in []byte) Hash256Digest {
 	first := sha256.Sum256(in)
 	second := sha256.Sum256(first[:])
 	return Hash256Digest(second)
 }
 
-
-
 // follow logic on bitcoin-spv.
-// This is check the tx belong to merkle tree hash in BTC header. 
+// This is check the tx belong to merkle tree hash in BTC header.
 func VerifyHash256Merkle(proof []byte, index uint) bool {
 	var current Hash256Digest
 	idx := index
@@ -70,8 +69,13 @@ func VerifyHash256Merkle(proof []byte, index uint) bool {
 	return bytes.Equal(current[:], root)
 }
 
-
 // verify UTXO on latest block
-func (lc *BTCLightClient) VerifyUTXO() {
-	
+func (lc *BTCLightClient) VerifyUTXO(tx *btcutil.Tx, merkleRoot *chainhash.Hash, merklePath []byte, index uint) bool {
+	txHash := tx.Hash()
+	proof := []byte{}
+	proof = append(proof, txHash[:]...)
+	proof = append(proof, merklePath...)
+	proof = append(proof, merkleRoot[:]...)
+
+	return VerifyHash256Merkle(proof, index)
 }
