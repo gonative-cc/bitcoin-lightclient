@@ -47,8 +47,8 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 	return nil, nil
 }
 
-func (lc *BTCLightClient) AddHeader(height int64, header wire.BlockHeader) error {
-	return lc.btcStore.AddHeader(height, header)
+func (lc *BTCLightClient) SetHeader(height int64, header wire.BlockHeader) error {
+	return lc.btcStore.SetHeader(height, header)
 }
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
@@ -66,7 +66,7 @@ func (lc *BTCLightClient) insertHeadersWithPosition(height uint64, headers []wir
 			return err
 		}
 
-		lc.AddHeader(int64(insertHeight), header)
+		lc.SetHeader(int64(insertHeight), header)
 		insertHeight = insertHeight + 1
 	}
 	return nil
@@ -144,7 +144,7 @@ func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHead
 		btcStore: lcStore,
 	}
 	for id, header := range headers {
-		lc.AddHeader(int64(id+start), header)
+		lc.SetHeader(int64(id+start), header)
 	}
 	return lc
 }

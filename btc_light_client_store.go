@@ -11,7 +11,7 @@ type Store interface {
 	LightBlockAtHeight(int64) *LightBlock
 	LatestHeight() int64
 	LatestLightBlock() *LightBlock
-	AddHeader(height int64, header wire.BlockHeader) error
+	SetHeader(height int64, header wire.BlockHeader) error
 	CurrentTotalWork() *big.Int
 	LightBlockByHash(hash chainhash.Hash) *LightBlock
 }
@@ -46,7 +46,7 @@ func (s *MemStore) LightBlockByHash(hash chainhash.Hash) *LightBlock {
 	return s.lightBlockByHashMap[hash]
 }
 
-func (s *MemStore) AddHeader(height int64, header wire.BlockHeader) error {
+func (s *MemStore) SetHeader(height int64, header wire.BlockHeader) error {
 	lightBlock := NewLightBlock(int32(height), header)
 
 	if previousBlock := s.LightBlockAtHeight(height - 1); previousBlock != nil {
