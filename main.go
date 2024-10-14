@@ -59,5 +59,6 @@ func main() {
 	}
 
 	btcLC.HandleFork(otherHeaders)
+	
 	btcLC.Status()
 }

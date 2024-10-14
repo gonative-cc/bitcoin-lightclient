@@ -61,9 +61,9 @@ func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
 
 func (lc *BTCLightClient) insertHeadersWithPosition(height uint64, headers []wire.BlockHeader) error {
 	insertHeight := height + 1
-	for _, header := range headers {
+	for i, header := range headers {
 		if err := lc.CheckHeader(header); err != nil {
-			return err
+			return NewInvalidHeaderErr(header.BlockHash().String(), i)
 		}
 
 		lc.SetHeader(int64(insertHeight), header)
