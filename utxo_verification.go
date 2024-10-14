@@ -8,11 +8,20 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
+
+
+func ReverseBytes(data []byte) []byte {
+	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
+		data[i], data[j] = data[j], data[i]
+	}
+	return data
+}
+
 type Hash256Digest [32]byte
 
 // We copy logic from bitcoin-spv. The main reason is bitcoin-spv is not maintain anymore.
 // https://github.com/summa-tx/bitcoin-spv/
-// Thank summa-tx for their awesome repo
+// Thank summa-tx for their awesome work
 
 // Hash256MerkleStep concatenates and hashes two inputs for merkle proving
 func Hash256MerkleStep(a []byte, b []byte) Hash256Digest {
@@ -48,9 +57,10 @@ func VerifyHash256Merkle(proof []byte, index uint) bool {
 	}
 
 	root := proof[proofLength-32:]
-
+	
 	cur := proof[:32:32]
 	copy(current[:], cur)
+
 
 	numSteps := (proofLength / 32) - 1
 

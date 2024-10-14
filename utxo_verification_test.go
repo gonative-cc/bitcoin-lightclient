@@ -2,25 +2,10 @@ package main
 
 import (
 	"encoding/hex"
-	"fmt"
 	"testing"
 )
 
 
-func BigToLitle(big []byte) []byte {
-	little := make([]byte, len(big))
-	for i := 0; i < len(big); i += 4 {
-		end := i + 4
-		if end > len(big) {
-			end = len(big)
-		}
-		for j := 0; j < end-i; j++ {
-			little[i+j] = little[end-1-j]
-		}
-	}
-	return little
-	
-}
 
 func TestUTXOVerification(t *testing.T) {
 	merkleProofStrings := []string{
@@ -35,21 +20,21 @@ func TestUTXOVerification(t *testing.T) {
 		"e4dc1f2ab5ac974d6b23690bd4d8ddbde63e9647c09a3d8f6b77fc0bf53544e5",
 	}
 	tx, _ := hex.DecodeString("4224625b409323d17e8842f935ce3764c3e7203ad0de3d403558881089cb3632")
-	tx = BigToLitle(tx)
+	tx = ReverseBytes(tx)
 	proof := []byte{}
 
-	
+
 	proof = append(proof, tx...)
 	
 	for _, element := range merkleProofStrings {
 		b, _ := hex.DecodeString(element)
-		b = BigToLitle(b)
+		b = ReverseBytes(b)
 		proof = append(proof, b...)
 	}
 
 
-	fmt.Println(len(proof))
 	ans := VerifyHash256Merkle(proof, 0)
+
 	if !ans {
 		t.Fatal("invalid")
 	}
