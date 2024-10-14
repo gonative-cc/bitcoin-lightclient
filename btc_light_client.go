@@ -88,7 +88,7 @@ func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
 			return errors.New("Invalid fork")
 		}
 	}
-	return errors.New("Header not belong to chain")
+	return errors.New("Header doesn't belong to the chain")
 
 }
 
