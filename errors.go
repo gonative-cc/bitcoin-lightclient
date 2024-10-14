@@ -17,5 +17,5 @@ func NewInvalidHeaderErr(headerHex string, id int) *InvalidHeaderErr {
 }
 
 func (e *InvalidHeaderErr) Error() string {
-	return  fmt.Sprintf("invalid header %s at index %d", e.HeaderHex, e.Id)
+	return fmt.Sprintf("invalid header %s at index %d", e.HeaderHex, e.Id)
 }

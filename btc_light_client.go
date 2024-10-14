@@ -73,7 +73,6 @@ func (lc *BTCLightClient) insertHeaderStartAtHeight(height uint64, headers []wir
 	return nil
 }
 
-
 func (lc *BTCLightClient) computeTotalWorkFork(startBlock *LightBlock, headers []wire.BlockHeader) *big.Int {
 	totalWork := startBlock.TotalWork
 	for _, header := range headers {
@@ -82,14 +81,13 @@ func (lc *BTCLightClient) computeTotalWorkFork(startBlock *LightBlock, headers [
 	return totalWork
 }
 
-
 func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
 	// find the light block match with first header
 	firstHeader := headers[0]
 	if lightBlock := lc.btcStore.LightBlockByHash(firstHeader.BlockHash()); lightBlock != nil {
 		currentTotalWork := lc.btcStore.LatestLightBlock()
 		otherForkTotalWork := lc.computeTotalWorkFork(lightBlock, headers[1:])
-		
+
 		if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
 			return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
 		} else {
