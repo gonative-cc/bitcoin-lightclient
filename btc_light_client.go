@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/btcsuite/btcd/blockchain"
@@ -56,10 +57,10 @@ func (lc *BTCLightClient) SetHeader(height int64, header wire.BlockHeader) error
 func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
 	latestHeight := lc.btcStore.LatestHeight()
 
-	return lc.insertHeadersWithPosition(uint64(latestHeight), headers)
+	return lc.insertHeaderStartAtHeight(uint64(latestHeight), headers)
 }
 
-func (lc *BTCLightClient) insertHeadersWithPosition(height uint64, headers []wire.BlockHeader) error {
+func (lc *BTCLightClient) insertHeaderStartAtHeight(height uint64, headers []wire.BlockHeader) error {
 	insertHeight := height + 1
 	for i, header := range headers {
 		if err := lc.CheckHeader(header); err != nil {
@@ -72,18 +73,25 @@ func (lc *BTCLightClient) insertHeadersWithPosition(height uint64, headers []wir
 	return nil
 }
 
+
+func (lc *BTCLightClient) computeTotalWorkFork(startBlock *LightBlock, headers []wire.BlockHeader) *big.Int {
+	totalWork := startBlock.TotalWork
+	for _, header := range headers {
+		totalWork.Add(totalWork, blockchain.CalcWork(header.Bits))
+	}
+	return totalWork
+}
+
+
 func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
 	// find the light block match with first header
 	firstHeader := headers[0]
 	if lightBlock := lc.btcStore.LightBlockByHash(firstHeader.BlockHash()); lightBlock != nil {
-		latestBlock := lc.btcStore.LatestLightBlock()
-		totalWorkOnSecondChain := lightBlock.TotalWork
-		for _, header := range headers[1:] {
-			totalWorkOnSecondChain.Add(totalWorkOnSecondChain, blockchain.CalcWork(header.Bits))
-		}
-
-		if totalWorkOnSecondChain.Cmp(latestBlock.TotalWork) > 0 {
-			return lc.insertHeadersWithPosition(uint64(lightBlock.Height), headers[1:])
+		currentTotalWork := lc.btcStore.LatestLightBlock()
+		otherForkTotalWork := lc.computeTotalWorkFork(lightBlock, headers[1:])
+		
+		if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
+			return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
 		} else {
 			return errors.New("Invalid fork")
 		}
