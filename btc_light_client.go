@@ -110,12 +110,7 @@ func (lc *BTCLightClient) Status() {
 }
 
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHeader, start int) *BTCLightClient {
-	lcStore := NewMemStore()
-
-	lc := &BTCLightClient{
-		params:   params,
-		btcStore: lcStore,
-	}
+	lc := NewBTCLightClient(params)
 	for id, header := range headers {
 		lc.AddHeader(int64(id+start), header)
 	}
