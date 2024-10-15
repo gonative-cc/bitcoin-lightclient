@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"slices"
 	"testing"
+
+	"gotest.tools/assert"
 )
 
 

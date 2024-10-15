@@ -20,7 +20,7 @@ func Hash256MerkleStep(a, b []byte) Hash256Digest {
 	c := []byte{}
 	c = append(c, a...)
 	c = append(c, b...)
-	return Hash256(c)
+	return Hash256Digest(c)
 }
 
 func DoubleHash(in []byte) Hash256Digest {
