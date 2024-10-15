@@ -9,14 +9,6 @@ import (
 )
 
 
-
-func ReverseBytes(data []byte) []byte {
-	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
-		data[i], data[j] = data[j], data[i]
-	}
-	return data
-}
-
 type Hash256Digest [32]byte
 
 // We copy logic from bitcoin-spv. The main reason is bitcoin-spv is not maintain anymore.
@@ -86,6 +78,6 @@ func (lc *BTCLightClient) VerifyUTXO(tx *btcutil.Tx, merkleRoot *chainhash.Hash,
 	proof = append(proof, txHash[:]...)
 	proof = append(proof, merklePath...)
 	proof = append(proof, merkleRoot[:]...)
-
+	
 	return VerifyHash256Merkle(proof, index)
 }

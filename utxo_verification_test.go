@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"slices"
 	"testing"
 )
 
@@ -20,7 +21,7 @@ func TestUTXOVerification(t *testing.T) {
 		"e4dc1f2ab5ac974d6b23690bd4d8ddbde63e9647c09a3d8f6b77fc0bf53544e5",
 	}
 	tx, _ := hex.DecodeString("4224625b409323d17e8842f935ce3764c3e7203ad0de3d403558881089cb3632")
-	tx = ReverseBytes(tx)
+	slices.Reverse(tx)
 	proof := []byte{}
 
 
@@ -28,7 +29,7 @@ func TestUTXOVerification(t *testing.T) {
 	
 	for _, element := range merkleProofStrings {
 		b, _ := hex.DecodeString(element)
-		b = ReverseBytes(b)
+		slices.Reverse(b)
 		proof = append(proof, b...)
 	}
 
