@@ -41,5 +41,5 @@ func main() {
 		fmt.Println("Insert success")
 	}
 
-	btcLC.Status()	
+	btcLC.Status()
 }
