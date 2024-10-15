@@ -27,6 +27,7 @@ func TestUTXOVerification(t *testing.T) {
 	slices.Reverse(tx)
 	proof := tx
 	
+	
 	for _, element := range merkleProofStrings {
 		b, _ := hex.DecodeString(element)
 		slices.Reverse(b)
