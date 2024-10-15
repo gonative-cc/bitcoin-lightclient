@@ -20,12 +20,10 @@ func TestUTXOVerification(t *testing.T) {
 		"cd1c4dbcc6d6a62e68054ff760b175c9e80361e6ae90dd0a3be8815b0a8c11cf",
 		"e4dc1f2ab5ac974d6b23690bd4d8ddbde63e9647c09a3d8f6b77fc0bf53544e5",
 	}
-	tx, _ := hex.DecodeString("4224625b409323d17e8842f935ce3764c3e7203ad0de3d403558881089cb3632")
+	tx, err := hex.DecodeString("4224625b409323d17e8842f935ce3764c3e7203ad0de3d403558881089cb3632")
+	assert.NilError(t, err)
 	slices.Reverse(tx)
-	proof := []byte{}
-
-
-	proof = append(proof, tx...)
+	proof := tx
 	
 	for _, element := range merkleProofStrings {
 		b, _ := hex.DecodeString(element)

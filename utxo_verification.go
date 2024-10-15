@@ -16,14 +16,14 @@ type Hash256Digest [32]byte
 // Thank summa-tx for their awesome work
 
 // Hash256MerkleStep concatenates and hashes two inputs for merkle proving
-func Hash256MerkleStep(a []byte, b []byte) Hash256Digest {
+func Hash256MerkleStep(a, b []byte) Hash256Digest {
 	c := []byte{}
 	c = append(c, a...)
 	c = append(c, b...)
 	return Hash256(c)
 }
 
-func Hash256(in []byte) Hash256Digest {
+func DoubleHash(in []byte) Hash256Digest {
 	first := sha256.Sum256(in)
 	second := sha256.Sum256(first[:])
 	return Hash256Digest(second)
@@ -39,21 +39,16 @@ func VerifyHash256Merkle(proof []byte, index uint) bool {
 	if proofLength%32 != 0 {
 		return false
 	}
-
 	if proofLength == 32 {
 		return true
 	}
-
 	if proofLength == 64 {
 		return false
 	}
 
 	root := proof[proofLength-32:]
-	
 	cur := proof[:32:32]
 	copy(current[:], cur)
-
-
 	numSteps := (proofLength / 32) - 1
 
 	for i := 1; i < numSteps; i++ {
