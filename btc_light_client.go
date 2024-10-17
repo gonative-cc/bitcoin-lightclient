@@ -60,15 +60,17 @@ func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
 	return lc.insertHeaderStartAtHeight(uint64(latestHeight), headers)
 }
 
-func (lc *BTCLightClient) insertHeaderStartAtHeight(height uint64, headers []wire.BlockHeader) error {
-	insertHeight := height + 1
+
+func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers []wire.BlockHeader) error {
+	height := startHeight + 1
 	for i, header := range headers {
 		if err := lc.CheckHeader(header); err != nil {
 			return NewInvalidHeaderErr(header.BlockHash().String(), i)
 		}
 
-		lc.SetHeader(int64(insertHeight), header)
-		insertHeight = insertHeight + 1
+		// override a height
+		lc.SetHeader(int64(height), header)
+		height = height + 1
 	}
 	return nil
 }
@@ -88,7 +90,9 @@ func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
 		currentTotalWork := lc.btcStore.LatestLightBlock()
 		otherForkTotalWork := lc.computeTotalWorkFork(lightBlock, headers[1:])
 
+		// comapre with current fork
 		if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
+			// accepte new fork
 			return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
 		} else {
 			return errors.New("Invalid fork")
