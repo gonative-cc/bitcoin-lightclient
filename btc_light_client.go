@@ -70,12 +70,12 @@ func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers 
 
 		// override a height
 		lc.SetHeader(int64(height), header)
-		height = height + 1
+		height++
 	}
 	return nil
 }
 
-func (lc *BTCLightClient) computeTotalWorkFork(startBlock *LightBlock, headers []wire.BlockHeader) *big.Int {
+func (lc *BTCLightClient) sumTotalWork(startBlock *LightBlock, headers []wire.BlockHeader) *big.Int {
 	totalWork := startBlock.TotalWork
 	for _, header := range headers {
 		totalWork.Add(totalWork, blockchain.CalcWork(header.Bits))
@@ -86,19 +86,19 @@ func (lc *BTCLightClient) computeTotalWorkFork(startBlock *LightBlock, headers [
 func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
 	// find the light block match with first header
 	firstHeader := headers[0]
-	if lightBlock := lc.btcStore.LightBlockByHash(firstHeader.BlockHash()); lightBlock != nil {
+	lightBlock := lc.btcStore.LightBlockByHash(firstHeader.BlockHash())
+	if lightBlock == nil {
+		return errors.New("Header doesn't belong to the chain")
+	}
 		currentTotalWork := lc.btcStore.LatestLightBlock()
 		otherForkTotalWork := lc.computeTotalWorkFork(lightBlock, headers[1:])
 
 		// comapre with current fork
 		if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
-			// accepte new fork
 			return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
 		} else {
 			return errors.New("Invalid fork")
 		}
-	}
-	return errors.New("Header doesn't belong to the chain")
 
 }
 
