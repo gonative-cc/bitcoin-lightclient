@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/btcsuite/btcd/blockchain"
@@ -46,23 +48,57 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 	return nil, nil
 }
 
-func (lc *BTCLightClient) AddHeader(height int64, header wire.BlockHeader) error {
-	return lc.btcStore.AddHeader(height, header)
+func (lc *BTCLightClient) SetHeader(height int64, header wire.BlockHeader) error {
+	return lc.btcStore.SetHeader(height, header)
 }
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable
 func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
 	latestHeight := lc.btcStore.LatestHeight()
-	for _, header := range headers {
+
+	return lc.insertHeaderStartAtHeight(uint64(latestHeight), headers)
+}
+
+func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers []wire.BlockHeader) error {
+	height := startHeight + 1
+	for i, header := range headers {
 		if err := lc.CheckHeader(header); err != nil {
-			return err
+			return NewInvalidHeaderErr(header.BlockHash().String(), i)
 		}
 
-		latestHeight = latestHeight + 1
-		lc.AddHeader(latestHeight, header)
+		// override a height
+		lc.SetHeader(int64(height), header)
+		height++
 	}
 	return nil
+}
+
+func (lc *BTCLightClient) sumTotalWork(startBlock *LightBlock, headers []wire.BlockHeader) *big.Int {
+	totalWork := startBlock.TotalWork
+	for _, header := range headers {
+		totalWork.Add(totalWork, blockchain.CalcWork(header.Bits))
+	}
+	return totalWork
+}
+
+func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
+	// find the light block match with first header
+	firstHeader := headers[0]
+	lightBlock := lc.btcStore.LightBlockByHash(firstHeader.BlockHash())
+	if lightBlock == nil {
+		return errors.New("Header doesn't belong to the chain")
+	}
+	currentTotalWork := lc.btcStore.LatestLightBlock()
+	otherForkTotalWork := lc.sumTotalWork(lightBlock, headers[1:])
+
+	// comapre with current fork
+	if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
+		return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
+	} else {
+		return errors.New("Invalid fork")
+	}
+
 }
 
 type BlockMedianTimeSource struct {
@@ -112,7 +148,7 @@ func (lc *BTCLightClient) Status() {
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHeader, start int) *BTCLightClient {
 	lc := NewBTCLightClient(params)
 	for id, header := range headers {
-		lc.AddHeader(int64(id+start), header)
+		lc.SetHeader(int64(id+start), header)
 	}
 	return lc
 }

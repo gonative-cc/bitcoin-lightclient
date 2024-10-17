@@ -42,4 +42,23 @@ func main() {
 	}
 
 	btcLC.Status()
+
+	// insert other branch stronger than current headers
+
+	otherHeaderStrings := []string{
+		`01000000d19ffbe9a876f329acb05feadc90dae27578762e3f538f5a08050000000000005c8524057100e644fb3680b5b5af3d79f24fc4e51f374d9205e926e9b9cafd9c38648250ef75051a20379982`,
+		"02000000670ffede95831fb41c09d0d104285d6182ce1c8577da40506405000000000000e54435f50bfc776b8f3d9ac047963ee6bdddd8d40b69236b4d97acb52a1fdce41e678250ef75051a88842656",
+		"01000000ea0ec14effa5f7f2a1a9f4431588b63b575d167a261c1d93b604000000000000c1844859aa7bb44251cf04a19098169f657e4bd91ebeb3f2a028211f1f8bde271c6e8250ef75051a7dc08785",
+		"020000006ece5de3e37b20666b666de21df240d4d1d0fb630c4b3c304e040000000000002555646e75b3630d9dac452599a4ed00066bb2cc99a29a49888444828eb43571e7728250ef75051af2fc3825",
+	}
+	otherHeaders := make([]wire.BlockHeader, len(otherHeaderStrings))
+
+	for id, headerStr := range otherHeaderStrings {
+		h, _ := BlockHeaderFromHex(headerStr)
+		otherHeaders[id] = h
+	}
+
+	btcLC.HandleFork(otherHeaders)
+
+	btcLC.Status()
 }
