@@ -73,5 +73,5 @@ func (lc *BTCLightClient) VerifyUTXO(tx *btcutil.Tx, utxoIdx uint, merkleRoot *c
 	proof = append(proof, merklePath...)
 	proof = append(proof, merkleRoot[:]...)
 
-	return VerifyHash256Merkle(proof, index)
+	return VerifyHash256Merkle(proof, utxoIdx)
 }

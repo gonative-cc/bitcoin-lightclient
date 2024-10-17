@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/hex"
-	"fmt"
 	"slices"
 	"testing"
 
@@ -10,7 +9,7 @@ import (
 )
 
 func encodeTxID(t *testing.T, txID string) []byte {
-	b, err := hex.DecodeString(str)
+	b, err := hex.DecodeString(txID)
 	assert.NilError(t, err)
 	slices.Reverse(b)
 	return b
@@ -30,9 +29,9 @@ func TestUTXOVerification(t *testing.T) {
 	run := func(t *testing.T, tc testCase) {
 		proof := encodeTxID(t, tc.txIdHash)
 		for _, n := range tc.merkleProof {
-			proof = append(proof, encodeTxID(t, n)...))
+			proof = append(proof, encodeTxID(t, n)...)
 		}
-		proof = append(proof, encodeTxID(t, tc.merkleRoot)...))
+		proof = append(proof, encodeTxID(t, tc.merkleRoot)...)
 
 		actual := VerifyHash256Merkle(proof, tc.index)
 		assert.Assert(t, actual == tc.expected)
