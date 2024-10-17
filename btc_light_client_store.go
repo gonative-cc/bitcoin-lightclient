@@ -46,12 +46,11 @@ func (s *MemStore) LightBlockByHash(hash chainhash.Hash) *LightBlock {
 	return s.lightBlockByHashMap[hash]
 }
 
-
 func (s *MemStore) removeBlockByHash(hash chainhash.Hash) bool {
-	if block := s.lightBlockByHashMap[hash]; block == nil  {
+	if block := s.lightBlockByHashMap[hash]; block == nil {
 		return false
 	}
-	
+
 	delete(s.lightBlockByHashMap, hash)
 	return true
 }
@@ -66,13 +65,13 @@ func (s *MemStore) SetHeader(height int64, header wire.BlockHeader) error {
 	}
 
 	headerHash := header.BlockHash()
-	
+
 	// remove the old hash if this exist in storage
 	s.removeBlockByHash(headerHash)
 
 	s.lightblockMap[height] = lightBlock
 	s.lightBlockByHashMap[headerHash] = lightBlock
-	
+
 	if s.latestHeight < height {
 		s.latestHeight = height
 	}

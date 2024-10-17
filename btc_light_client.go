@@ -60,7 +60,6 @@ func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
 	return lc.insertHeaderStartAtHeight(uint64(latestHeight), headers)
 }
 
-
 func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers []wire.BlockHeader) error {
 	height := startHeight + 1
 	for i, header := range headers {
@@ -90,15 +89,15 @@ func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
 	if lightBlock == nil {
 		return errors.New("Header doesn't belong to the chain")
 	}
-		currentTotalWork := lc.btcStore.LatestLightBlock()
-		otherForkTotalWork := lc.computeTotalWorkFork(lightBlock, headers[1:])
+	currentTotalWork := lc.btcStore.LatestLightBlock()
+	otherForkTotalWork := lc.sumTotalWork(lightBlock, headers[1:])
 
-		// comapre with current fork
-		if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
-			return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
-		} else {
-			return errors.New("Invalid fork")
-		}
+	// comapre with current fork
+	if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
+		return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
+	} else {
+		return errors.New("Invalid fork")
+	}
 
 }
 
