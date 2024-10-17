@@ -65,8 +65,8 @@ func VerifyHash256Merkle(proof []byte, index uint) bool {
 	return bytes.Equal(current[:], root)
 }
 
-// verify UTXO on latest block
-func (lc *BTCLightClient) VerifyUTXO(tx *btcutil.Tx, merkleRoot *chainhash.Hash, merklePath []byte, index uint) bool {
+// verify UTXO (identified as tx and UTXO index) is in a blocks' Merkle root
+func (lc *BTCLightClient) VerifyUTXO(tx *btcutil.Tx, utxoIdx uint, merkleRoot *chainhash.Hash, merklePath []byte) bool {
 	txHash := tx.Hash()
 	proof := []byte{}
 	proof = append(proof, txHash[:]...)

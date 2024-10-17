@@ -9,13 +9,11 @@ import (
 	"gotest.tools/assert"
 )
 
-func encodeToLittleEndian(str string) ([]byte, error) {
+func encodeTxID(t *testing.T, txID string) []byte {
 	b, err := hex.DecodeString(str)
-	if err != nil {
-		return nil, err
-	}
+	assert.NilError(t, err)
 	slices.Reverse(b)
-	return b, nil
+	return b
 }
 
 func TestUTXOVerification(t *testing.T) {
@@ -30,19 +28,11 @@ func TestUTXOVerification(t *testing.T) {
 	}
 
 	run := func(t *testing.T, tc testCase) {
-		tx, err := encodeToLittleEndian(tc.txIdHash)
-		assert.NilError(t, err)
-		proof := tx
-
-		for _, element := range tc.merkleProof {
-			b, err := encodeToLittleEndian(element)
-			assert.NilError(t, err)
-			proof = append(proof, b...)
+		proof := encodeTxID(t, tc.txIdHash)
+		for _, n := range tc.merkleProof {
+			proof = append(proof, encodeTxID(t, n)...))
 		}
-
-		root, err := encodeToLittleEndian(tc.merkleRoot)
-		assert.NilError(t, err)
-		proof = append(proof, root...)
+		proof = append(proof, encodeTxID(t, tc.merkleRoot)...))
 
 		actual := VerifyHash256Merkle(proof, tc.index)
 		assert.Assert(t, actual == tc.expected)
