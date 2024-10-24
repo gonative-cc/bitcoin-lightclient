@@ -18,6 +18,7 @@ type Store interface {
 	LightBlockByHash(hash chainhash.Hash) *LightBlock
 	RemindFork(latestBlockInFork chainhash.Hash) bool
 	LatestBlockOfFork() *[]LightBlock
+	LatestCheckPoint() *LightBlock
 }
 
 type MemStore struct {

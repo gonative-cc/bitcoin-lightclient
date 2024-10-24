@@ -21,7 +21,7 @@ func (lb LightBlock) CalcWork() *big.Int {
 type HeaderContext struct {
 	lightBlock *LightBlock
 	store      Store
-	fork       []LightBlock
+	fork       []*LightBlock
 }
 
 func (h *HeaderContext) Height() int32 {
@@ -44,7 +44,7 @@ func (h *HeaderContext) RelativeAncestorCtx(
 	distance int32) blockchain.HeaderCtx {
 	if distance <= h.Height() {
 		if int(distance) >= len(h.fork) {
-			return NewHeaderContext(&h.fork[distance], h.store, h.fork)
+			return NewHeaderContext(h.fork[distance], h.store, h.fork)
 		}
 
 		ancestorHeight := h.Height() - distance
@@ -61,7 +61,7 @@ func NewLightBlock(height int32, header wire.BlockHeader) *LightBlock {
 	}
 }
 
-func NewHeaderContext(lightBlock *LightBlock, store Store, fork []LightBlock) *HeaderContext {
+func NewHeaderContext(lightBlock *LightBlock, store Store, fork []*LightBlock) *HeaderContext {
 	return &HeaderContext{
 		lightBlock: lightBlock,
 		store:      store,

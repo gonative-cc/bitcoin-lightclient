@@ -55,18 +55,38 @@ func (lc *BTCLightClient) SetHeader(height int64, header wire.BlockHeader) error
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable
 func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
-	latestHeight := lc.btcStore.LatestHeight()
-
 	previous := header.PrevBlock
 
-	if !lc.btcStore.RemindFork(previous) {
+	if lc.btcStore.LightBlockByHash(previous) == nil {
 		return errors.New("Block doesn't belong to any fork!")
 	}
 
-	if lc.CheckHeader() {
+	// we need to handle 2 cases
 
+	latestCheckpoint := lc.btcStore.LatestCheckPoint()
+	if lc.btcStore.RemindFork(previous) {
+		if lc.CheckHeader(header, latestCheckpoint, fork) {
+
+		}
 	}
+
 	return nil
+}
+
+func (lc *BTCLightClient) extractFork(lastBlock chainhash.Hash) ([]*LightBlock, error) {
+	checkpoint := lc.btcStore.LatestCheckPoint()
+	checkpointHash := checkpoint.Header.BlockHash()
+	count := 0
+	fork := make([]*LightBlock, 0)
+
+	for count <= MaxForkAge {
+		if lastBlock.IsEqual(&checkpointHash) {
+			return fork, nil
+		}
+		count++
+	}
+
+	return nil, errors.New("Fork age invalid")
 }
 
 func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers []wire.BlockHeader) error {
@@ -133,11 +153,11 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 	return 0
 }
 
-func (lc *BTCLightClient) CheckHeader(header wire.BlockHeader) error {
+func (lc *BTCLightClient) CheckHeader(header wire.BlockHeader, checkpoint *LightBlock, fork []*LightBlock) error {
 	noFlag := blockchain.BFNone
 	latestLightBlock := lc.btcStore.LatestLightBlock()
 
-	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore), noFlag, lc, true); err != nil {
+	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {
 		return err
 	}
 
