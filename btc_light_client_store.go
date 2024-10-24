@@ -7,26 +7,32 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
+const MaxForkAge = 10
+
 type Store interface {
 	LightBlockAtHeight(int64) *LightBlock
 	LatestHeight() int64
 	LatestLightBlock() *LightBlock
 	SetHeader(height int64, header wire.BlockHeader) error
-	CurrentTotalWork() *big.Int
+	TotalWorkOfBranch(latestBlockInFork chainhash.Hash) *big.Int
 	LightBlockByHash(hash chainhash.Hash) *LightBlock
+	RemindFork(latestBlockInFork chainhash.Hash) bool
+	LatestBlockOfFork() *[]LightBlock
 }
 
 type MemStore struct {
-	latestHeight        int64
-	lightblockMap       map[int64]*LightBlock
-	lightBlockByHashMap map[chainhash.Hash]*LightBlock
+	latestHeight          int64
+	lightblockMap         map[int64]*LightBlock
+	lightBlockByHashMap   map[chainhash.Hash]*LightBlock
+	latestBlockHashOfFork map[chainhash.Hash]bool
 }
 
 func NewMemStore() *MemStore {
 	return &MemStore{
-		latestHeight:        0,
-		lightblockMap:       make(map[int64]*LightBlock),
-		lightBlockByHashMap: make(map[chainhash.Hash]*LightBlock),
+		latestHeight:          0,
+		lightblockMap:         make(map[int64]*LightBlock),
+		lightBlockByHashMap:   make(map[chainhash.Hash]*LightBlock),
+		latestBlockHashOfFork: make(map[chainhash.Hash]bool),
 	}
 }
 

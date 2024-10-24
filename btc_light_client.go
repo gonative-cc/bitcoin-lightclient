@@ -54,10 +54,19 @@ func (lc *BTCLightClient) SetHeader(height int64, header wire.BlockHeader) error
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable
-func (lc *BTCLightClient) InsertHeaders(headers []wire.BlockHeader) error {
+func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
 	latestHeight := lc.btcStore.LatestHeight()
 
-	return lc.insertHeaderStartAtHeight(uint64(latestHeight), headers)
+	previous := header.PrevBlock
+
+	if !lc.btcStore.RemindFork(previous) {
+		return errors.New("Block doesn't belong to any fork!")
+	}
+
+	if lc.CheckHeader() {
+
+	}
+	return nil
 }
 
 func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers []wire.BlockHeader) error {
