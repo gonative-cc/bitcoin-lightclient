@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math/big"
 	"time"
 
 	"github.com/btcsuite/btcd/blockchain"
@@ -48,30 +47,41 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 	return nil, nil
 }
 
-func (lc *BTCLightClient) SetHeader(height int64, header wire.BlockHeader) error {
-	return lc.btcStore.SetHeader(height, header)
-}
+// func (lc *BTCLightClient) SetHeader(height int64, header wire.BlockHeader) error {
+// 	return lc.btcStore.SetHeader(height, header)
+// }
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable
 func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
 	previous := header.PrevBlock
 
-	if lc.btcStore.LightBlockByHash(previous) == nil {
+	previousBlock := lc.btcStore.LightBlockByHash(previous)
+
+	if previousBlock == nil {
 		return errors.New("Block doesn't belong to any fork!")
 	}
+	// we need to handle 2 cases:
 
-	// we need to handle 2 cases
-
-	latestCheckpoint := lc.btcStore.LatestCheckPoint()
+	// extend the exist fork
 	if lc.btcStore.RemindFork(previous) {
-		if lc.CheckHeader(header, latestCheckpoint, fork) {
+		previousHeader := previousBlock.Header
+		if err := lc.CheckHeader(previousHeader, header); err != nil {
+			return err
 
 		}
+		
+		lc.btcStore.AddBlock(previousBlock, header)
+		lc.btcStore.SetLatestBlockOnFork(previous, false)
+		lc.btcStore.SetLatestBlockOnFork(header.BlockHash(), true)
+		return nil
 	}
 
-	return nil
+	// create a new fork
+	parent := lc.btcStore.LightBlockByHash(previous)
+	return lc.CreateNewFork(parent, header)
 }
+
 
 func (lc *BTCLightClient) extractFork(lastBlock chainhash.Hash) ([]*LightBlock, error) {
 	checkpoint := lc.btcStore.LatestCheckPoint()
@@ -89,45 +99,36 @@ func (lc *BTCLightClient) extractFork(lastBlock chainhash.Hash) ([]*LightBlock, 
 	return nil, errors.New("Fork age invalid")
 }
 
-func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers []wire.BlockHeader) error {
-	height := startHeight + 1
-	for i, header := range headers {
-		if err := lc.CheckHeader(header); err != nil {
-			return NewInvalidHeaderErr(header.BlockHash().String(), i)
-		}
+// func (lc *BTCLightClient) insertHeaderStartAtHeight(startHeight uint64, headers []wire.BlockHeader) error {
+// 	height := startHeight + 1
+// 	for i, header := range headers {
+// 		if err := lc.CheckHeader(header); err != nil {
+// 			return NewInvalidHeaderErr(header.BlockHash().String(), i)
+// 		}
 
-		// override a height
-		lc.SetHeader(int64(height), header)
-		height++
+// 		// override a height
+// 		lc.SetHeader(int64(height), header)
+// 		height++
+// 	}
+// 	return nil
+// }
+
+// func (lc *BTCLightClient) sumTotalWork(startBlock *LightBlock, headers []wire.BlockHeader) *big.Int {
+// 	totalWork := startBlock.TotalWork
+// 	for _, header := range headers {
+// 		totalWork.Add(totalWork, blockchain.CalcWork(header.Bits))
+// 	}
+// 	return totalWork
+// }
+
+func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHeader) error {
+	if lc.CheckHeader(parent.Header, header) != nil {
+		// add to db
+		lc.btcStore.AddBlock(parent, header)
+		// update block as latest block in this fork
+		lc.btcStore.SetLatestBlockOnFork(header.BlockHash(), true)
 	}
 	return nil
-}
-
-func (lc *BTCLightClient) sumTotalWork(startBlock *LightBlock, headers []wire.BlockHeader) *big.Int {
-	totalWork := startBlock.TotalWork
-	for _, header := range headers {
-		totalWork.Add(totalWork, blockchain.CalcWork(header.Bits))
-	}
-	return totalWork
-}
-
-func (lc *BTCLightClient) HandleFork(headers []wire.BlockHeader) error {
-	// find the light block match with first header
-	firstHeader := headers[0]
-	lightBlock := lc.btcStore.LightBlockByHash(firstHeader.BlockHash())
-	if lightBlock == nil {
-		return errors.New("Header doesn't belong to the chain")
-	}
-	currentTotalWork := lc.btcStore.LatestLightBlock()
-	otherForkTotalWork := lc.sumTotalWork(lightBlock, headers[1:])
-
-	// comapre with current fork
-	if otherForkTotalWork.Cmp(currentTotalWork.TotalWork) > 0 {
-		return lc.insertHeaderStartAtHeight(uint64(lightBlock.Height), headers[1:])
-	} else {
-		return errors.New("Invalid fork")
-	}
-
 }
 
 type BlockMedianTimeSource struct {
@@ -153,9 +154,10 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 	return 0
 }
 
-func (lc *BTCLightClient) CheckHeader(header wire.BlockHeader, checkpoint *LightBlock, fork []*LightBlock) error {
+func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	latestLightBlock := lc.btcStore.LatestLightBlock()
+	fork, _ := lc.extractFork(parent.BlockHash())
+	latestLightBlock := fork[0]
 
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {
 		return err
@@ -176,8 +178,10 @@ func (lc *BTCLightClient) Status() {
 
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHeader, start int) *BTCLightClient {
 	lc := NewBTCLightClient(params)
-	for id, header := range headers {
-		lc.SetHeader(int64(id+start), header)
+	lb := NewLightBlock(int32(start), headers[0])
+	for _, header := range headers[1:] {
+		lc.btcStore.AddBlock(lb, header)
+
 	}
 	return lc
 }

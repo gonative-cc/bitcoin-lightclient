@@ -1,7 +1,7 @@
 package main
 
 import (
-	"math/big"
+	// "math/big"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
@@ -13,19 +13,23 @@ type Store interface {
 	LightBlockAtHeight(int64) *LightBlock
 	LatestHeight() int64
 	LatestLightBlock() *LightBlock
-	SetHeader(height int64, header wire.BlockHeader) error
-	TotalWorkOfBranch(latestBlockInFork chainhash.Hash) *big.Int
+	// SetHeader(height int64, header wire.BlockHeader) error
 	LightBlockByHash(hash chainhash.Hash) *LightBlock
 	RemindFork(latestBlockInFork chainhash.Hash) bool
-	LatestBlockOfFork() *[]LightBlock
+	LatestBlockOfFork() []chainhash.Hash
 	LatestCheckPoint() *LightBlock
+	AddBlock(parent *LightBlock, header wire.BlockHeader) error
+	SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error
+	TotalWorkAtBlock(bh chainhash.Hash) uint64
 }
 
 type MemStore struct {
 	latestHeight          int64
 	lightblockMap         map[int64]*LightBlock
 	lightBlockByHashMap   map[chainhash.Hash]*LightBlock
-	latestBlockHashOfFork map[chainhash.Hash]bool
+	latestBlockHashOfFork map[chainhash.Hash]struct{}
+	totalWorkMap          map[chainhash.Hash]uint64
+	latestcheckpoint *LightBlock
 }
 
 func NewMemStore() *MemStore {
@@ -33,7 +37,8 @@ func NewMemStore() *MemStore {
 		latestHeight:          0,
 		lightblockMap:         make(map[int64]*LightBlock),
 		lightBlockByHashMap:   make(map[chainhash.Hash]*LightBlock),
-		latestBlockHashOfFork: make(map[chainhash.Hash]bool),
+		latestBlockHashOfFork: make(map[chainhash.Hash]struct{}),
+		latestcheckpoint: nil,
 	}
 }
 
@@ -62,30 +67,69 @@ func (s *MemStore) removeBlockByHash(hash chainhash.Hash) bool {
 	return true
 }
 
-// this remove the block at current height/by hash and
-// this override a new light block by height/hash
-func (s *MemStore) SetHeader(height int64, header wire.BlockHeader) error {
-	lightBlock := NewLightBlock(int32(height), header)
+// // this remove the block at current height/by hash and
+// // this override a new light block by height/hash
+// func (s *MemStore) SetHeader(height int64, header wire.BlockHeader) error {
+// 	lightBlock := NewLightBlock(int32(height), header)
 
-	if previousBlock := s.LightBlockAtHeight(height - 1); previousBlock != nil {
-		lightBlock.TotalWork.Add(lightBlock.TotalWork, previousBlock.TotalWork)
-	}
+// 	if previousBlock := s.LightBlockAtHeight(height - 1); previousBlock != nil {
+// 		lightBlock.TotalWork.Add(lightBlock.TotalWork, previousBlock.TotalWork)
+// 	}
 
-	headerHash := header.BlockHash()
+// 	headerHash := header.BlockHash()
 
-	// remove the old hash if this exist in storage
-	s.removeBlockByHash(headerHash)
+// 	// remove the old hash if this exist in storage
+// 	s.removeBlockByHash(headerHash)
 
-	s.lightblockMap[height] = lightBlock
-	s.lightBlockByHashMap[headerHash] = lightBlock
+// 	s.lightblockMap[height] = lightBlock
+// 	s.lightBlockByHashMap[headerHash] = lightBlock
 
-	if s.latestHeight < height {
-		s.latestHeight = height
-	}
+// 	if s.latestHeight < height {
+// 		s.latestHeight = height
+// 	}
 
+// 	return nil
+// }
+
+
+
+func (s *MemStore) AddBlock(parent *LightBlock, header wire.BlockHeader) error{
+	height := parent.Height + 1
+
+	newBlock := NewLightBlock(height, header)
+	blockHash := header.BlockHash()
+	// TODO: handle case block exist in db when add
+	s.lightBlockByHashMap[blockHash] = newBlock
+	prevTotalWork := s.TotalWorkAtBlock(parent.Header.BlockHash())
+
+	s.totalWorkMap[blockHash] = prevTotalWork + newBlock.CalcWork().Uint64()
 	return nil
 }
 
-func (s *MemStore) CurrentTotalWork() *big.Int {
-	return s.LatestLightBlock().TotalWork
+func (s *MemStore) SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error {
+	if latest {
+		s.latestBlockHashOfFork[bh] = struct {}{}
+	} else {
+		delete(s.latestBlockHashOfFork, bh)
+	}
+	
+	return nil
 }
+
+func(s *MemStore) TotalWorkAtBlock(hash chainhash.Hash) uint64 {
+	return s.totalWorkMap[hash]
+}
+
+func (s *MemStore) LatestBlockOfFork() []chainhash.Hash {
+	return []chainhash.Hash{}
+}
+
+func (s *MemStore) LatestCheckPoint() *LightBlock {
+	return s.latestcheckpoint
+} 
+
+func (s *MemStore) RemindFork(h chainhash.Hash) bool {
+	_, ok := s.latestBlockHashOfFork[h]	
+	return ok
+}
+
