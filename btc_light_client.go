@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/btcsuite/btcd/blockchain"
@@ -83,16 +84,19 @@ func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
 }
 
 
-func (lc *BTCLightClient) extractFork(lastBlock chainhash.Hash) ([]*LightBlock, error) {
+func (lc *BTCLightClient) extractFork(bh chainhash.Hash) ([]*LightBlock, error) {
 	checkpoint := lc.btcStore.LatestCheckPoint()
 	checkpointHash := checkpoint.Header.BlockHash()
 	count := 0
 	fork := make([]*LightBlock, 0)
 
 	for count <= MaxForkAge {
-		if lastBlock.IsEqual(&checkpointHash) {
+		curr := lc.btcStore.LightBlockByHash(bh)
+		fork = append(fork, curr)
+		if bh.IsEqual(&checkpointHash) {
 			return fork, nil
 		}
+		bh = curr.Header.PrevBlock
 		count++
 	}
 
@@ -172,15 +176,21 @@ func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.Block
 // query status, use for test
 func (lc *BTCLightClient) Status() {
 	fmt.Println(lc.params.Net)
-	latestBlock := lc.btcStore.LatestLightBlock()
-	fmt.Println(latestBlock.Height)
+	// latestBlock := lc.btcStore.LatestLightBlock()
+	// fmt.Println(latestBlock.Height)
 }
 
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHeader, start int) *BTCLightClient {
 	lc := NewBTCLightClient(params)
 	lb := NewLightBlock(int32(start), headers[0])
-	for _, header := range headers[1:] {
-		lc.btcStore.AddBlock(lb, header)
+	lc.btcStore.SetBlock(lb, big.NewInt(0))
+	lc.btcStore.SetLatestCheckPoint(lb)
+	lc.btcStore.SetLightBlockByHeight(lb)
+	for i, header := range headers[1:] {
+		previousPower := lc.btcStore.TotalWorkAtBlock(header.PrevBlock)
+		lb := NewLightBlock(int32(start + i + 1), header)
+		lc.btcStore.SetBlock(lb, previousPower)
+		fmt.Println(start + i + 1)
 
 	}
 	return lc

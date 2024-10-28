@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/btcsuite/btcd/blockchain"
@@ -43,13 +44,14 @@ func (h *HeaderContext) Parent() blockchain.HeaderCtx {
 func (h *HeaderContext) RelativeAncestorCtx(
 	distance int32) blockchain.HeaderCtx {
 	if distance <= h.Height() {
-		if int(distance) >= len(h.fork) {
-			return NewHeaderContext(h.fork[distance], h.store, h.fork)
+		fmt.Println(distance, h.Height(), h.fork)
+		if int(distance) <= len(h.fork) && len(h.fork) != 0{
+			return NewHeaderContext(h.fork[distance], h.store, h.fork[distance:])
 		}
 
 		ancestorHeight := h.Height() - distance
 		blockAtHeight := h.store.LightBlockAtHeight(int64(ancestorHeight))
-		return NewHeaderContext(blockAtHeight, h.store, h.fork)
+		return NewHeaderContext(blockAtHeight, h.store, []*LightBlock{})
 	}
 	return nil
 }
