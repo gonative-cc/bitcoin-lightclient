@@ -35,7 +35,7 @@ func main() {
 
 	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
 
-	if err := btcLC.InsertHeaders([]wire.BlockHeader{headerInsert}); err != nil {
+	if err := btcLC.InsertHeaders(headerInsert); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("Insert success")
@@ -58,7 +58,7 @@ func main() {
 		otherHeaders[id] = h
 	}
 
-	btcLC.HandleFork(otherHeaders)
+	// btcLC.HandleFork(otherHeaders)
 
 	btcLC.Status()
 }

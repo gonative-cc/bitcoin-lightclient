@@ -3,6 +3,8 @@ package main
 import (
 	// "math/big"
 
+	"math/big"
+
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
 )
@@ -20,7 +22,8 @@ type Store interface {
 	LatestCheckPoint() *LightBlock
 	AddBlock(parent *LightBlock, header wire.BlockHeader) error
 	SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error
-	TotalWorkAtBlock(bh chainhash.Hash) uint64
+	TotalWorkAtBlock(bh chainhash.Hash) *big.Int
+	SetBlock(lb *LightBlock, perviousPower *big.Int) 
 }
 
 type MemStore struct {
@@ -28,7 +31,7 @@ type MemStore struct {
 	lightblockMap         map[int64]*LightBlock
 	lightBlockByHashMap   map[chainhash.Hash]*LightBlock
 	latestBlockHashOfFork map[chainhash.Hash]struct{}
-	totalWorkMap          map[chainhash.Hash]uint64
+	totalWorkMap          map[chainhash.Hash]*big.Int
 	latestcheckpoint *LightBlock
 }
 
@@ -93,6 +96,13 @@ func (s *MemStore) removeBlockByHash(hash chainhash.Hash) bool {
 
 
 
+func (s *MemStore) SetBlock(lb *LightBlock, previousPower *big.Int) {
+	blockHash := lb.Header.BlockHash()
+	s.lightBlockByHashMap[blockHash] = lb
+	power := previousPower.Add(previousPower, lb.CalcWork())
+	s.totalWorkMap[blockHash] = power
+}
+
 func (s *MemStore) AddBlock(parent *LightBlock, header wire.BlockHeader) error{
 	height := parent.Height + 1
 
@@ -102,7 +112,8 @@ func (s *MemStore) AddBlock(parent *LightBlock, header wire.BlockHeader) error{
 	s.lightBlockByHashMap[blockHash] = newBlock
 	prevTotalWork := s.TotalWorkAtBlock(parent.Header.BlockHash())
 
-	s.totalWorkMap[blockHash] = prevTotalWork + newBlock.CalcWork().Uint64()
+	s.SetBlock(newBlock, prevTotalWork)
+	
 	return nil
 }
 
@@ -116,7 +127,7 @@ func (s *MemStore) SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error {
 	return nil
 }
 
-func(s *MemStore) TotalWorkAtBlock(hash chainhash.Hash) uint64 {
+func(s *MemStore) TotalWorkAtBlock(hash chainhash.Hash) *big.Int{
 	return s.totalWorkMap[hash]
 }
 
