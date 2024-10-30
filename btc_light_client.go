@@ -106,7 +106,35 @@ func (lc *BTCLightClient) extractFork(bh chainhash.Hash) ([]*LightBlock, error) 
 // TODO: We will do this in the next PR
 // - Remove all fork invalid
 // - Update map(height => block) in btcStore
-func (lc *BTCLightClient) CleanupFork() {
+func (lc *BTCLightClient) CleanUpFork() {
+	mostPowerForkLatestBlock := lc.btcStore.MostDifficultFork()
+	mostPowerForkAge, _ := lc.ForkAge(mostPowerForkLatestBlock.Header.BlockHash())
+
+	// extract most power fork
+
+	// TODO handle error
+	fork, _ := lc.extractFork(mostPowerForkLatestBlock.Header.BlockHash())
+
+	
+	if mostPowerForkAge > MaxForkAge {
+		// fork[1] always not nil because fork len > maxforkage
+		lc.btcStore.SetLatestCheckPoint(fork[1])
+		for  h, _ := range lc.btcStore.LatestBlockHashOfFork() {
+			otherFork, _ := lc.extractFork(h)
+			if otherFork == nil {
+				removedHash := h
+				removeBlock := lc.btcStore.LightBlockByHash(removedHash)
+				for removedHash != fork[0].Header.BlockHash() {
+					lc.btcStore.RemoveBlock(removedHash)
+					removedHash = removeBlock.Header.PrevBlock
+					removeBlock = lc.btcStore.LightBlockByHash(removedHash)
+				}
+				lc.btcStore.SetLatestBlockOnFork(h, false)
+			}
+		}
+		
+	}
+
 	
 }
 
