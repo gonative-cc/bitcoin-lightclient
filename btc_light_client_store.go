@@ -1,9 +1,7 @@
 package main
 
 import (
-	// "math/big"
-
-	"fmt"
+	
 	"math/big"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
@@ -80,7 +78,6 @@ func (s *MemStore) SetLatestCheckPoint(lb *LightBlock) {
 func (s *MemStore) SetBlock(lb *LightBlock, previousPower *big.Int) {
 	blockHash := lb.Header.BlockHash()
 	s.lightBlockByHashMap[blockHash] = lb
-	fmt.Println(previousPower)
 
 	power := big.NewInt(0)
 	power = power.Add(previousPower, lb.CalcWork())

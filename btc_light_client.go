@@ -51,10 +51,15 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable
 func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
+
+	if lb := lc.btcStore.LightBlockByHash(header.BlockHash()); lb != nil {
+		return errors.New("Block exists in db")
+	}
+	
 	previousBlockHash := header.PrevBlock
 
 	previousBlock := lc.btcStore.LightBlockByHash(previousBlockHash)
-
+	
 	if previousBlock == nil {
 		return errors.New("Block doesn't belong to any fork!")
 	}
