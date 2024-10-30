@@ -18,12 +18,14 @@ type Store interface {
 	RemindFork(h chainhash.Hash) bool
 	LatestCheckPoint() *LightBlock
 	AddBlock(parent *LightBlock, header wire.BlockHeader) error
+	RemoveBlock(h chainhash.Hash)
 	SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error
 	TotalWorkAtBlock(bh chainhash.Hash) *big.Int
 	SetBlock(lb *LightBlock, perviousPower *big.Int)
 	SetLatestCheckPoint(lb *LightBlock)
 	SetLightBlockByHeight(lb *LightBlock)
 	MostDifficultFork() *LightBlock
+	LatestBlockHashOfFork() map[chainhash.Hash]struct{}
 }
 
 type MemStore struct {
@@ -44,6 +46,10 @@ func NewMemStore() *MemStore {
 		latestcheckpoint:      nil,
 		mostDifficultFork: nil,
 	}
+}
+
+func (s *MemStore) RemoveBlock(h chainhash.Hash) {
+	delete(s.lightBlockByHashMap, h)
 }
 
 func (s *MemStore) SetLightBlockByHeight(lb *LightBlock) {
@@ -118,6 +124,11 @@ func (s *MemStore) SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error {
 	}
 
 	return nil
+}
+
+
+func (s *MemStore) LatestBlockHashOfFork() map[chainhash.Hash]struct{} {
+	return  s.latestBlockHashOfFork
 }
 
 func (s *MemStore) TotalWorkAtBlock(hash chainhash.Hash) *big.Int {
