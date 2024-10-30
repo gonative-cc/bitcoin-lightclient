@@ -3,6 +3,7 @@ package main
 import (
 	// "math/big"
 
+	"fmt"
 	"math/big"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
@@ -24,6 +25,7 @@ type Store interface {
 	SetBlock(lb *LightBlock, perviousPower *big.Int)
 	SetLatestCheckPoint(lb *LightBlock)
 	SetLightBlockByHeight(lb *LightBlock)
+	MostDifficultFork() *LightBlock
 }
 
 type MemStore struct {
@@ -32,6 +34,7 @@ type MemStore struct {
 	latestBlockHashOfFork map[chainhash.Hash]struct{}
 	totalWorkMap          map[chainhash.Hash]*big.Int
 	latestcheckpoint      *LightBlock
+	mostDifficultFork     *LightBlock
 }
 
 func NewMemStore() *MemStore {
@@ -41,6 +44,7 @@ func NewMemStore() *MemStore {
 		latestBlockHashOfFork: make(map[chainhash.Hash]struct{}),
 		totalWorkMap:          make(map[chainhash.Hash]*big.Int),
 		latestcheckpoint:      nil,
+		mostDifficultFork: nil,
 	}
 }
 
@@ -76,7 +80,23 @@ func (s *MemStore) SetLatestCheckPoint(lb *LightBlock) {
 func (s *MemStore) SetBlock(lb *LightBlock, previousPower *big.Int) {
 	blockHash := lb.Header.BlockHash()
 	s.lightBlockByHashMap[blockHash] = lb
-	power := previousPower.Add(previousPower, lb.CalcWork())
+	fmt.Println(previousPower)
+
+	power := big.NewInt(0)
+	power = power.Add(previousPower, lb.CalcWork())
+	
+
+	powerForkBlock := s.MostDifficultFork()
+	mostPower := big.NewInt(0);
+	if powerForkBlock != nil {
+		mostPower = s.totalWorkMap[powerForkBlock.Header.BlockHash()]
+	}
+
+	
+	if mostPower.Cmp(power) < 0 {
+		s.mostDifficultFork = lb
+	}
+	
 	s.totalWorkMap[blockHash] = power
 }
 
@@ -90,7 +110,6 @@ func (s *MemStore) AddBlock(parent *LightBlock, header wire.BlockHeader) error {
 	prevTotalWork := s.TotalWorkAtBlock(parent.Header.BlockHash())
 
 	s.SetBlock(newBlock, prevTotalWork)
-
 	return nil
 }
 
@@ -115,4 +134,8 @@ func (s *MemStore) LatestCheckPoint() *LightBlock {
 func (s *MemStore) RemindFork(h chainhash.Hash) bool {
 	_, ok := s.latestBlockHashOfFork[h]
 	return ok
+}
+
+func (s *MemStore) MostDifficultFork() *LightBlock {
+	return s.mostDifficultFork
 }

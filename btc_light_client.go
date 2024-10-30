@@ -157,6 +157,7 @@ func (lc *BTCLightClient) Status() {
 	fmt.Println(lc.params.Net)
 	latestBlock := lc.btcStore.LatestCheckPoint()
 	fmt.Println(latestBlock.Height)
+	fmt.Println(lc.btcStore.MostDifficultFork())
 }
 
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHeader, start int) *BTCLightClient {

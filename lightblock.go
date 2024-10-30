@@ -14,7 +14,7 @@ type LightBlock struct {
 	Header wire.BlockHeader
 }
 
-func (lb LightBlock) CalcWork() *big.Int {
+func (lb *LightBlock) CalcWork() *big.Int {
 	return blockchain.CalcWork(lb.Header.Bits)
 }
 
