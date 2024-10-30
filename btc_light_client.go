@@ -107,7 +107,25 @@ func (lc *BTCLightClient) extractFork(bh chainhash.Hash) ([]*LightBlock, error) 
 // - Remove all fork invalid
 // - Update map(height => block) in btcStore
 func (lc *BTCLightClient) CleanupFork() {
+	
 }
+
+
+func (lc *BTCLightClient) ForkAge(bh chainhash.Hash)  (int32, error) {
+	lb := lc.btcStore.LightBlockByHash(bh);
+	checkpoint := lc.btcStore.LatestCheckPoint()
+	if lb == nil {
+		return 0, errors.New("hash doesn't belong to db")
+	}
+	
+	if !lc.btcStore.RemindFork(bh) {
+		return 0, errors.New("hash not a latest block in forks")
+	}
+
+	age := lb.Height - checkpoint.Height
+	return age, nil
+}
+
 
 func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHeader) error {
 	if lc.CheckHeader(parent.Header, header) != nil {
