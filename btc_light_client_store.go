@@ -1,7 +1,6 @@
 package main
 
 import (
-	
 	"math/big"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
@@ -44,7 +43,7 @@ func NewMemStore() *MemStore {
 		latestBlockHashOfFork: make(map[chainhash.Hash]struct{}),
 		totalWorkMap:          make(map[chainhash.Hash]*big.Int),
 		latestcheckpoint:      nil,
-		mostDifficultFork: nil,
+		mostDifficultFork:     nil,
 	}
 }
 
@@ -87,19 +86,17 @@ func (s *MemStore) SetBlock(lb *LightBlock, previousPower *big.Int) {
 
 	power := big.NewInt(0)
 	power = power.Add(previousPower, lb.CalcWork())
-	
 
 	powerForkBlock := s.MostDifficultFork()
-	mostPower := big.NewInt(0);
+	mostPower := big.NewInt(0)
 	if powerForkBlock != nil {
 		mostPower = s.totalWorkMap[powerForkBlock.Header.BlockHash()]
 	}
 
-	
 	if mostPower.Cmp(power) < 0 {
 		s.mostDifficultFork = lb
 	}
-	
+
 	s.totalWorkMap[blockHash] = power
 }
 
@@ -126,9 +123,8 @@ func (s *MemStore) SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error {
 	return nil
 }
 
-
 func (s *MemStore) LatestBlockHashOfFork() map[chainhash.Hash]struct{} {
-	return  s.latestBlockHashOfFork
+	return s.latestBlockHashOfFork
 }
 
 func (s *MemStore) TotalWorkAtBlock(hash chainhash.Hash) *big.Int {
