@@ -53,13 +53,11 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
 
 	if lb := lc.btcStore.LightBlockByHash(header.BlockHash()); lb != nil {
-		return errors.New("Block exists in db")
+		return errors.New("Parent block not found")
 	}
 	
 	previousBlockHash := header.PrevBlock
-
 	previousBlock := lc.btcStore.LightBlockByHash(previousBlockHash)
-	
 	if previousBlock == nil {
 		return errors.New("Block doesn't belong to any fork!")
 	}
