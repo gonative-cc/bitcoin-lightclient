@@ -6,6 +6,7 @@ import (
 
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/btcsuite/btcd/wire"
 )
 
 type Hash256Digest [32]byte
@@ -73,5 +74,14 @@ func (lc *BTCLightClient) VerifyUTXO(tx *btcutil.Tx, utxoIdx uint, merkleRoot *c
 	proof = append(proof, merklePath...)
 	proof = append(proof, merkleRoot[:]...)
 
+	return VerifyHash256Merkle(proof, utxoIdx)
+}
+
+func (lc *BTCLightClient) VerifyTXID(txHash *chainhash.Hash, utxoIdx uint, header *wire.BlockHeader, merklePath []byte) bool {
+	proof := []byte{}
+	proof = append(proof, txHash[:]...)
+	proof = append(proof, merklePath...)
+	merkleRoot := header.MerkleRoot
+	proof = append(proof, merkleRoot[:]...)
 	return VerifyHash256Merkle(proof, utxoIdx)
 }
