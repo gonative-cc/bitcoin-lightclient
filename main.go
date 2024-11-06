@@ -36,11 +36,13 @@ func main() {
 
 	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
 
+	btcLC.Status()
 	if err := btcLC.InsertHeaders(headerInsert); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("Insert success")
 	}
 
+	btcLC.CleanUpFork()
 	btcLC.Status()
 }
