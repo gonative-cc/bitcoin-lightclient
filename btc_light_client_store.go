@@ -7,7 +7,7 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-const MaxForkAge = 4
+const MaxForkAge = 8
 
 type Store interface {
 	LightBlockAtHeight(int64) *LightBlock

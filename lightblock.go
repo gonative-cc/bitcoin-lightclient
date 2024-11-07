@@ -47,7 +47,7 @@ func (h *HeaderContext) RelativeAncestorCtx(
 		if int(distance) < len(h.fork) && len(h.fork) != 0 {
 			return NewHeaderContext(h.fork[distance], h.store, h.fork[distance:])
 		}
-		
+
 		ancestorHeight := h.Height() - distance
 		blockAtHeight := h.store.LightBlockAtHeight(int64(ancestorHeight))
 		return NewHeaderContext(blockAtHeight, h.store, []*LightBlock{})
