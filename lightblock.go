@@ -10,18 +10,18 @@ import (
 var _ blockchain.HeaderCtx = (*HeaderContext)(nil)
 
 type LightBlock struct {
-	Height    int32
-	Header    wire.BlockHeader
-	TotalWork *big.Int
+	Height int32
+	Header wire.BlockHeader
 }
 
-func (lb LightBlock) CalcWork() *big.Int {
+func (lb *LightBlock) CalcWork() *big.Int {
 	return blockchain.CalcWork(lb.Header.Bits)
 }
 
 type HeaderContext struct {
 	lightBlock *LightBlock
 	store      Store
+	fork       []*LightBlock
 }
 
 func (h *HeaderContext) Height() int32 {
@@ -43,24 +43,29 @@ func (h *HeaderContext) Parent() blockchain.HeaderCtx {
 func (h *HeaderContext) RelativeAncestorCtx(
 	distance int32) blockchain.HeaderCtx {
 	if distance <= h.Height() {
+		// between the header to latestCheckpoint. we call this fork"
+		if int(distance) <= len(h.fork) && len(h.fork) != 0 {
+			return NewHeaderContext(h.fork[distance], h.store, h.fork[distance:])
+		}
+
 		ancestorHeight := h.Height() - distance
 		blockAtHeight := h.store.LightBlockAtHeight(int64(ancestorHeight))
-		return NewHeaderContext(blockAtHeight, h.store)
+		return NewHeaderContext(blockAtHeight, h.store, []*LightBlock{})
 	}
 	return nil
 }
 
 func NewLightBlock(height int32, header wire.BlockHeader) *LightBlock {
 	return &LightBlock{
-		Height:    height,
-		Header:    header,
-		TotalWork: blockchain.CalcWork(header.Bits),
+		Height: height,
+		Header: header,
 	}
 }
 
-func NewHeaderContext(lightBlock *LightBlock, store Store) *HeaderContext {
+func NewHeaderContext(lightBlock *LightBlock, store Store, fork []*LightBlock) *HeaderContext {
 	return &HeaderContext{
 		lightBlock: lightBlock,
 		store:      store,
+		fork:       fork,
 	}
 }
