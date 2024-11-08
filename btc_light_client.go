@@ -50,23 +50,22 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable
-func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
+func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 
 	if lb := lc.btcStore.LightBlockByHash(header.BlockHash()); lb != nil {
 		return errors.New("Parent block not found")
 	}
 	
-	previousBlockHash := header.PrevBlock
-	previousBlock := lc.btcStore.LightBlockByHash(previousBlockHash)
+	parentHash := header.PrevBlock
+	parent := lc.btcStore.LightBlockByHash(previousBlockHash)
 	if previousBlock == nil {
 		return errors.New("Block doesn't belong to any fork!")
 	}
 
 	// we need to handle 2 cases:
 	// extend the exist fork
-	if lc.btcStore.RemindFork(previousBlockHash) {
-		previousHeader := previousBlock.Header
-		if err := lc.CheckHeader(previousHeader, header); err != nil {
+	if lc.btcStore.IsForkHead(previousBlockHash) {
+		if err := lc.CheckHeader(parent.Header, header); err != nil {
 			return err
 
 		}
@@ -82,23 +81,20 @@ func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
 	return lc.CreateNewFork(parent, header)
 }
 
-func (lc *BTCLightClient) extractFork(bh chainhash.Hash) ([]*LightBlock, error) {
+func (lc *BTCLightClient) findLightBlock(bh chainhash.Hash) ([]*LightBlock, error) {
 	checkpoint := lc.btcStore.LatestCheckPoint()
 	checkpointHash := checkpoint.Header.BlockHash()
-	count := 0
 	fork := make([]*LightBlock, 0)
-
-	for count <= MaxForkAge {
+	for count := 0; count <= MaxForkAge; count++ {
 		curr := lc.btcStore.LightBlockByHash(bh)
 		fork = append(fork, curr)
 		if bh.IsEqual(&checkpointHash) {
 			return fork, nil
 		}
 		bh = curr.Header.PrevBlock
-		count++
 	}
 
-	return nil, errors.New("Fork age invalid")
+	return nil, errors.New("Block not found or too old")
 }
 
 // TODO: We will do this in the next PR
