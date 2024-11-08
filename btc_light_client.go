@@ -80,6 +80,11 @@ func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 	return lc.CreateNewFork(parent, header)
 }
 
+// TODO: fix this function in the next PR
+// There can be few heads. Example, where we have 3 active forks, with 3 latest blocks (b3, c3, d3):
+// b1 <- b2  <- b3
+//    |- c2  <- c3
+//    |- d2'  <- d3
 func (lc *BTCLightClient) findLightBlock(bh chainhash.Hash) ([]*LightBlock, error) {
 	checkpoint := lc.btcStore.LatestCheckPoint()
 	checkpointHash := checkpoint.Header.BlockHash()
