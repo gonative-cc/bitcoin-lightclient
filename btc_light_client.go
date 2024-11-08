@@ -55,29 +55,28 @@ func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 	if lb := lc.btcStore.LightBlockByHash(header.BlockHash()); lb != nil {
 		return errors.New("Parent block not found")
 	}
-	
+
 	parentHash := header.PrevBlock
-	parent := lc.btcStore.LightBlockByHash(previousBlockHash)
-	if previousBlock == nil {
+	parent := lc.btcStore.LightBlockByHash(parentHash)
+	if parent == nil {
 		return errors.New("Block doesn't belong to any fork!")
 	}
 
 	// we need to handle 2 cases:
 	// extend the exist fork
-	if lc.btcStore.IsForkHead(previousBlockHash) {
+	if lc.btcStore.IsForkHead(parentHash) {
 		if err := lc.CheckHeader(parent.Header, header); err != nil {
 			return err
 
 		}
 
-		lc.btcStore.AddBlock(previousBlock, header)
-		lc.btcStore.SetLatestBlockOnFork(previousBlockHash, false)
+		lc.btcStore.AddBlock(parent, header)
+		lc.btcStore.SetLatestBlockOnFork(parentHash, false)
 		lc.btcStore.SetLatestBlockOnFork(header.BlockHash(), true)
 		return nil
 	}
 
 	// create a new fork
-	parent := lc.btcStore.LightBlockByHash(previousBlockHash)
 	return lc.CreateNewFork(parent, header)
 }
 
@@ -138,7 +137,7 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	fork, _ := lc.extractFork(parent.BlockHash())
+	fork, _ := lc.findLightBlock(parent.BlockHash())
 	latestLightBlock := fork[0]
 
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {
