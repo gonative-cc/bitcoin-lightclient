@@ -14,10 +14,9 @@ type Store interface {
 	LatestHeight() int64
 	LightBlockByHash(hash chainhash.Hash) *LightBlock
 	// check hash h is hash of latest block in remind fork sets.
-	RemindFork(h chainhash.Hash) bool
+	IsForkHead(h chainhash.Hash) bool
 	LatestCheckPoint() *LightBlock
 	AddBlock(parent *LightBlock, header wire.BlockHeader) error
-	RemoveBlock(h chainhash.Hash)
 	SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error
 	TotalWorkAtBlock(bh chainhash.Hash) *big.Int
 	SetBlock(lb *LightBlock, perviousPower *big.Int)
@@ -25,6 +24,7 @@ type Store interface {
 	SetLightBlockByHeight(lb *LightBlock)
 	MostDifficultFork() *LightBlock
 	LatestBlockHashOfFork() map[chainhash.Hash]struct{}
+	RemoveBlock(h chainhash.Hash)
 }
 
 type MemStore struct {
@@ -135,7 +135,7 @@ func (s *MemStore) LatestCheckPoint() *LightBlock {
 	return s.latestcheckpoint
 }
 
-func (s *MemStore) RemindFork(h chainhash.Hash) bool {
+func (s *MemStore) IsForkHead(h chainhash.Hash) bool {
 	_, ok := s.latestBlockHashOfFork[h]
 	return ok
 }

@@ -50,41 +50,42 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 
 // We assume we always insert valid header. Acctually, Cosmos can revert a state
 // when module return error so this assumtion is reasonable
-func (lc *BTCLightClient) InsertHeaders(header wire.BlockHeader) error {
+func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 
 	if lb := lc.btcStore.LightBlockByHash(header.BlockHash()); lb != nil {
-		return errors.New("Block exists in db")
+		return errors.New("Parent block not found")
 	}
 
-	previousBlockHash := header.PrevBlock
-
-	previousBlock := lc.btcStore.LightBlockByHash(previousBlockHash)
-
-	if previousBlock == nil {
+	parentHash := header.PrevBlock
+	parent := lc.btcStore.LightBlockByHash(parentHash)
+	if parent == nil {
 		return errors.New("Block doesn't belong to any fork!")
 	}
 
 	// we need to handle 2 cases:
 	// extend the exist fork
-	if lc.btcStore.RemindFork(previousBlockHash) {
-		previousHeader := previousBlock.Header
-		if err := lc.CheckHeader(previousHeader, header); err != nil {
+	if lc.btcStore.IsForkHead(parentHash) {
+		if err := lc.CheckHeader(parent.Header, header); err != nil {
 			return err
 
 		}
 
-		lc.btcStore.AddBlock(previousBlock, header)
-		lc.btcStore.SetLatestBlockOnFork(previousBlockHash, false)
+		lc.btcStore.AddBlock(parent, header)
+		lc.btcStore.SetLatestBlockOnFork(parentHash, false)
 		lc.btcStore.SetLatestBlockOnFork(header.BlockHash(), true)
 		return nil
 	}
 
 	// create a new fork
-	parent := lc.btcStore.LightBlockByHash(previousBlockHash)
 	return lc.CreateNewFork(parent, header)
 }
 
-func (lc *BTCLightClient) extractFork(bh chainhash.Hash) ([]*LightBlock, error) {
+// TODO: fix this function in the next PR
+// There can be few heads. Example, where we have 3 active forks, with 3 latest blocks (b3, c3, d3):
+// b1 <- b2  <- b3
+//    |- c2  <- c3
+//    |- d2'  <- d3
+func (lc *BTCLightClient) findLightBlock(bh chainhash.Hash) ([]*LightBlock, error) {
 	checkpoint := lc.btcStore.LatestCheckPoint()
 	checkpointHash := checkpoint.Header.BlockHash()
 	count := 0
@@ -103,6 +104,7 @@ func (lc *BTCLightClient) extractFork(bh chainhash.Hash) ([]*LightBlock, error) 
 	return nil, errors.New("Fork age invalid")
 }
 
+
 // TODO: We will do this in the next PR
 // - select the next finalize block base on 2 conditions:
 //   - this fork len greater than MaxForkAge
@@ -119,7 +121,7 @@ func (lc *BTCLightClient) CleanUpFork() error {
 	}
 	// extract most power fork
 	// TODO handle error
-	fork, err := lc.extractFork(mostPowerForkLatestBlock.Header.BlockHash())
+	fork, err := lc.findLightBlock(mostPowerForkLatestBlock.Header.BlockHash())
 
 	if err != nil {
 		return err
@@ -129,7 +131,7 @@ func (lc *BTCLightClient) CleanUpFork() error {
 		// fork[MaxForkAge - 1] always not nil because fork len >= maxforkage
 		lc.btcStore.SetLatestCheckPoint(fork[MaxForkAge-1])
 		for h := range lc.btcStore.LatestBlockHashOfFork() {
-			otherFork, _ := lc.extractFork(h)
+			otherFork, _ := lc.findLightBlock(h)
 			// clean other fork not start at checkpoint
 			if otherFork == nil {
 				removedHash := h
@@ -144,22 +146,8 @@ func (lc *BTCLightClient) CleanUpFork() error {
 		}
 
 	}
-	return nil
-}
 
-func (lc *BTCLightClient) ForkAge(bh chainhash.Hash) (int32, error) {
-	lb := lc.btcStore.LightBlockByHash(bh)
-	checkpoint := lc.btcStore.LatestCheckPoint()
-	if lb == nil {
-		return 0, errors.New("hash doesn't belong to db")
-	}
-
-	if !lc.btcStore.RemindFork(bh) {
-		return 0, errors.New("hash not a latest block in forks")
-	}
-
-	age := lb.Height - checkpoint.Height
-	return age, nil
+	return errors.New("Block not found or too old")
 }
 
 func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHeader) error {
@@ -171,6 +159,22 @@ func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHea
 	}
 	return nil
 }
+
+func (lc *BTCLightClient) ForkAge(bh chainhash.Hash) (int32, error) {
+	lb := lc.btcStore.LightBlockByHash(bh)
+	checkpoint := lc.btcStore.LatestCheckPoint()
+	if lb == nil {
+		return 0, errors.New("hash doesn't belong to db")
+	}
+
+	if !lc.btcStore.IsForkHead(bh) {
+		return 0, errors.New("hash not a latest block in forks")
+	}
+
+	age := lb.Height - checkpoint.Height
+	return age, nil
+}
+
 
 type BlockMedianTimeSource struct {
 	h *wire.BlockHeader
@@ -197,7 +201,7 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	fork, _ := lc.extractFork(parent.BlockHash())
+	fork, _ := lc.findLightBlock(parent.BlockHash())
 	latestLightBlock := fork[0]
 
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {
