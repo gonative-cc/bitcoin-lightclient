@@ -111,6 +111,7 @@ func (lc *BTCLightClient) findLightBlock(bh chainhash.Hash) ([]*LightBlock, erro
 // - Remove all fork invalid
 // - Update map(height => block) in btcStore
 func (lc *BTCLightClient) CleanUpFork() error {
+	// TODO: need to iterate through all heads.
 	mostPowerForkLatestBlock := lc.btcStore.MostDifficultFork()
 	mostPowerForkAge, err := lc.ForkAge(mostPowerForkLatestBlock.Header.BlockHash())
 
