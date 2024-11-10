@@ -99,7 +99,7 @@ func (lc *BTCLightClient) findLightBlock(bh chainhash.Hash) ([]*LightBlock, erro
 		bh = curr.Header.PrevBlock
 	}
 
-	return nil, errors.New("Fork age invalid")
+	return nil, errors.New("block not found or too old")
 }
 
 
