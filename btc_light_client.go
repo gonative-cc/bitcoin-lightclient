@@ -88,17 +88,15 @@ func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 func (lc *BTCLightClient) findLightBlock(bh chainhash.Hash) ([]*LightBlock, error) {
 	checkpoint := lc.btcStore.LatestCheckPoint()
 	checkpointHash := checkpoint.Header.BlockHash()
-	count := 0
 	fork := make([]*LightBlock, 0)
 
-	for count <= MaxForkAge {
+	for count := 0; count <= MaxForkAge; count++ {
 		curr := lc.btcStore.LightBlockByHash(bh)
 		fork = append(fork, curr)
 		if bh.IsEqual(&checkpointHash) {
 			return fork, nil
 		}
 		bh = curr.Header.PrevBlock
-		count++
 	}
 
 	return nil, errors.New("Fork age invalid")
