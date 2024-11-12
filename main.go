@@ -35,12 +35,14 @@ func main() {
 	headerInsert, _ := BlockHeaderFromHex("01000000ea0ec14effa5f7f2a1a9f4431588b63b575d167a261c1d93b604000000000000c1844859aa7bb44251cf04a19098169f657e4bd91ebeb3f2a028211f1f8bde271c6e8250ef75051a7dc08785")
 
 	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
-
+	btcLC.Status()
+	
 	if err := btcLC.InsertHeader(headerInsert); err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("Insert success")
 	}
 
+	btcLC.CleanUpFork()
 	btcLC.Status()
 }
