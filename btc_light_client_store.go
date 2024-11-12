@@ -17,7 +17,8 @@ type Store interface {
 	IsForkHead(h chainhash.Hash) bool
 	LatestCheckPoint() *LightBlock
 	AddBlock(parent *LightBlock, header wire.BlockHeader) error
-	SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error
+	SetIsHead(bh chainhash.Hash)
+	SetIsNotHead(bh chainhash.Hash)
 	TotalWorkAtBlock(bh chainhash.Hash) *big.Int
 	SetBlock(lb *LightBlock, perviousPower *big.Int)
 	SetLatestCheckPoint(lb *LightBlock)
@@ -113,14 +114,12 @@ func (s *MemStore) AddBlock(parent *LightBlock, header wire.BlockHeader) error {
 	return nil
 }
 
-func (s *MemStore) SetLatestBlockOnFork(bh chainhash.Hash, latest bool) error {
-	if latest {
-		s.latestBlockHashOfFork[bh] = struct{}{}
-	} else {
-		delete(s.latestBlockHashOfFork, bh)
-	}
+func (s *MemStore) SetIsHead(bh chainhash.Hash) {
+	s.latestBlockHashOfFork[bh] = struct{}{}
+}
 
-	return nil
+func (s *MemStore) SetIsNotHead(bh chainhash.Hash) {
+	delete(s.latestBlockHashOfFork, bh)
 }
 
 func (s *MemStore) LatestBlockHashOfFork() map[chainhash.Hash]struct{} {
