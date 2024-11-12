@@ -80,13 +80,7 @@ func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 	return lc.CreateNewFork(parent, header)
 }
 
-// TODO: fix this function in the next PR
-// There can be few heads. Example, where we have 3 active forks, with 3 latest blocks (b3, c3, d3)  :
-//
-//	b1 <- b2  <- b3
-//	   |- c2  <- c3
-//	   |- d2'  <- d3
-func (lc *BTCLightClient) findLightBlock(bh chainhash.Hash) ([]*LightBlock, error) {
+func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, error) {
 	checkpoint := lc.btcStore.LatestCheckPoint()
 	checkpointHash := checkpoint.Header.BlockHash()
 	fork := make([]*LightBlock, 0)
@@ -120,7 +114,7 @@ func (lc *BTCLightClient) CleanUpFork() error {
 	}
 	// extract most power fork
 	// TODO handle error
-	fork, err := lc.findLightBlock(mostPowerForkLatestBlock.Header.BlockHash())
+	fork, err := lc.forkOfBlockhash(mostPowerForkLatestBlock.Header.BlockHash())
 
 	if err != nil {
 		return err
@@ -130,7 +124,7 @@ func (lc *BTCLightClient) CleanUpFork() error {
 		// fork[MaxForkAge - 1] always not nil because fork len >= maxforkage
 		lc.btcStore.SetLatestCheckPoint(fork[MaxForkAge-1])
 		for h := range lc.btcStore.LatestBlockHashOfFork() {
-			otherFork, _ := lc.findLightBlock(h)
+			otherFork, _ := lc.forkOfBlockhash(h)
 			// clean other fork not start at checkpoint
 			if otherFork == nil {
 				removedHash := h
@@ -198,7 +192,7 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	fork, _ := lc.findLightBlock(parent.BlockHash())
+	fork, _ := lc.forkOfBlockhash(parent.BlockHash())
 	latestLightBlock := fork[0]
 
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {

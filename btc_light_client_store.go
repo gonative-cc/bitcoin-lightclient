@@ -102,9 +102,7 @@ func (s *MemStore) SetBlock(lb *LightBlock, previousPower *big.Int) {
 }
 
 func (s *MemStore) AddBlock(parent *LightBlock, header wire.BlockHeader) error {
-	height := parent.Height + 1
-
-	newBlock := NewLightBlock(height, header)
+	newBlock := NewLightBlock(parent.Height+1, header)
 	blockHash := header.BlockHash()
 	// TODO: handle case block exist in db when add
 	s.lightBlockByHashMap[blockHash] = newBlock
@@ -122,6 +120,7 @@ func (s *MemStore) SetIsNotHead(bh chainhash.Hash) {
 	delete(s.latestBlockHashOfFork, bh)
 }
 
+// TODO: convert to iterator rather than returning a map
 func (s *MemStore) LatestBlockHashOfFork() map[chainhash.Hash]struct{} {
 	return s.latestBlockHashOfFork
 }
