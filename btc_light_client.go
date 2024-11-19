@@ -110,9 +110,8 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 func (lc *BTCLightClient) CleanUpFork() error {
 	mostPowerForkLatestBlock := lc.btcStore.MostDifficultFork()
 
-	fmt.Println(mostPowerForkLatestBlock.Height)
 	mostPowerForkAge, err := lc.ForkAge(mostPowerForkLatestBlock.Header.BlockHash())
-
+	
 	if err != nil {
 		return err
 	}
@@ -124,7 +123,6 @@ func (lc *BTCLightClient) CleanUpFork() error {
 		return err
 	}
 
-	fmt.Println("age", mostPowerForkAge)
 	if mostPowerForkAge >= MaxForkAge {
 		// fork[MaxForkAge - 1] always not nil because fork len >= maxforkage
 		lc.btcStore.SetLatestCheckPoint(fork[MaxForkAge-1])
@@ -145,7 +143,7 @@ func (lc *BTCLightClient) CleanUpFork() error {
 
 	}
 
-	return errors.New("Block not found or too old")
+	return nil
 }
 
 func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHeader) error {
