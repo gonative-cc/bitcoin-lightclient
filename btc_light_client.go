@@ -87,6 +87,9 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 
 	for count := 0; count <= MaxForkAge; count++ {
 		curr := lc.btcStore.LightBlockByHash(bh)
+		if checkpoint.Height > curr.Height {
+			return nil, errors.New("fork too old")
+		}
 		fork = append(fork, curr)
 		if bh.IsEqual(&checkpointHash) {
 			return fork, nil
@@ -193,7 +196,12 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	fork, _ := lc.forkOfBlockhash(parent.BlockHash())
+	
+	fork, err := lc.forkOfBlockhash(parent.BlockHash())
+
+	if err != nil {
+		return err
+ 	}
 	latestLightBlock := fork[0]
 
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {
