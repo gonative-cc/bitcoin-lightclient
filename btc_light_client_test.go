@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcd/chaincfg"
@@ -49,8 +50,10 @@ func TestInsertHeader(t *testing.T) {
 
 		lcErr := lc.InsertHeader(btcHeader)
 
+		fmt.Println(lcErr)
 		if tc.err == nil {
 			assert.Assert(t, lcErr == nil)
+			// TODO: fix bug can't compare 2 errors
 		} else if errors.Is(lcErr, tc.err) {
 			t.Fatalf("Error not match")
 		}
@@ -65,11 +68,18 @@ func TestInsertHeader(t *testing.T) {
 			err:     nil,
 		},
 		{
-			name:    "Insert failed",
+			name:    "Insert failed because fork too old",
 			headers: headers,
 			header:  "0000002006226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f91bf7fc009e51a44f6c7b063e64d80b36af5cb8bc9879b9dadc7eebec779a70b437f3c67ffff7f200100000001020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff025100ffffffff0200f2052a01000000160014db62d5ead43bde6defb99c188151bf9c9d37f6c30000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000",
 			err:     errors.New("fork too old"),
 		},
+		{
+			name:    "Insert failed because invalid block",
+			headers: headers,
+			header:  "0000002018c8213eb4f94b3847dccc7946ff82a4d022a9e87162bc0601992b7dbaf12b43b275a58e2107b29a5735d8c6bd63d674ef01d4596c78961f338e5a364693b03502b53c67ffff7f200000000001020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff03011100ffffffff0200f2052a01000000160014c6aee90d5d3120a43a090b1e3720aea464248c5f0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000",
+			err:     errors.New("Block doesn't belong to any fork!"),
+		},
+
 		{
 			name:    "Create fork",
 			headers: headers,
