@@ -126,8 +126,14 @@ func (lc *BTCLightClient) CleanUpFork() error {
 	if mostPowerForkAge >= MaxForkAge {
 		// fork[MaxForkAge - 1] always not nil because fork len >= maxforkage
 		lc.btcStore.SetLatestCheckPoint(fork[MaxForkAge-1])
+		lc.btcStore.SetLightBlockByHeight(fork[MaxForkAge - 1])
 		for _, h := range lc.btcStore.LatestBlockHashOfFork() {
-			otherFork, _ := lc.forkOfBlockhash(h)
+			otherFork, err := lc.forkOfBlockhash(h)
+
+			if err != nil {
+				return err
+			}
+			
 			// clean other fork not start at checkpoint
 			if otherFork == nil {
 				removedHash := h
