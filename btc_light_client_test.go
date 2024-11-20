@@ -123,8 +123,6 @@ func TestCleanup(t *testing.T) {
 	data := tcs["Append a fork"]
 	btcHeader, _ := BlockHeaderFromHex(data.header)
 
-
-
 	beforeCheckpoint := lc.btcStore.LatestCheckPoint()
 
 	lcErr := lc.InsertHeader(btcHeader)
@@ -148,7 +146,7 @@ func TestCleanup(t *testing.T) {
 	// b3  ... b8 <- b9 <- b10
 	//                  \- c10
 	lc.CleanUpFork()
-	
+
 	notupdateCheckpoint := lc.btcStore.LatestCheckPoint()
 
 	assert.Assert(t, notupdateCheckpoint == afterCheckpoint)
@@ -157,8 +155,6 @@ func TestCleanup(t *testing.T) {
 	btcHeader, _ = BlockHeaderFromHex(data.header)
 	lc.InsertHeader(btcHeader)
 
-
-	
 	// test-case3
 	// b1 <- b2 <- b3  .... b9
 	//          \- c3
@@ -166,7 +162,6 @@ func TestCleanup(t *testing.T) {
 	// run cleanup
 	// b2 <- b3  .... b9
 	//    \- c3
-
 
 	headers := []string{
 		"000000201bb3e1c443436f66b4cd58bad75748ceddd9d5737cf8c28bfffe3be786e21f6df83b5f5af28fbbac9795e543e2ef0f97bf9137305483e6c2fe59771a59303d89e1bd3d67ffff7f200200000001020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff03011300ffffffff0200f2052a01000000160014c2adc16152275bed2e0c7f3c86852d9e15ea31680000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000",
@@ -178,10 +173,8 @@ func TestCleanup(t *testing.T) {
 		"000000203325626e050e9f17884eb04c08f89d4c689879e86bae5518ba0e77535de63976e9413b0e69182999433ea49fc52e8bb29c8d3ff7ff69c58da5f3d7978e23ea5fe2bd3d67ffff7f200000000001020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff03011900ffffffff0200f2052a01000000160014c2adc16152275bed2e0c7f3c86852d9e15ea31680000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000",
 	}
 
-	// lc.btcStore.SetLatestCheckPoint() 
+	// lc.btcStore.SetLatestCheckPoint()
 
-	
-	
 	for id, h := range headers {
 		btcHeader, _ := BlockHeaderFromHex(h)
 		lcErr := lc.InsertHeader(btcHeader)

@@ -100,7 +100,7 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 	return nil, errors.New("block not found or too old")
 }
 
-// We follow: 
+// We follow:
 // - select the next finalize block base on 2 conditions:
 //   - this fork len greater than MaxForkAge
 //   - this fork is the most powerful fork
@@ -111,11 +111,11 @@ func (lc *BTCLightClient) CleanUpFork() error {
 	mostPowerForkLatestBlock := lc.btcStore.MostDifficultFork()
 
 	mostPowerForkAge, err := lc.ForkAge(mostPowerForkLatestBlock.Header.BlockHash())
-	
+
 	if err != nil {
 		return err
 	}
-	
+
 	// extract most power fork
 	fork, err := lc.forkOfBlockhash(mostPowerForkLatestBlock.Header.BlockHash())
 
@@ -126,15 +126,15 @@ func (lc *BTCLightClient) CleanUpFork() error {
 	if mostPowerForkAge >= MaxForkAge {
 		// fork[MaxForkAge - 1] always not nil because fork len >= maxforkage
 		lc.btcStore.SetLatestCheckPoint(fork[MaxForkAge-1])
-		lc.btcStore.SetLightBlockByHeight(fork[MaxForkAge - 1])
+		lc.btcStore.SetLightBlockByHeight(fork[MaxForkAge-1])
 		for _, h := range lc.btcStore.LatestBlockHashOfFork() {
 			_, err := lc.forkOfBlockhash(h)
-			
+
 			// clean other fork not start at checkpoint
 			if err != nil {
 				removedHash := h
 				removeBlock := lc.btcStore.LightBlockByHash(removedHash)
-				for removeBlock.Height > fork[MaxForkAge - 1].Height {
+				for removeBlock.Height > fork[MaxForkAge-1].Height {
 					lc.btcStore.RemoveBlock(removedHash)
 					removedHash = removeBlock.Header.PrevBlock
 					removeBlock = lc.btcStore.LightBlockByHash(removedHash)
@@ -152,7 +152,7 @@ func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHea
 	if err := lc.CheckHeader(parent.Header, header); err != nil {
 		return err
 	}
-	
+
 	lc.btcStore.AddBlock(parent, header)
 	lc.btcStore.SetIsHead(header.BlockHash())
 	return nil
@@ -201,7 +201,7 @@ func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.Block
 	fork, err := lc.forkOfBlockhash(parent.BlockHash())
 	if err != nil {
 		return err
- 	}
+	}
 	latestLightBlock := fork[0]
 
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {
