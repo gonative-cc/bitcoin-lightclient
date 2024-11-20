@@ -83,9 +83,7 @@ func TestInsertHeader(t *testing.T) {
 			decodedHeader[id] = h
 		}
 		lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
-
 		lcErr := lc.InsertHeader(btcHeader)
-
 		fmt.Println(lcErr)
 
 		err := testCases[testcase]
