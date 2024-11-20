@@ -192,11 +192,12 @@ func TestCleanup(t *testing.T) {
 			t.Fatal("Should not return error when insert header")
 		}
 		err := lc.CleanUpFork()
-		fmt.Println(err)
-
-		fmt.Println(lc.btcStore.LatestBlockHashOfFork())
+		assert.NilError(t, err)
+		fmt.Println(btcHeader.BlockHash())
 	}
 
+	listFork := lc.btcStore.LatestBlockHashOfFork()
 
-	// lc.CleanUpFork()
+	assert.Assert(t, len(listFork) == 1)
+
 }
