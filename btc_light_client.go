@@ -105,7 +105,7 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 //   - this fork len greater than MaxForkAge
 //   - this fork is the most powerful fork
 //
-// - Remove all forks invalid
+// - Remove all invalid forks
 // - Update map(height => block) in btcStore
 func (lc *BTCLightClient) CleanUpFork() error {
 	mostPowerForkLatestBlock := lc.btcStore.MostDifficultFork()
@@ -196,9 +196,7 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	
 	fork, err := lc.forkOfBlockhash(parent.BlockHash())
-
 	if err != nil {
 		return err
  	}
