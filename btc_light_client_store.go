@@ -127,7 +127,6 @@ func (s *MemStore) LatestBlockHashOfFork() []chainhash.Hash {
 	}
 
 	return hashes
-	// return s.latestBlockHashOfFork
 }
 
 func (s *MemStore) TotalWorkAtBlock(hash chainhash.Hash) *big.Int {
