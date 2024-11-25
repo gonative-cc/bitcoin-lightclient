@@ -1,6 +1,6 @@
 module btclightclient
 
-go 1.22
+go 1.23
 
 require github.com/btcsuite/btcd v0.24.2
 
