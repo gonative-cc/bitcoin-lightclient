@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-go@v5
         if: env.GIT_DIFF
         with:
-          go-version: "1.22"
+          go-version: "1.23"
           cache: true
       - name: Compile
         if: env.GIT_DIFF
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/setup-go@v5
         if: env.GIT_DIFF
         with:
-          go-version: "1.22"
+          go-version: "1.23"
           cache: true
       - name: Test and Create Coverage Report
         if: env.GIT_DIFF
@@ -78,7 +78,7 @@ jobs:
   #     - uses: actions/setup-go@v5
   #       if: env.GIT_DIFF
   #       with:
-  #         go-version: "1.22"
+  #         go-version: "1.23"
   #         cache: true
 
   #     - name: Test E2E
