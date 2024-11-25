@@ -71,8 +71,8 @@ func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 		}
 
 		lc.btcStore.AddBlock(parent, header)
-		lc.btcStore.SetIsHead(parentHash)
-		lc.btcStore.SetIsNotHead(header.BlockHash())
+		lc.btcStore.SetIsNotHead(parentHash)
+		lc.btcStore.SetIsHead(header.BlockHash())
 		return nil
 	}
 
@@ -87,6 +87,9 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 
 	for count := 0; count <= MaxForkAge; count++ {
 		curr := lc.btcStore.LightBlockByHash(bh)
+		if checkpoint.Height > curr.Height {
+			return nil, errors.New("fork too old")
+		}
 		fork = append(fork, curr)
 		if bh.IsEqual(&checkpointHash) {
 			return fork, nil
@@ -97,23 +100,23 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 	return nil, errors.New("block not found or too old")
 }
 
-// TODO: We will do this in the next PR
+// We follow:
 // - select the next finalize block base on 2 conditions:
 //   - this fork len greater than MaxForkAge
 //   - this fork is the most powerful fork
 //
-// - Remove all fork invalid
+// - Remove all invalid forks
 // - Update map(height => block) in btcStore
 func (lc *BTCLightClient) CleanUpFork() error {
-	// TODO: need to iterate through all heads.
 	mostPowerForkLatestBlock := lc.btcStore.MostDifficultFork()
+
 	mostPowerForkAge, err := lc.ForkAge(mostPowerForkLatestBlock.Header.BlockHash())
 
 	if err != nil {
 		return err
 	}
+
 	// extract most power fork
-	// TODO handle error
 	fork, err := lc.forkOfBlockhash(mostPowerForkLatestBlock.Header.BlockHash())
 
 	if err != nil {
@@ -123,13 +126,15 @@ func (lc *BTCLightClient) CleanUpFork() error {
 	if mostPowerForkAge >= MaxForkAge {
 		// fork[MaxForkAge - 1] always not nil because fork len >= maxforkage
 		lc.btcStore.SetLatestCheckPoint(fork[MaxForkAge-1])
-		for h := range lc.btcStore.LatestBlockHashOfFork() {
-			otherFork, _ := lc.forkOfBlockhash(h)
+		lc.btcStore.SetLightBlockByHeight(fork[MaxForkAge-1])
+		for _, h := range lc.btcStore.LatestBlockHashOfFork() {
+			_, err := lc.forkOfBlockhash(h)
+
 			// clean other fork not start at checkpoint
-			if otherFork == nil {
+			if err != nil {
 				removedHash := h
 				removeBlock := lc.btcStore.LightBlockByHash(removedHash)
-				for removedHash != fork[0].Header.BlockHash() {
+				for removeBlock.Height > fork[MaxForkAge-1].Height {
 					lc.btcStore.RemoveBlock(removedHash)
 					removedHash = removeBlock.Header.PrevBlock
 					removeBlock = lc.btcStore.LightBlockByHash(removedHash)
@@ -140,13 +145,14 @@ func (lc *BTCLightClient) CleanUpFork() error {
 
 	}
 
-	return errors.New("Block not found or too old")
+	return nil
 }
 
 func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHeader) error {
 	if err := lc.CheckHeader(parent.Header, header); err != nil {
 		return err
 	}
+
 	lc.btcStore.AddBlock(parent, header)
 	lc.btcStore.SetIsHead(header.BlockHash())
 	return nil
@@ -192,7 +198,10 @@ func (b *BlockMedianTimeSource) Offset() time.Duration {
 
 func (lc *BTCLightClient) CheckHeader(parent wire.BlockHeader, header wire.BlockHeader) error {
 	noFlag := blockchain.BFNone
-	fork, _ := lc.forkOfBlockhash(parent.BlockHash())
+	fork, err := lc.forkOfBlockhash(parent.BlockHash())
+	if err != nil {
+		return err
+	}
 	latestLightBlock := fork[0]
 
 	if err := blockchain.CheckBlockHeaderContext(&header, NewHeaderContext(latestLightBlock, lc.btcStore, fork), noFlag, lc, true); err != nil {

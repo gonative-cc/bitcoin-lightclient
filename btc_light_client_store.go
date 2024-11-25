@@ -1,10 +1,9 @@
 package main
 
 import (
-	"math/big"
-
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
+	"math/big"
 )
 
 const MaxForkAge = 8
@@ -24,7 +23,7 @@ type Store interface {
 	SetLatestCheckPoint(lb *LightBlock)
 	SetLightBlockByHeight(lb *LightBlock)
 	MostDifficultFork() *LightBlock
-	LatestBlockHashOfFork() map[chainhash.Hash]struct{}
+	LatestBlockHashOfFork() []chainhash.Hash
 	RemoveBlock(h chainhash.Hash)
 }
 
@@ -121,8 +120,13 @@ func (s *MemStore) SetIsNotHead(bh chainhash.Hash) {
 }
 
 // TODO: convert to iterator rather than returning a map
-func (s *MemStore) LatestBlockHashOfFork() map[chainhash.Hash]struct{} {
-	return s.latestBlockHashOfFork
+func (s *MemStore) LatestBlockHashOfFork() []chainhash.Hash {
+	hashes := []chainhash.Hash{}
+	for h := range s.latestBlockHashOfFork {
+		hashes = append(hashes, h)
+	}
+
+	return hashes
 }
 
 func (s *MemStore) TotalWorkAtBlock(hash chainhash.Hash) *big.Int {
