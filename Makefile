@@ -3,20 +3,16 @@ setup:
 	@cd .git/hooks; ln -s -f ../../scripts/git-hooks/* ./
 
 
-out:
-	mkdir out
-
 .git/hooks/pre-commit: setup
 
-build: out .git/hooks/pre-commit
-	go build -o ./out ./cmd/*
+build: .git/hooks/pre-commit
+	go build .
 
-run:
-	@if [ ! -f .env ]; then echo "Create .env file by copying and updating .env.example"; exit 1; fi
-	@./out/rly-pera start --block 8713586
+start:
+	@./btclightclient
 
 clean:
-	rm -rf out
+	rm ./btclightclient
 
 # used as pre-commit
 lint-git:
@@ -39,7 +35,7 @@ lint-fix-go-all:
 	@gofmt -w -s -l .
 
 
-.PHONY: build run clean setup
+.PHONY: build start clean setup
 .PHONY: lint lint-all lint-fix-all lint-fix-go-all
 
 ###############################################################################
