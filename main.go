@@ -1,10 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -37,12 +40,22 @@ func main() {
 	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
 	btcLC.Status()
 
+	rpcService := NewRPCServer(btcLC)
+	log.Info().Msgf("RPC server running at: %s", rpcService.URL)
+
 	if err := btcLC.InsertHeader(headerInsert); err != nil {
-		fmt.Println(err)
+		log.Err(err).Msg("Failed to insert block header")
 	} else {
-		fmt.Println("Insert success")
+		log.Info().Msgf("Inserted block header %s", headerInsert.BlockHash())
 	}
 
 	btcLC.CleanUpFork()
 	btcLC.Status()
+
+	// Create channel to listen for interrupt signal
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// Wait for interrupt signal
+	<-sigChan
 }
