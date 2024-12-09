@@ -1,4 +1,4 @@
-package main
+package btclightclient
 
 import (
 	"errors"
@@ -104,6 +104,7 @@ func TestInsertHeader(t *testing.T) {
 }
 
 func TestCleanup(t *testing.T) {
+	var err error
 
 	tcs := CommonTestCases()
 	decodedHeader := make([]wire.BlockHeader, len(HEADERS))
@@ -130,7 +131,8 @@ func TestCleanup(t *testing.T) {
 		t.Fatal("Should not return error when insert header")
 	}
 
-	lc.CleanUpFork()
+	err = lc.CleanUpFork()
+	assert.NilError(t, err)
 
 	afterCheckpoint := lc.btcStore.LatestCheckPoint()
 
@@ -143,7 +145,8 @@ func TestCleanup(t *testing.T) {
 	// run cleanup
 	// b3  ... b8 <- b9 <- b10
 	//                  \- c10
-	lc.CleanUpFork()
+	err = lc.CleanUpFork()
+	assert.NilError(t, err)
 
 	notupdateCheckpoint := lc.btcStore.LatestCheckPoint()
 
@@ -151,7 +154,9 @@ func TestCleanup(t *testing.T) {
 
 	data = tcs["Create fork"]
 	btcHeader, _ = BlockHeaderFromHex(data.header)
-	lc.InsertHeader(btcHeader)
+
+	err = lc.InsertHeader(btcHeader)
+	assert.NilError(t, err)
 
 	// test-case3
 	// b1 <- b2 <- b3  .... b9
