@@ -53,9 +53,8 @@ func main() {
 	btcLC.Status()
 
 	// Create channel to listen for interrupt signal
+	// Wait for interrupt signal
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-
-	// Wait for interrupt signal
 	<-sigChan
 }
