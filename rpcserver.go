@@ -59,8 +59,5 @@ func NewRPCServer(btcLC *BTCLightClient) *httptest.Server {
 	rpcServer.AliasMethod("insert_headers", "RPCServerHandler.InsertHeaders")
 	rpcServer.AliasMethod("get_btc_header_chain_tip", "RPCServerHandler.GetBTCHeaderChainTip")
 
-	// serve the API
-	testServ := httptest.NewServer(rpcServer)
-
-	return testServ
+	return httptest.NewServer(rpcServer)
 }
