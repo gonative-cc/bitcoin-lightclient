@@ -68,6 +68,7 @@ func (s *MemStore) LightBlockByHash(hash chainhash.Hash) *LightBlock {
 	return s.lightBlockByHashMap[hash]
 }
 
+//nolint:unused
 func (s *MemStore) removeBlockByHash(hash chainhash.Hash) bool {
 	if block := s.lightBlockByHashMap[hash]; block == nil {
 		return false

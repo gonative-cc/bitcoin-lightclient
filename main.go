@@ -52,7 +52,10 @@ func main() {
 		log.Info().Msgf("Inserted block header %s", headerInsert.BlockHash())
 	}
 
-	btcLC.CleanUpFork()
+	err := btcLC.CleanUpFork()
+	if err != nil {
+		log.Err(err).Msg("Failed to clean up fork")
+	}
 	btcLC.Status()
 
 	// Create channel to listen for interrupt signal
