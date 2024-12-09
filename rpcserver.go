@@ -46,10 +46,7 @@ func (h *RPCServerHandler) GetBTCHeaderChainTip() (*chainhash.Hash, error) {
 
 // NewRPCServer creates a new instance of the rpcServer and starts listening
 func NewRPCServer(btcLC *BTCLightClient) *httptest.Server {
-	// Create a new RPC server
 	rpcServer := jsonrpc.NewServer()
-
-	// create a handler instance and register it
 	serverHandler := &RPCServerHandler{
 		btcLC: btcLC,
 	}
