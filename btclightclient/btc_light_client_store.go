@@ -1,9 +1,10 @@
-package main
+package btclightclient
 
 import (
+	"math/big"
+
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
-	"math/big"
 )
 
 const MaxForkAge = 8

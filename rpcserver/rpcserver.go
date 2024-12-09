@@ -1,9 +1,9 @@
-package main
+package rpcserver
 
 import (
 	"net/http/httptest"
 
-	// "github.com/babylonchain/babylon/x/btclightclient/types"
+	"github.com/gonative-cc/bitcoin-lightclient/btclightclient"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
@@ -13,7 +13,7 @@ import (
 
 // Have a type with some exported methods
 type RPCServerHandler struct {
-	btcLC *BTCLightClient
+	btcLC *btclightclient.BTCLightClient
 }
 
 func (h *RPCServerHandler) Ping(in int) int {
@@ -39,13 +39,13 @@ func (h *RPCServerHandler) InsertHeaders(
 
 // returns the block height and hash of tip block stored in babylon chain
 func (h *RPCServerHandler) GetBTCHeaderChainTip() (*chainhash.Hash, error) {
-	latestBlockHash := h.btcLC.btcStore.LatestCheckPoint().Header.BlockHash()
+	latestBlockHash := h.btcLC.LatestBlockHash()
 
 	return &latestBlockHash, nil
 }
 
 // NewRPCServer creates a new instance of the rpcServer and starts listening
-func NewRPCServer(btcLC *BTCLightClient) *httptest.Server {
+func NewRPCServer(btcLC *btclightclient.BTCLightClient) *httptest.Server {
 	rpcServer := jsonrpc.NewServer()
 	serverHandler := &RPCServerHandler{
 		btcLC: btcLC,

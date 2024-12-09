@@ -1,4 +1,4 @@
-module btclightclient
+module github.com/gonative-cc/bitcoin-lightclient
 
 go 1.23.1
 

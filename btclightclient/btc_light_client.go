@@ -1,4 +1,4 @@
-package main
+package btclightclient
 
 import (
 	"errors"
@@ -220,6 +220,11 @@ func (lc *BTCLightClient) Status() {
 	latestBlock := lc.btcStore.LatestCheckPoint()
 	fmt.Println(latestBlock.Height)
 	fmt.Println(lc.btcStore.MostDifficultFork())
+}
+
+func (lc *BTCLightClient) LatestBlockHash() chainhash.Hash {
+	latestBlockHash := lc.btcStore.LatestCheckPoint().Header.BlockHash()
+	return latestBlockHash
 }
 
 // TODO: make it more simple
