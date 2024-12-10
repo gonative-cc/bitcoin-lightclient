@@ -1,10 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/gonative-cc/bitcoin-lightclient/btclightclient"
+	"github.com/gonative-cc/bitcoin-lightclient/rpcserver"
 
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -28,21 +34,19 @@ func main() {
 	headers := make([]wire.BlockHeader, len(headerStrings))
 
 	for id, headerStr := range headerStrings {
-		h, _ := BlockHeaderFromHex(headerStr)
+		h, _ := btclightclient.BlockHeaderFromHex(headerStr)
 		headers[id] = h
 	}
 
-	headerInsert, _ := BlockHeaderFromHex("01000000ea0ec14effa5f7f2a1a9f4431588b63b575d167a261c1d93b604000000000000c1844859aa7bb44251cf04a19098169f657e4bd91ebeb3f2a028211f1f8bde271c6e8250ef75051a7dc08785")
-
-	btcLC := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
+	btcLC := btclightclient.NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
 	btcLC.Status()
 
-	if err := btcLC.InsertHeader(headerInsert); err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Insert success")
-	}
+	rpcService := rpcserver.NewRPCServer(btcLC)
+	log.Info().Msgf("RPC server running at: %s", rpcService.URL)
 
-	btcLC.CleanUpFork()
-	btcLC.Status()
+	// Create channel to listen for interrupt signal
+	// Wait for interrupt signal
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
 }
