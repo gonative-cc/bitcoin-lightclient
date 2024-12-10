@@ -38,25 +38,11 @@ func main() {
 		headers[id] = h
 	}
 
-	headerInsert, _ := btclightclient.BlockHeaderFromHex("01000000ea0ec14effa5f7f2a1a9f4431588b63b575d167a261c1d93b604000000000000c1844859aa7bb44251cf04a19098169f657e4bd91ebeb3f2a028211f1f8bde271c6e8250ef75051a7dc08785")
-
 	btcLC := btclightclient.NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, startHeight)
 	btcLC.Status()
 
 	rpcService := rpcserver.NewRPCServer(btcLC)
 	log.Info().Msgf("RPC server running at: %s", rpcService.URL)
-
-	if err := btcLC.InsertHeader(headerInsert); err != nil {
-		log.Err(err).Msg("Failed to insert block header")
-	} else {
-		log.Info().Msgf("Inserted block header %s", headerInsert.BlockHash())
-	}
-
-	err := btcLC.CleanUpFork()
-	if err != nil {
-		log.Err(err).Msg("Failed to clean up fork")
-	}
-	btcLC.Status()
 
 	// Create channel to listen for interrupt signal
 	// Wait for interrupt signal

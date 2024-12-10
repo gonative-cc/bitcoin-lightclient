@@ -23,18 +23,18 @@ func (h *RPCServerHandler) Ping(in int) int {
 // txn to insert bitcoin block headers to babylon chain
 func (h *RPCServerHandler) InsertHeaders(
 	blockHeaders []*wire.BlockHeader,
-) (*chainhash.Hash, error) {
+) error {
 	for _, blockHeader := range blockHeaders {
 		if err := h.btcLC.InsertHeader(*blockHeader); err != nil {
 			log.Err(err).Msg("Failed to insert block header")
 
-			return nil, err
+			return err
 		} else {
 			log.Info().Msgf("Inserted block header %s", blockHeader.BlockHash())
 		}
 	}
 
-	return nil, nil
+	return nil
 }
 
 // returns the block height and hash of tip block stored in babylon chain
