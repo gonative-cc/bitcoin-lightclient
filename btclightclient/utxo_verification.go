@@ -11,6 +11,17 @@ import (
 
 type Hash256Digest [32]byte
 
+type VerifyStatus int
+
+const (
+	// proof is complete wrong
+	InValidTXOut VerifyStatus = iota
+	// proof valid but the block have not "finalized" yet. 
+	ParialValidTXOut
+	// proof vlaid and block is "finalized". 
+	ValidTXOut
+)
+
 // We copy logic from bitcoin-spv. The main reason is bitcoin-spv is not maintain anymore.
 // https://github.com/summa-tx/bitcoin-spv/
 // Thank summa-tx for their awesome work
@@ -66,22 +77,33 @@ func VerifyHash256Merkle(proof []byte, index uint) bool {
 	return bytes.Equal(current[:], root)
 }
 
-// verify UTXO (identified as tx and UTXO index) is in a blocks' Merkle root
-func (lc *BTCLightClient) VerifyUTXO(tx *btcutil.Tx, utxoIdx uint, merkleRoot *chainhash.Hash, merklePath []byte) bool {
-	txHash := tx.Hash()
+
+func (lc *BTCLightClient) VerifyTxOutProof(txHash *chainhash.Hash, utxoIdx uint, blockHash *chainhash.Hash, merklePath []byte) VerifyStatus{
+
+	lightBlock := lc.btcStore.LightBlockByHash(*blockHash)
+
+	// In the case light block not belong currect database
+	if lightBlock == nil {
+		return InValidTXOut
+	}
+
+	
 	proof := []byte{}
 	proof = append(proof, txHash[:]...)
 	proof = append(proof, merklePath...)
+	merkleRoot := lightBlock.Header.BlockHash()
 	proof = append(proof, merkleRoot[:]...)
 
-	return VerifyHash256Merkle(proof, utxoIdx)
-}
+	validProof := VerifyHash256Merkle(proof, utxoIdx)
 
-func (lc *BTCLightClient) VerifyTXID(txHash *chainhash.Hash, utxoIdx uint, header *wire.BlockHeader, merklePath []byte) bool {
-	proof := []byte{}
-	proof = append(proof, txHash[:]...)
-	proof = append(proof, merklePath...)
-	merkleRoot := header.MerkleRoot
-	proof = append(proof, merkleRoot[:]...)
-	return VerifyHash256Merkle(proof, utxoIdx)
+	if !validProof {
+		return InValidTXOut
+	}
+
+	// in the case the block not finalize
+	if lc.btcStore.LatestHeight() < int64(lightBlock.Height){
+		return ParialValidTXOut
+	}
+
+	return ValidTXOut
 }
