@@ -11,12 +11,19 @@ type Hash256Digest [32]byte
 
 type VerifyStatus int
 
+type SPVProof struct {
+	blockHash   *chainhash.Hash
+	txId        *chainhash.Hash
+	txIndex     uint
+	merkleProof []byte
+}
+
 const (
 	// proof is complete wrong
 	InValidTXOut VerifyStatus = iota
-	// proof valid but the block have not "finalized" yet. 
+	// proof valid but the block have not "finalized" yet.
 	ParialValidTXOut
-	// proof vlaid and block is "finalized". 
+	// proof vlaid and block is "finalized".
 	ValidTXOut
 )
 
@@ -75,33 +82,56 @@ func VerifyHash256Merkle(proof []byte, index uint) bool {
 	return bytes.Equal(current[:], root)
 }
 
+func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) VerifyStatus {
 
-func (lc *BTCLightClient) VerifyTxOutProof(txHash *chainhash.Hash, utxoIdx uint, blockHash *chainhash.Hash, merklePath []byte) VerifyStatus{
-
-	lightBlock := lc.btcStore.LightBlockByHash(*blockHash)
+	lightBlock := lc.btcStore.LightBlockByHash(*spvProof.blockHash)
 
 	// In the case light block not belong currect database
 	if lightBlock == nil {
 		return InValidTXOut
 	}
 
-	
 	proof := []byte{}
-	proof = append(proof, txHash[:]...)
-	proof = append(proof, merklePath...)
+	proof = append(proof, spvProof.txId[:]...)
+	proof = append(proof, spvProof.merkleProof...)
 	merkleRoot := lightBlock.Header.BlockHash()
 	proof = append(proof, merkleRoot[:]...)
 
-	validProof := VerifyHash256Merkle(proof, utxoIdx)
+	validProof := VerifyHash256Merkle(proof, spvProof.txIndex)
 
 	if !validProof {
 		return InValidTXOut
 	}
 
 	// in the case the block not finalize
-	if lc.btcStore.LatestHeight() < int64(lightBlock.Height){
+	if lc.btcStore.LatestHeight() < int64(lightBlock.Height) {
 		return ParialValidTXOut
 	}
 
 	return ValidTXOut
+}
+
+// / Get Merkle proof for single transaction from gettxoutproof output
+func (lc *BTCLightClient) VerifySPVFromHex(hexStr string, txId *chainhash.Hash) error {
+	return nil
+}
+
+func SPVFromHex(hexStr string) (*SPVProof, error) {
+	// get header from gettxoutproof encode
+	header, err := BlockHeaderFromHex(hexStr[0:160])
+
+	if err != nil {
+		return nil, err
+	}
+
+	blockHash := header.BlockHash()
+
+	
+	return &SPVProof{
+		blockHash:   &blockHash,
+		txId:        nil,
+		txIndex:     0,
+		merkleProof: make([]byte, 0),
+	}, nil
+
 }

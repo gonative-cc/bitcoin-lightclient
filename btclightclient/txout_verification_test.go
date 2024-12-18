@@ -2,6 +2,7 @@ package btclightclient
 
 import (
 	"encoding/hex"
+	"fmt"
 	"slices"
 	"testing"
 
@@ -13,6 +14,55 @@ func encodeTxID(t *testing.T, txID string) []byte {
 	assert.NilError(t, err)
 	slices.Reverse(b)
 	return b
+}
+
+
+// ExtractTxIndexLE extracts the LE tx input index from the input in a tx
+// Returns the tx index as a little endian []byte
+func ExtractTxIndexLE(input []byte) []byte {
+	return input[32:36:36]
+}
+
+// ReverseEndianness takes in a byte slice and returns a
+// reversed endian byte slice.
+func ReverseEndianness(b []byte) []byte {
+	out := make([]byte, len(b), len(b))
+	copy(out, b)
+
+	for i := len(out)/2 - 1; i >= 0; i-- {
+		opp := len(out) - 1 - i
+		out[i], out[opp] = out[opp], out[i]
+	}
+
+	return out
+}
+
+
+// BytesToUint converts 1, 2, 3, or 4-byte numbers to uints
+func BytesToUint(b []byte) uint {
+	total := uint(0)
+	length := uint(len(b))
+
+	for i := uint(0); i < length; i++ {
+		total += uint(b[i]) << ((length - i - 1) * 8)
+	}
+
+	return total
+}
+
+
+// ExtractTxIndex extracts the tx input index from the input in a tx
+func ExtractTxIndex(input []byte) uint {
+	return BytesToUint(ReverseEndianness(ExtractTxIndexLE(input)))
+}
+
+
+func TestSPVFromHex(t *testing.T) {
+	hexStr := "00000030516567e505288fe41b2fc6be9b96318c406418c7d338168fe75a26111490eb2fec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a3f5b6167ffff7f20040000000100000001ec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a0101";
+	spv, err := SPVFromHex(hexStr)
+
+	assert.NilError(t, err)
+	fmt.Println(spv.blockHash)
 }
 
 func TestUTXOVerification(t *testing.T) {
