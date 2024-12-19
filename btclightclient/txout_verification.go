@@ -38,6 +38,7 @@ func readPMerkleTree(r io.Reader, pMerkletree *PMerkleTree, buf []byte) error {
 		return err
 	}
 
+	fmt.Println(buf);
 	pMerkletree.numberTransactions = uint(binary.LittleEndian.Uint32(buf[:4]))
 
 	var pver uint32; // pversion but btcd don't use this in those function we want.
@@ -71,8 +72,22 @@ func readPMerkleTree(r io.Reader, pMerkletree *PMerkleTree, buf []byte) error {
 		
 		pMerkletree.vHash = vHash
 	}
-
 	
+
+	if vBytes, err := wire.ReadVarBytes(r, pver, uint32(maxAllowBytes), "vBits"); err != nil {
+		return err; 
+	} else {
+
+		vBits := make([]bool, len(vBytes) * 8)
+		i := 0;
+		for _, b := range vBytes {
+			for j := 0; j < 8; j++ {
+				vBits[i] = (b & (1 << j)) != 0
+				i++
+			}
+		}
+		pMerkletree.vBits = vBits
+	}
 	return nil
 	
 }
