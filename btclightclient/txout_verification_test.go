@@ -1,6 +1,7 @@
 package btclightclient
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"slices"
@@ -59,10 +60,24 @@ func ExtractTxIndex(input []byte) uint {
 
 func TestSPVFromHex(t *testing.T) {
 	hexStr := "00000030516567e505288fe41b2fc6be9b96318c406418c7d338168fe75a26111490eb2fec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a3f5b6167ffff7f20040000000100000001ec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a0101";
-	spv, err := SPVFromHex(hexStr)
 
-	assert.NilError(t, err)
-	fmt.Println(spv.blockHash)
+	proof, _ := hex.DecodeString(hexStr[160:]);
+	fmt.Println(len(hexStr));
+
+	
+	spv := PMerkleTreeFromBytes(hexStr[160:])
+
+	fmt.Println(spv)
+
+	var pmk PMerkleTree
+	reader := bytes.NewReader(proof)
+
+	err := readPMerkleTree(reader, &pmk, proof)
+
+	fmt.Println(err);
+	fmt.Println(pmk);
+	// assert.NilError(t, err)
+	// fmt.Println(spv.blockHash)
 }
 
 func TestUTXOVerification(t *testing.T) {

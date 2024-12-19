@@ -3,8 +3,15 @@ package btclightclient
 import (
 	"bytes"
 	"crypto/sha256"
+	"encoding/binary"
+	"encoding/hex"
+	"fmt"
+	"io"
+
+	// "fmt"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/btcsuite/btcd/wire"
 )
 
 type Hash256Digest [32]byte
@@ -16,6 +23,49 @@ type SPVProof struct {
 	txId        *chainhash.Hash
 	txIndex     uint
 	merkleProof []byte
+}
+
+type PMerkleTree struct {
+	numberTransactions uint
+	vBits              []bool
+	vHash              []chainhash.Hash
+}
+
+
+func readPMerkleTree(r io.Reader, pMerkletree *PMerkleTree, buf []byte) error {
+	if _, err := io.ReadFull(r, buf[:4]); err != nil {
+		return err
+	}
+
+	pMerkletree.numberTransactions = uint(binary.LittleEndian.Uint32(buf[:4]))
+
+	var pver uint32; // pversion but btcd don't use this in those function we want.
+	if numberHash, err := wire.ReadVarIntBuf(r, pver, buf); err != nil {
+		return err
+	} else {
+		fmt.Println(numberHash);
+		fmt.Println(buf);
+	}
+	return nil
+	
+}
+
+
+
+func PMerkleTreeFromBytes(hexStr string) PMerkleTree {
+	// 4 bytes for numnerTransactions
+	fmt.Println(hexStr);
+	proof, _ := hex.DecodeString(hexStr)
+	numberTransaction := binary.LittleEndian.Uint32(proof[:4])
+
+	// VHash decode
+	
+	// vBits decode
+	return PMerkleTree{
+		numberTransactions: uint(numberTransaction),
+		vBits:              make([]bool, 0),
+		vHash:              make([]chainhash.Hash, 0),
+	}
 }
 
 const (
@@ -126,7 +176,7 @@ func SPVFromHex(hexStr string) (*SPVProof, error) {
 
 	blockHash := header.BlockHash()
 
-	
+	// txId :=
 	return &SPVProof{
 		blockHash:   &blockHash,
 		txId:        nil,
