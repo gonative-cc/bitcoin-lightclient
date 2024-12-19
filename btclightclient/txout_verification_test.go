@@ -64,11 +64,6 @@ func TestSPVFromHex(t *testing.T) {
 	proof, _ := hex.DecodeString(hexStr[160:]);
 	fmt.Println(len(hexStr));
 
-	
-	spv := PMerkleTreeFromBytes(hexStr[160:])
-
-	fmt.Println(spv)
-
 	var pmk PMerkleTree
 	reader := bytes.NewReader(proof)
 

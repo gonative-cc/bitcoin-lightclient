@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 
@@ -28,7 +29,7 @@ type SPVProof struct {
 type PMerkleTree struct {
 	numberTransactions uint
 	vBits              []bool
-	vHash              []chainhash.Hash
+	vHash              []*chainhash.Hash
 }
 
 
@@ -40,12 +41,38 @@ func readPMerkleTree(r io.Reader, pMerkletree *PMerkleTree, buf []byte) error {
 	pMerkletree.numberTransactions = uint(binary.LittleEndian.Uint32(buf[:4]))
 
 	var pver uint32; // pversion but btcd don't use this in those function we want.
+
+	// TODO: verify maxAllowBytes
+	maxAllowBytes := 65536
+	
 	if numberHash, err := wire.ReadVarIntBuf(r, pver, buf); err != nil {
 		return err
 	} else {
-		fmt.Println(numberHash);
-		fmt.Println(buf);
+		if numberHash * 32 > uint64(maxAllowBytes) {
+			return errors.New("number of hash is too big")
+		}
+
+		bytes := make([]byte, numberHash * 32);
+		_, err := io.ReadFull(r, bytes);
+
+		if err != nil {
+			return err
+		}
+
+		vHash := make([]*chainhash.Hash, numberHash)
+		for i := 0; i < int(numberHash); i++ {
+			hash, err := chainhash.NewHash(bytes[i * 32 : (i + 1) * 32]);
+			if err != nil {
+				return err
+			}
+			vHash[i] = hash
+		}
+
+		
+		pMerkletree.vHash = vHash
 	}
+
+	
 	return nil
 	
 }
@@ -64,7 +91,7 @@ func PMerkleTreeFromBytes(hexStr string) PMerkleTree {
 	return PMerkleTree{
 		numberTransactions: uint(numberTransaction),
 		vBits:              make([]bool, 0),
-		vHash:              make([]chainhash.Hash, 0),
+		vHash:              make([]*chainhash.Hash, 0),
 	}
 }
 
