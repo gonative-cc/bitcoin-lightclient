@@ -69,10 +69,9 @@ func TestSPVFromHex(t *testing.T) {
 
 	err := readPMerkleTree(reader, &pmk, proof)
 
-	fmt.Println(err);
+	assert.NilError(t, err)
+
 	fmt.Println(pmk);
-	// assert.NilError(t, err)
-	// fmt.Println(spv.blockHash)
 }
 
 func TestUTXOVerification(t *testing.T) {
