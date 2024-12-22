@@ -15,7 +15,7 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-type Hash256Digest [32]byte
+type Hash256Digest = [32]byte
 
 type VerifyStatus int
 
@@ -230,6 +230,16 @@ func (pmk *PMerkleTree)  CalcTreeWidth(height int32) uint {
         return (pmk.numberTransactions+(1 << height)-1) >> height;
 }
 
+
+// TODO: make it more simple
+func Hash256MerkleStepHashChain(a, b *chainhash.Hash) *chainhash.Hash{
+	x := [32]byte(*a)
+	y := [32]byte(*b)
+	z := Hash256MerkleStep(x[:], y[:]);
+	hash, _ := chainhash.NewHash(z[:]);
+	return hash
+}
+
 func (pmk *PMerkleTree) ComputerRootPMerkleTree(height int32, pos uint32, nBitUsed *uint32, nHashUsed *uint32, vMatch *[]*chainhash.Hash, vnIndex *[]uint32) (*chainhash.Hash, error) {
 	if int(*nBitUsed) >= len(pmk.vBits) {
 		return nil, errors.New("Error")
@@ -270,7 +280,7 @@ func (pmk *PMerkleTree) ComputerRootPMerkleTree(height int32, pos uint32, nBitUs
 			right = left;
 		}
 
-		return  chainhash.NewHash(Hash256MerkleStep(*left, *right)), nil
+		return  Hash256MerkleStepHashChain(left, right), nil
 	}
 	return nil, nil
 }
