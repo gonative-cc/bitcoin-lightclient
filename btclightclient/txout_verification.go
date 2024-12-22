@@ -240,6 +240,16 @@ func Hash256MerkleStepHashChain(a, b *chainhash.Hash) *chainhash.Hash{
 	return hash
 }
 
+
+
+func (pmk *PMerkleTree) Height() int32 {
+	nHeight := 0
+	for pmk.CalcTreeWidth(int32(nHeight)) > 1 {
+		nHeight++
+	}
+	return int32(nHeight)
+}
+
 func (pmk *PMerkleTree) ComputerRootPMerkleTree(height int32, pos uint32, nBitUsed *uint32, nHashUsed *uint32, vMatch *[]*chainhash.Hash, vnIndex *[]uint32) (*chainhash.Hash, error) {
 	if int(*nBitUsed) >= len(pmk.vBits) {
 		return nil, errors.New("Error")

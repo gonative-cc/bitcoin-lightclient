@@ -7,6 +7,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"gotest.tools/assert"
 )
 
@@ -58,7 +59,7 @@ func ExtractTxIndex(input []byte) uint {
 }
 
 
-func TestSPVFromHex(t *testing.T) {
+func TestVerifyTxOutProof(t *testing.T) {
 	hexStr := "00000030516567e505288fe41b2fc6be9b96318c406418c7d338168fe75a26111490eb2fec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a3f5b6167ffff7f20040000000100000001ec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a0101";
 
 	proof, _ := hex.DecodeString(hexStr[160:]);
@@ -71,8 +72,18 @@ func TestSPVFromHex(t *testing.T) {
 
 	assert.NilError(t, err)
 
-	fmt.Println(pmk);
+	height := pmk.Height();
+	nUsedBit := uint32(0);
+	nUsedHash := uint32(0);
+	vMatch := make([]*chainhash.Hash, 0);
+	vnIndex := make([]uint32, 0);
+	root, err := pmk.ComputerRootPMerkleTree(height, 0, &nUsedBit, &nUsedHash, &vMatch, &vnIndex)
+
+	assert.NilError(t, err)
+
+	fmt.Println("my root", root);
 }
+
 
 func TestUTXOVerification(t *testing.T) {
 
