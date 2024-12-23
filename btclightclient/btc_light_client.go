@@ -230,6 +230,10 @@ func (lc *BTCLightClient) LatestBlockHash() chainhash.Hash {
 	return latestBlockHash
 }
 
+func (lc *BTCLightClient) IsBlockPresent(h chainhash.Hash) bool {
+	return lc.btcStore.IsBlockPresent(h)
+}
+
 // TODO: make it more simple
 func NewBTCLightClientWithData(params *chaincfg.Params, headers []wire.BlockHeader, start int) *BTCLightClient {
 	lc := NewBTCLightClient(params)
