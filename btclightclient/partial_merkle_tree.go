@@ -114,7 +114,7 @@ func (pmk *PartialMerkleTree) Height() uint32 {
 
 type MerkleProof struct {
 	nodeValue  *chainhash.Hash
-	merklePath []*chainhash.Hash
+	merklePath []chainhash.Hash
 	pos        uint32
 }
 
@@ -138,14 +138,14 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 		if height == 0 && fParentOfMatch {
 			return &MerkleProof{
 				nodeValue:  hash,
-				merklePath: []*chainhash.Hash{hash},
+				merklePath: []chainhash.Hash{*hash},
 				pos:        pos,
 			}, nil
 		}
 
 		return &MerkleProof{
 			nodeValue: hash,
-			merklePath: []*chainhash.Hash{},
+			merklePath: []chainhash.Hash{},
 			pos: uint32(pmk.numberTransactions) + 1,
 		}, nil
 		
@@ -175,14 +175,14 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 			return &MerkleProof {
 				nodeValue : nodeValue,
 				pos: left.pos,
-				merklePath : append(left.merklePath, right.nodeValue),
+				merklePath : append(left.merklePath, *right.nodeValue),
 			}, nil
 		}
 		// TxID on right side
 		return &MerkleProof {
 				nodeValue : nodeValue,
 				pos: right.pos,
-				merklePath : append(right.merklePath, left.nodeValue),
+				merklePath : append(right.merklePath, *left.nodeValue),
 		}, nil 
 	}
 }

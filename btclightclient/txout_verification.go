@@ -11,10 +11,10 @@ type Hash256Digest = [32]byte
 type VerifyStatus int
 
 type SPVProof struct {
-	blockHash   *chainhash.Hash
-	txId        *chainhash.Hash
+	blockHash   chainhash.Hash
+	txId        string
 	txIndex     uint
-	merkleProof []byte
+	merkleProof []chainhash.Hash
 }
 
 
@@ -84,13 +84,14 @@ func VerifyHash256Merkle(proof []byte, index uint) bool {
 
 func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) VerifyStatus {
 
-	lightBlock := lc.btcStore.LightBlockByHash(*spvProof.blockHash)
+	lightBlock := lc.btcStore.LightBlockByHash(spvProof.blockHash)
 
 	// In the case light block not belong currect database
 	if lightBlock == nil {
 		return InValidTXOut
 	}
 
+	
 	proof := []byte{}
 	proof = append(proof, spvProof.txId[:]...)
 	proof = append(proof, spvProof.merkleProof...)
