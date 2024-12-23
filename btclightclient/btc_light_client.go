@@ -225,6 +225,11 @@ func (lc *BTCLightClient) Status() {
 	fmt.Println(lc.btcStore.MostDifficultFork())
 }
 
+func (lc *BTCLightClient) LatestBlockHeight() int64 {
+	latestBlockHeight := lc.btcStore.LatestHeight()
+	return latestBlockHeight
+}
+
 func (lc *BTCLightClient) LatestBlockHash() chainhash.Hash {
 	latestBlockHash := lc.btcStore.LatestCheckPoint().Header.BlockHash()
 	return latestBlockHash
