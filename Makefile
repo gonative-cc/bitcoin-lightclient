@@ -1,7 +1,6 @@
 
-setup:
+setup-hooks:
 	@cd .git/hooks; ln -s -f ../../scripts/git-hooks/* ./
-
 
 .git/hooks/pre-commit: setup
 
