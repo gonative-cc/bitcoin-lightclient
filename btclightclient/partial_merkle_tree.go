@@ -189,11 +189,9 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 
 func (pmk *PartialMerkleTree) ComputeMerkleProof(txID string) (*MerkleProof, error) {
 	txIDHash, err := chainhash.NewHashFromStr(txID);
-
 	if err != nil {
 		return nil, err
 	}
-
 	height := pmk.Height();
 	nUsedBit := uint32(0)
 	nUsedHash := uint32(0)	
@@ -213,6 +211,5 @@ func Hash256MerkleStepHashChain(a, b *chainhash.Hash) *chainhash.Hash {
 	x := [32]byte(*a)
 	y := [32]byte(*b)
 	z := Hash256MerkleStep(x[:], y[:])
-	hash, _ := chainhash.NewHash(z[:])
-	return hash
+	return &z
 }
