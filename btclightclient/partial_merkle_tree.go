@@ -20,6 +20,12 @@ type PartialMerkleTree struct {
 	vHash              []*chainhash.Hash
 }
 
+type MerkleProof struct {
+	nodeValue  chainhash.Hash
+	merklePath []chainhash.Hash
+	pos        uint32
+}
+
 // TODO: verify this value
 const maxAllowBytes = 65536
 
@@ -112,14 +118,8 @@ func (pmk *PartialMerkleTree) Height() uint32 {
 	return nHeight
 }
 
-type MerkleProof struct {
-	nodeValue  *chainhash.Hash
-	merklePath []chainhash.Hash
-	pos        uint32
-}
-
-// / Port logic from gettxoutproof from bitcoin-core
-// / TODO: Make error handler more sense
+/// Port logic from gettxoutproof from bitcoin-core
+/// TODO: Make error handler more sense
 func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, txID *chainhash.Hash) (*MerkleProof, error) {
 	if int(*nBitUsed) >= len(pmk.vBits) {
 		return nil, errors.New("Error")
@@ -137,14 +137,14 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 		*nHashUsed++
 		if height == 0 && fParentOfMatch {
 			return &MerkleProof{
-				nodeValue:  hash,
+				nodeValue:  *hash,
 				merklePath: []chainhash.Hash{*hash},
 				pos:        pos,
 			}, nil
 		}
 
 		return &MerkleProof{
-			nodeValue: hash,
+			nodeValue: *hash,
 			merklePath: []chainhash.Hash{},
 			pos: uint32(pmk.numberTransactions) + 1,
 		}, nil
@@ -161,28 +161,28 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 				return nil, err
 			}
 
-			if left.nodeValue.IsEqual(right.nodeValue) {
+			if left.nodeValue.IsEqual(&right.nodeValue) {
 				return nil, errors.New("error")
 			}
 		} else {
 			right = left
 		}
 
-		nodeValue := Hash256MerkleStepHashChain(left.nodeValue, right.nodeValue)
+		nodeValue := Hash256MerkleStepHashChain(&left.nodeValue, &right.nodeValue)
 		// Compute new proof
 		if left.pos != uint32(pmk.numberTransactions) {
 			// txID on the left side
 			return &MerkleProof {
-				nodeValue : nodeValue,
+				nodeValue : *nodeValue,
 				pos: left.pos,
-				merklePath : append(left.merklePath, *right.nodeValue),
+				merklePath : append(left.merklePath, right.nodeValue),
 			}, nil
 		}
 		// TxID on right side
 		return &MerkleProof {
-				nodeValue : nodeValue,
+				nodeValue : *nodeValue,
 				pos: right.pos,
-				merklePath : append(right.merklePath, *left.nodeValue),
+				merklePath : append(right.merklePath, left.nodeValue),
 		}, nil 
 	}
 }
