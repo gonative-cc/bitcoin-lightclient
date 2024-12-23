@@ -1,22 +1,19 @@
 package btclightclient
 
 import (
-	"encoding/hex"
-	"slices"
 	"testing"
+
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"gotest.tools/assert"
 )
 
-func encodeTxID(t *testing.T, txID string) []byte {
-	b, err := hex.DecodeString(txID)
+func hashFromString(t *testing.T, hashStr string) chainhash.Hash {
+	h, err := chainhash.NewHashFromStr(hashStr)
 	assert.NilError(t, err)
-	slices.Reverse(b)
-	return b
+	return *h
 }
 
-
-
-func TestUTXOVerification(t *testing.T) {
+func TestSPVMerkleRoot(t *testing.T) {
 
 	type testCase struct {
 		name        string
@@ -24,18 +21,24 @@ func TestUTXOVerification(t *testing.T) {
 		merkleRoot  string
 		merkleProof []string
 		index       uint
-		expected    bool
 	}
 
 	run := func(t *testing.T, tc testCase) {
-		proof := encodeTxID(t, tc.txIdHash)
-		for _, n := range tc.merkleProof {
-			proof = append(proof, encodeTxID(t, n)...)
-		}
-		proof = append(proof, encodeTxID(t, tc.merkleRoot)...)
+		merklePath := make([]chainhash.Hash, len(tc.merkleProof))
 
-		actual := VerifyHash256Merkle(proof, tc.index)
-		assert.Assert(t, actual == tc.expected)
+		for i := 0; i < len(merklePath); i++ {
+			merklePath[i] = hashFromString(t, tc.merkleProof[i])
+		}
+
+		spv := SPVProof{
+			blockHash:  hashFromString(t, "9d5369290c3d97f47d07a12e1b7f171c9c69ddfc876ecec6a16dfe3e94773a1c"), // dummy hash for testing only
+			txId:       tc.txIdHash,
+			txIndex:    tc.index,
+			merklePath: merklePath,
+		}
+
+		actual := spv.MerkleRoot()
+		assert.Assert(t, actual.String() == tc.merkleRoot)
 	}
 
 	testCases := []testCase{
@@ -43,6 +46,7 @@ func TestUTXOVerification(t *testing.T) {
 			name:     "Success Verify TX ID",
 			txIdHash: "4224625b409323d17e8842f935ce3764c3e7203ad0de3d403558881089cb3632",
 			merkleProof: []string{
+				"4224625b409323d17e8842f935ce3764c3e7203ad0de3d403558881089cb3632",
 				"8e2f5bf7ad1839ec83538d0c7a8bc4f0f9b624896760cccc2bfe399746c8277f",
 				"2feb97ce13d350cab8c94aa58772ad825486b1b39112b2189da7294fd8740085",
 				"60ba6889cf8183fd353bd87248bbeaa46c17483d6a34d4914c6cb709fb5497bc",
@@ -55,7 +59,6 @@ func TestUTXOVerification(t *testing.T) {
 			merkleRoot: "e4dc1f2ab5ac974d6b23690bd4d8ddbde63e9647c09a3d8f6b77fc0bf53544e5",
 
 			index:    0,
-			expected: true,
 		},
 	}
 

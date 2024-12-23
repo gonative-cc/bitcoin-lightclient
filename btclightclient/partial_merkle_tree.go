@@ -200,6 +200,14 @@ func (pmk *PartialMerkleTree) ComputeMerkleProof(txID string) (*MerkleProof, err
 	return pmk.computeMerkleProofRecursive(height, 0, &nUsedBit, &nUsedHash, txIDHash)
 }
 
+// Hash256MerkleStep concatenates and hashes two inputs for merkle proving
+func Hash256MerkleStep(a, b []byte) chainhash.Hash {
+	c := []byte{}
+	c = append(c, a...)
+	c = append(c, b...)
+	return  chainhash.DoubleHashH(c)
+}
+
 // TODO: make it more simple
 func Hash256MerkleStepHashChain(a, b *chainhash.Hash) *chainhash.Hash {
 	x := [32]byte(*a)

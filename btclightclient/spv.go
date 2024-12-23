@@ -56,7 +56,7 @@ func SPVProofFromHex(proofHex string, txID string) (*SPVProof, error) {
 
 func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
 	hashValue := &spvProof.merklePath[0];
-	numberSteps := len(spvProof.merklePath[0]);
+	numberSteps := len(spvProof.merklePath);
 	for i := 1; i < numberSteps; i++ {
 		hashValue = Hash256MerkleStepHashChain(hashValue, &spvProof.merklePath[i]);
 	}
