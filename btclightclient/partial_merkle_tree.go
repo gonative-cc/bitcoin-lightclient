@@ -120,7 +120,7 @@ type MerkleProof struct {
 
 // / Port logic from gettxoutproof from bitcoin-core
 // / TODO: Make error handler more sense
-func (pmk *PartialMerkleTree) GetProof(height, pos uint32, nBitUsed, nHashUsed *uint32, txID *chainhash.Hash) (*MerkleProof, error) {
+func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, txID *chainhash.Hash) (*MerkleProof, error) {
 	if int(*nBitUsed) >= len(pmk.vBits) {
 		return nil, errors.New("Error")
 	}
@@ -150,13 +150,13 @@ func (pmk *PartialMerkleTree) GetProof(height, pos uint32, nBitUsed, nHashUsed *
 		}, nil
 		
 	} else {
-		left, err := pmk.GetProof(height-1, pos*2, nBitUsed, nHashUsed, txID)
+		left, err := pmk.computeMerkleProofRecursive(height-1, pos*2, nBitUsed, nHashUsed, txID)
 		var right *MerkleProof
 		if err != nil {
 			return nil, err
 		}
 		if uint(pos*2+1) < pmk.CalcTreeWidth(height-1) {
-			right, err = pmk.GetProof(height-1, pos*2+1, nBitUsed, nHashUsed, txID)
+			right, err = pmk.computeMerkleProofRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, txID)
 			if err != nil {
 				return nil, err
 			}
@@ -185,6 +185,19 @@ func (pmk *PartialMerkleTree) GetProof(height, pos uint32, nBitUsed, nHashUsed *
 				merklePath : append(right.merklePath, left.nodeValue),
 		}, nil 
 	}
+}
+
+func (pmk *PartialMerkleTree) ComputeMerkleProof(txID string) (*MerkleProof, error) {
+	txIDHash, err := chainhash.NewHashFromStr(txID);
+
+	if err != nil {
+		return nil, err
+	}
+
+	height := pmk.Height();
+	nUsedBit := uint32(0)
+	nUsedHash := uint32(0)	
+	return pmk.computeMerkleProofRecursive(height, 0, &nUsedBit, &nUsedHash, txIDHash)
 }
 
 // TODO: make it more simple
