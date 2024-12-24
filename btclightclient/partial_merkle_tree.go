@@ -11,7 +11,26 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-// We verify a partial merkle tree proof. This logic is used in verifytxoutproof
+// We verify a partial merkle tree proof. This logic is used in verifytxoutproof.
+// First one, we must know how merkle tree store in bitcoin. The tree is prefect
+// binary tree. At height `h` this index from 0 to `tree width` at level h.
+// At level(height) 0, this is the list of transaction IDs. At level 1, we compute
+// node value at positon `p` = hash(node at (h - 1, p * 2), node at (h - 1, p * 2 + 1))
+// You can see p * 2 is left node and p * 2 + 1 is right node. We define (h, p)
+// is  merkle node at height h, position p on this level. We can virualize the tree
+// like below:
+//
+// level h                              (h, 0)
+//                                  /              \
+// level h - 1                  (h-1, 0)             (h- 1, 1)
+//                             /       \             /         \
+// level h - 2              (h - 2, 0)  (h - 2, 1)  (h - 2, 2)  (h - 2, 3)
+//                             .................................
+// level 0            (0, 0)  (0, 1)  (0, 2)  (0, 3) ... (0, numberTransactions)
+// We travel the tree in depth-first order. A vBits[i] is true if node i-th in DFS
+// is parent of leaf node which is we want to verify, otherwise this value is false.
+// vHash store hash value at node i in DFS order. Follow the vBits and vHash,
+// we can rebuild the tree and extract merkle path we want.
 
 type PartialMerkleTree struct {
 	numberTransactions uint
@@ -19,13 +38,19 @@ type PartialMerkleTree struct {
 	vHash              []*chainhash.Hash
 }
 
+// Merkle proof use for rebuild the merkle tree and extract merkle proof for
+// single transaction
 type MerkleProof struct {
+	// merkle node value at this sub tree  
 	nodeValue  chainhash.Hash
+	// merkle path if the txID we want to build merkle proof in this subtree
+	// if not this is empty
 	merklePath []chainhash.Hash
+	// position in the level 0. We use this for check "left, right" when
+	// compute merkle root.
 	pos        uint32
 }
 
-// TODO: verify this value
 const maxAllowBytes = 65536
 
 // TODO: wrap error
@@ -42,18 +67,18 @@ func readPartialMerkleTree(r io.Reader, buf []byte) (*PartialMerkleTree, error) 
 	if numberOfHashes, err := wire.ReadVarIntBuf(r, pver, buf); err != nil {
 		return nil, err
 	} else {
-		if numberOfHashes*32 > maxAllowBytes {
+		if numberOfHashes*chainhash.HashSize > maxAllowBytes {
 			return nil, errors.New("number of hashes is too big")
 		}
 
-		bytes := make([]byte, numberOfHashes*32)
+		bytes := make([]byte, numberOfHashes*chainhash.HashSize)
 		if _, err := io.ReadFull(r, bytes); err != nil {
 			return nil, err
 		}
 
 		vHash = make([]*chainhash.Hash, numberOfHashes)
 		for i := 0; i < int(numberOfHashes); i++ {
-			vHash[i], err = chainhash.NewHash(bytes[i*32 : (i+1)*32])
+			vHash[i], err = chainhash.NewHash(bytes[i*chainhash.HashSize : (i+1)*chainhash.HashSize])
 			if err != nil {
 				return nil, err
 			}
@@ -189,7 +214,6 @@ func (pmt *PartialMerkleTree) ComputeMerkleProof(txID string) (*MerkleProof, err
 
 
 
-// TODO: make it more simple
 func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
 	h := make([]byte, 0, chainhash.HashSize*2)
 	h = append(h, l.CloneBytes()...)
