@@ -50,8 +50,8 @@ func NewMemStore() *MemStore {
 }
 
 func (s *MemStore) IsBlockPresent(h chainhash.Hash) bool {
-	_, ok := s.lightBlockByHashMap[h]
-	return ok
+	lightBlock := s.LightBlockByHash(h)
+	return (lightBlock != nil)
 }
 
 func (s *MemStore) RemoveBlock(h chainhash.Hash) {
