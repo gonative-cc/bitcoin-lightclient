@@ -58,7 +58,6 @@ func TestSPVMerkleRoot(t *testing.T) {
 				"cd1c4dbcc6d6a62e68054ff760b175c9e80361e6ae90dd0a3be8815b0a8c11cf",
 			},
 			merkleRoot: "e4dc1f2ab5ac974d6b23690bd4d8ddbde63e9647c09a3d8f6b77fc0bf53544e5",
-
 			index: 0,
 		},
 	}

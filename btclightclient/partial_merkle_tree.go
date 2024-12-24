@@ -11,8 +11,7 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-// / We verify partial merkle tree proof. This logic are using in verifytxoutproof
-// / We are follow the logic in verifytxoutproof.
+// We verify a partial merkle tree proof. This logic is used in verifytxoutproof
 
 type PartialMerkleTree struct {
 	numberTransactions uint
@@ -40,27 +39,24 @@ func readPartialMerkleTree(r io.Reader, buf []byte) (*PartialMerkleTree, error) 
 	var pver uint32 // pversion but btcd don't use this in those function we want.
 
 	var vHash []*chainhash.Hash
-	if numberHash, err := wire.ReadVarIntBuf(r, pver, buf); err != nil {
+	if numberOfHashes, err := wire.ReadVarIntBuf(r, pver, buf); err != nil {
 		return nil, err
 	} else {
-		if numberHash*32 > uint64(maxAllowBytes) {
-			return nil, errors.New("number of hash is too big")
+		if numberHash*32 > maxAllowBytes {
+			return nil, errors.New("number of hashes is too big")
 		}
 
 		bytes := make([]byte, numberHash*32)
-		_, err := io.ReadFull(r, bytes)
-
-		if err != nil {
+		if _, err := io.ReadFull(r, bytes); err != nil {
 			return nil, err
 		}
 
 		vHash = make([]*chainhash.Hash, numberHash)
-		for i := 0; i < int(numberHash); i++ {
-			hash, err := chainhash.NewHash(bytes[i*32 : (i+1)*32])
+		for i := 0; i < numberHash; i++ {
+			vHash[i], err = chainhash.NewHash(bytes[i*32 : (i+1)*32])
 			if err != nil {
 				return nil, err
 			}
-			vHash[i] = hash
 		}
 	}
 
@@ -79,7 +75,7 @@ func readPartialMerkleTree(r io.Reader, buf []byte) (*PartialMerkleTree, error) 
 		}
 	}
 
-	parialMerkleTree := PartialMerkleTree{
+	partialMerkleTree := PartialMerkleTree{
 		numberTransactions: numberTransactions,
 		vBits:              vBits,
 		vHash:              vHash,
@@ -88,28 +84,21 @@ func readPartialMerkleTree(r io.Reader, buf []byte) (*PartialMerkleTree, error) 
 	return &parialMerkleTree, nil
 }
 
-func ParialMerkleTreeFromBytes(hexStr string) (*PartialMerkleTree, error) {
+func ParialMerkleTreeFromHex(hexStr string) (PartialMerkleTree, error) {
 	hexBytes, err := hex.DecodeString(hexStr)
-
 	if err != nil {
 		return nil, err
 	}
 
 	reader := bytes.NewReader(hexBytes)
-
-	pmk, err := readPartialMerkleTree(reader, hexBytes)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return pmk, nil
+	return readPartialMerkleTree(reader, hexBytes)
 }
 
 func (pmk *PartialMerkleTree) CalcTreeWidth(height uint32) uint {
 	return (pmk.numberTransactions + (1 << height) - 1) >> height
 }
 
+// MinHeight returns the minimum height of a Merkele tree to fit `pmk.numberTransactions`.
 func (pmk *PartialMerkleTree) Height() uint32 {
 	var nHeight uint32 = 0
 	for pmk.CalcTreeWidth(nHeight) > 1 {
@@ -118,8 +107,8 @@ func (pmk *PartialMerkleTree) Height() uint32 {
 	return nHeight
 }
 
-/// Port logic from gettxoutproof from bitcoin-core
-/// TODO: Make error handler more sense
+// Port logic from gettxoutproof from bitcoin-core
+// TODO: Make error handler more sense
 func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, txID *chainhash.Hash) (*MerkleProof, error) {
 	if int(*nBitUsed) >= len(pmk.vBits) {
 		return nil, errors.New("Error")
@@ -200,16 +189,16 @@ func (pmk *PartialMerkleTree) ComputeMerkleProof(txID string) (*MerkleProof, err
 
 // Hash256MerkleStep concatenates and hashes two inputs for merkle proving
 func Hash256MerkleStep(a, b []byte) chainhash.Hash {
-	c := []byte{}
+	c := make([]byte{}, 0, len(a) + len(b))
 	c = append(c, a...)
 	c = append(c, b...)
 	return  chainhash.DoubleHashH(c)
 }
 
 // TODO: make it more simple
-func Hash256MerkleStepHashChain(a, b *chainhash.Hash) *chainhash.Hash {
-	x := [32]byte(*a)
-	y := [32]byte(*b)
-	z := Hash256MerkleStep(x[:], y[:])
-	return &z
+func HashNodes(a, b *chainhash.Hash) *chainhash.Hash {
+	c := make([]byte{}, 0, chainhash.HashSize*2)
+	c = append(c, a...)
+	c = append(c, b...)
+	return &chainhash.DoubleHashH(c)
 }

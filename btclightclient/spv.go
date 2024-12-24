@@ -36,7 +36,7 @@ func SPVProofFromHex(proofHex string, txID string) (*SPVProof, error) {
 	// get merkle proof for txID
 	merkleProofBytes, _ := hex.DecodeString(proofHex[160:])
 	reader := bytes.NewReader(merkleProofBytes)
-	pmk, err := readPartialMerkleTree(reader, merkleProofBytes)
+	pmt, err := readPartialMerkleTree(reader, merkleProofBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -74,8 +74,6 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 
 	blockMerkleRoot := lightBlock.Header.MerkleRoot
 	spvMerkleRoot := spvProof.MerkleRoot()
-
-	// 2 hashes a not equal hash
 	if !spvMerkleRoot.IsEqual(&blockMerkleRoot) {
 		return InvalidSPVProof
 	}
