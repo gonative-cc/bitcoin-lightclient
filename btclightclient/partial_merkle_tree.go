@@ -42,17 +42,17 @@ func readPartialMerkleTree(r io.Reader, buf []byte) (*PartialMerkleTree, error) 
 	if numberOfHashes, err := wire.ReadVarIntBuf(r, pver, buf); err != nil {
 		return nil, err
 	} else {
-		if numberHash*32 > maxAllowBytes {
+		if numberOfHashes*32 > maxAllowBytes {
 			return nil, errors.New("number of hashes is too big")
 		}
 
-		bytes := make([]byte, numberHash*32)
+		bytes := make([]byte, numberOfHashes*32)
 		if _, err := io.ReadFull(r, bytes); err != nil {
 			return nil, err
 		}
 
-		vHash = make([]*chainhash.Hash, numberHash)
-		for i := 0; i < numberHash; i++ {
+		vHash = make([]*chainhash.Hash, numberOfHashes)
+		for i := 0; i < int(numberOfHashes); i++ {
 			vHash[i], err = chainhash.NewHash(bytes[i*32 : (i+1)*32])
 			if err != nil {
 				return nil, err
@@ -81,10 +81,10 @@ func readPartialMerkleTree(r io.Reader, buf []byte) (*PartialMerkleTree, error) 
 		vHash:              vHash,
 	}
 
-	return &parialMerkleTree, nil
+	return &partialMerkleTree, nil
 }
 
-func ParialMerkleTreeFromHex(hexStr string) (PartialMerkleTree, error) {
+func ParialMerkleTreeFromHex(hexStr string) (*PartialMerkleTree, error) {
 	hexBytes, err := hex.DecodeString(hexStr)
 	if err != nil {
 		return nil, err
@@ -94,14 +94,14 @@ func ParialMerkleTreeFromHex(hexStr string) (PartialMerkleTree, error) {
 	return readPartialMerkleTree(reader, hexBytes)
 }
 
-func (pmk *PartialMerkleTree) CalcTreeWidth(height uint32) uint {
-	return (pmk.numberTransactions + (1 << height) - 1) >> height
+func (pmt *PartialMerkleTree) CalcTreeWidth(height uint32) uint {
+	return (pmt.numberTransactions + (1 << height) - 1) >> height
 }
 
-// MinHeight returns the minimum height of a Merkele tree to fit `pmk.numberTransactions`.
-func (pmk *PartialMerkleTree) Height() uint32 {
+// MinHeight returns the minimum height of a Merkele tree to fit `pmt.numberTransactions`.
+func (pmt *PartialMerkleTree) Height() uint32 {
 	var nHeight uint32 = 0
-	for pmk.CalcTreeWidth(nHeight) > 1 {
+	for pmt.CalcTreeWidth(nHeight) > 1 {
 		nHeight++
 	}
 	return nHeight
@@ -109,20 +109,20 @@ func (pmk *PartialMerkleTree) Height() uint32 {
 
 // Port logic from gettxoutproof from bitcoin-core
 // TODO: Make error handler more sense
-func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, txID *chainhash.Hash) (*MerkleProof, error) {
-	if int(*nBitUsed) >= len(pmk.vBits) {
+func (pmt *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, txID *chainhash.Hash) (*MerkleProof, error) {
+	if int(*nBitUsed) >= len(pmt.vBits) {
 		return nil, errors.New("Error")
 	}
 
-	fParentOfMatch := pmk.vBits[*nBitUsed]
+	fParentOfMatch := pmt.vBits[*nBitUsed]
 	*nBitUsed = *nBitUsed + 1
 
 	if height == 0 || !fParentOfMatch {
-		if int(*nHashUsed) >= len(pmk.vHash) {
+		if int(*nHashUsed) >= len(pmt.vHash) {
 			return nil, errors.New("error")
 		}
 
-		hash := pmk.vHash[*nHashUsed]
+		hash := pmt.vHash[*nHashUsed]
 		*nHashUsed++
 		if height == 0 && fParentOfMatch {
 			return &MerkleProof{
@@ -135,17 +135,17 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 		return &MerkleProof{
 			nodeValue: *hash,
 			merklePath: []chainhash.Hash{},
-			pos: uint32(pmk.numberTransactions) + 1,
+			pos: uint32(pmt.numberTransactions) + 1,
 		}, nil
 		
 	} else {
-		left, err := pmk.computeMerkleProofRecursive(height-1, pos*2, nBitUsed, nHashUsed, txID)
+		left, err := pmt.computeMerkleProofRecursive(height-1, pos*2, nBitUsed, nHashUsed, txID)
 		var right *MerkleProof
 		if err != nil {
 			return nil, err
 		}
-		if uint(pos*2+1) < pmk.CalcTreeWidth(height-1) {
-			right, err = pmk.computeMerkleProofRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, txID)
+		if uint(pos*2+1) < pmt.CalcTreeWidth(height-1) {
+			right, err = pmt.computeMerkleProofRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, txID)
 			if err != nil {
 				return nil, err
 			}
@@ -157,9 +157,9 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 			right = left
 		}
 
-		nodeValue := Hash256MerkleStepHashChain(&left.nodeValue, &right.nodeValue)
+		nodeValue := HashNodes(&left.nodeValue, &right.nodeValue)
 		// Compute new proof
-		if left.pos != uint32(pmk.numberTransactions) {
+		if left.pos != uint32(pmt.numberTransactions) {
 			// txID on the left side
 			return &MerkleProof {
 				nodeValue : *nodeValue,
@@ -176,29 +176,24 @@ func (pmk *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 	}
 }
 
-func (pmk *PartialMerkleTree) ComputeMerkleProof(txID string) (*MerkleProof, error) {
+func (pmt *PartialMerkleTree) ComputeMerkleProof(txID string) (*MerkleProof, error) {
 	txIDHash, err := chainhash.NewHashFromStr(txID);
 	if err != nil {
 		return nil, err
 	}
-	height := pmk.Height();
+	height := pmt.Height();
 	nUsedBit := uint32(0)
 	nUsedHash := uint32(0)	
-	return pmk.computeMerkleProofRecursive(height, 0, &nUsedBit, &nUsedHash, txIDHash)
+	return pmt.computeMerkleProofRecursive(height, 0, &nUsedBit, &nUsedHash, txIDHash)
 }
 
-// Hash256MerkleStep concatenates and hashes two inputs for merkle proving
-func Hash256MerkleStep(a, b []byte) chainhash.Hash {
-	c := make([]byte{}, 0, len(a) + len(b))
-	c = append(c, a...)
-	c = append(c, b...)
-	return  chainhash.DoubleHashH(c)
-}
+
 
 // TODO: make it more simple
-func HashNodes(a, b *chainhash.Hash) *chainhash.Hash {
-	c := make([]byte{}, 0, chainhash.HashSize*2)
-	c = append(c, a...)
-	c = append(c, b...)
-	return &chainhash.DoubleHashH(c)
+func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
+	h := make([]byte, 0, chainhash.HashSize*2)
+	h = append(h, l.CloneBytes()...)
+	h = append(h, r.CloneBytes()...)
+	newHash := chainhash.DoubleHashH(h)
+	return &newHash
 }

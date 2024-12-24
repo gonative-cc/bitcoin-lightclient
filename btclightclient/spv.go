@@ -41,7 +41,7 @@ func SPVProofFromHex(proofHex string, txID string) (*SPVProof, error) {
 		return nil, err
 	}
 
-	merkleProof, err := pmk.ComputeMerkleProof(txID)
+	merkleProof, err := pmt.ComputeMerkleProof(txID)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
 	hashValue := &spvProof.merklePath[0];
 	numberSteps := len(spvProof.merklePath);
 	for i := 1; i < numberSteps; i++ {
-		hashValue = Hash256MerkleStepHashChain(hashValue, &spvProof.merklePath[i]);
+		hashValue = HashNodes(hashValue, &spvProof.merklePath[i]);
 	}
 	return *hashValue
 }
