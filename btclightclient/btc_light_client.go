@@ -230,7 +230,7 @@ func (lc *BTCLightClient) LatestFinalizedBlockHeight() int64 {
 	return latestFinalizedBlockHeight
 }
 
-func (lc *BTCLightClient) FinalizedBlockHash() chainhash.Hash {
+func (lc *BTCLightClient) LatestFinalizedBlockHash() chainhash.Hash {
 	latestFinalizedBlockHash := lc.btcStore.LatestCheckPoint().Header.BlockHash()
 	return latestFinalizedBlockHash
 }
