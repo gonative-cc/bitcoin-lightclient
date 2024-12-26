@@ -43,7 +43,7 @@ type PartialMerkleTree struct {
 // single transaction
 type MerkleProof struct {
 	// merkle node value at this sub tree
-	nodeValue chainhash.Hash
+	merkleRoot chainhash.Hash
 	// merkle path if the txID we want to build merkle proof in this subtree
 	// if not this is empty
 	merklePath []chainhash.Hash
@@ -148,14 +148,14 @@ func (pmt *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 		*nHashUsed++
 		if height == 0 && fParentOfMatch {
 			return &MerkleProof{
-				nodeValue:  *hash,
+				merkleRoot:  *hash,
 				merklePath: []chainhash.Hash{*hash},
 				pos:        pos,
 			}, nil
 		}
 
 		return &MerkleProof{
-			nodeValue:  *hash,
+			merkleRoot:  *hash,
 			merklePath: []chainhash.Hash{},
 			pos:        uint32(pmt.numberTransactions) + 1,
 		}, nil
@@ -172,28 +172,28 @@ func (pmt *PartialMerkleTree) computeMerkleProofRecursive(height, pos uint32, nB
 				return nil, err
 			}
 
-			if left.nodeValue.IsEqual(&right.nodeValue) {
+			if left.merkleRoot.IsEqual(&right.merkleRoot) {
 				return nil, fmt.Errorf("In the case tree width is old, the last hash must be duplicate")
 			}
 		} else {
 			right = left
 		}
 
-		nodeValue := HashNodes(&left.nodeValue, &right.nodeValue)
+		nodeValue := HashNodes(&left.merkleRoot, &right.merkleRoot)
 		// Compute new proof
 		if left.pos != uint32(pmt.numberTransactions) {
 			// txID on the left side
 			return &MerkleProof{
-				nodeValue:  *nodeValue,
+				merkleRoot:  *nodeValue,
 				pos:        left.pos,
-				merklePath: append(left.merklePath, right.nodeValue),
+				merklePath: append(left.merklePath, right.merkleRoot),
 			}, nil
 		}
 		// TxID on right side
 		return &MerkleProof{
-			nodeValue:  *nodeValue,
+			merkleRoot:  *nodeValue,
 			pos:        right.pos,
-			merklePath: append(right.merklePath, left.nodeValue),
+			merklePath: append(right.merklePath, left.merkleRoot),
 		}, nil
 	}
 }

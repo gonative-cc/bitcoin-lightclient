@@ -19,5 +19,5 @@ func TestComputeMerkleProof(t *testing.T) {
 	
 	merkleProof, err := pmk.ComputeMerkleProof("0bf82c1d62b73497de2d796636cb1ce64415d25982332436007c0f51b5a75a62")
 	assert.NilError(t, err)
-	assert.Equal(t, merkleProof.nodeValue.String(), "e95de06cb47c1732bc650b2c928f0f84c7946dec5d4c30276105515be1ea6947");
+	assert.Equal(t, merkleProof.merkleRoot.String(), "e95de06cb47c1732bc650b2c928f0f84c7946dec5d4c30276105515be1ea6947");
 }
