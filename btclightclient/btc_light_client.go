@@ -225,9 +225,19 @@ func (lc *BTCLightClient) Status() {
 	fmt.Println(lc.btcStore.MostDifficultFork())
 }
 
-func (lc *BTCLightClient) LatestBlockHash() chainhash.Hash {
-	latestBlockHash := lc.btcStore.LatestCheckPoint().Header.BlockHash()
-	return latestBlockHash
+func (lc *BTCLightClient) LatestFinalizedBlockHeight() int64 {
+	latestFinalizedBlockHeight := lc.btcStore.LatestFinalizedHeight()
+	return latestFinalizedBlockHeight
+}
+
+func (lc *BTCLightClient) LatestFinalizedBlockHash() chainhash.Hash {
+	latestFinalizedBlockHash := lc.btcStore.LatestCheckPoint().Header.BlockHash()
+	return latestFinalizedBlockHash
+}
+
+func (lc *BTCLightClient) IsBlockPresent(h chainhash.Hash) bool {
+	lightBlock := lc.btcStore.LightBlockByHash(h)
+	return (lightBlock != nil)
 }
 
 // TODO: make it more simple

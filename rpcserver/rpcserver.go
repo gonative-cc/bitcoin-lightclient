@@ -37,11 +37,16 @@ func (h *RPCServerHandler) InsertHeaders(
 	return nil
 }
 
-// returns the block height and hash of tip block stored in babylon chain
-func (h *RPCServerHandler) GetBTCHeaderChainTip() (*chainhash.Hash, error) {
-	latestBlockHash := h.btcLC.LatestBlockHash()
+func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, error) {
+	return h.btcLC.IsBlockPresent(*blockHash), nil
+}
 
-	return &latestBlockHash, nil
+// returns the block height and hash of tip block stored in babylon chain
+func (h *RPCServerHandler) GetBTCHeaderChainTip() (int64, *chainhash.Hash, error) {
+	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
+	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
+
+	return latestFinalizedBlockHeight, &latestFinalizedBlockHash, nil
 }
 
 // NewRPCServer creates a new instance of the rpcServer and starts listening
@@ -54,6 +59,7 @@ func NewRPCServer(btcLC *btclightclient.BTCLightClient) *httptest.Server {
 
 	rpcServer.AliasMethod("ping", "RPCServerHandler.Ping")
 	rpcServer.AliasMethod("insert_headers", "RPCServerHandler.InsertHeaders")
+	rpcServer.AliasMethod("contains_btc_block", "RPCServerHandler.ContainsBTCBlock")
 	rpcServer.AliasMethod("get_btc_header_chain_tip", "RPCServerHandler.GetBTCHeaderChainTip")
 
 	return httptest.NewServer(rpcServer)
