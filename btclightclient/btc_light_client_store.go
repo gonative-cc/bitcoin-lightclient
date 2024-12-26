@@ -26,7 +26,6 @@ type Store interface {
 	MostDifficultFork() *LightBlock
 	LatestBlockHashOfFork() []chainhash.Hash
 	RemoveBlock(h chainhash.Hash)
-	IsBlockPresent(h chainhash.Hash) bool
 }
 
 type MemStore struct {
@@ -47,11 +46,6 @@ func NewMemStore() *MemStore {
 		latestcheckpoint:      nil,
 		mostDifficultFork:     nil,
 	}
-}
-
-func (s *MemStore) IsBlockPresent(h chainhash.Hash) bool {
-	lightBlock := s.LightBlockByHash(h)
-	return (lightBlock != nil)
 }
 
 func (s *MemStore) RemoveBlock(h chainhash.Hash) {

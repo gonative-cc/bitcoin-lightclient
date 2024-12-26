@@ -236,7 +236,8 @@ func (lc *BTCLightClient) FinalizedBlockHash() chainhash.Hash {
 }
 
 func (lc *BTCLightClient) IsBlockPresent(h chainhash.Hash) bool {
-	return lc.btcStore.IsBlockPresent(h)
+	lightBlock := lc.btcStore.LightBlockByHash(h)
+	return (lightBlock != nil)
 }
 
 // TODO: make it more simple
