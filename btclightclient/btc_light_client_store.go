@@ -60,7 +60,7 @@ func (s *MemStore) LightBlockAtHeight(height int64) *LightBlock {
 	return s.lightblockMap[height]
 }
 
-func (s *MemStore) FinalizedHeight() int64 {
+func (s *MemStore) LatestFinalizedHeight() int64 {
 	return int64(s.latestcheckpoint.Height)
 }
 

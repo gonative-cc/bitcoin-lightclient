@@ -226,7 +226,7 @@ func (lc *BTCLightClient) Status() {
 }
 
 func (lc *BTCLightClient) LatestFinalizedBlockHeight() int64 {
-	latestFinalizedBlockHeight := lc.btcStore.FinalizedHeight()
+	latestFinalizedBlockHeight := lc.btcStore.LatestFinalizedHeight()
 	return latestFinalizedBlockHeight
 }
 
