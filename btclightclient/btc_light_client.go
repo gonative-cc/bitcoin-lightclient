@@ -225,7 +225,7 @@ func (lc *BTCLightClient) Status() {
 	fmt.Println(lc.btcStore.MostDifficultFork())
 }
 
-func (lc *BTCLightClient) FinalizedBlockHeight() int64 {
+func (lc *BTCLightClient) LatestFinalizedBlockHeight() int64 {
 	latestFinalizedBlockHeight := lc.btcStore.FinalizedHeight()
 	return latestFinalizedBlockHeight
 }
