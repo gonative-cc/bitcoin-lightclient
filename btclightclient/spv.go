@@ -36,11 +36,12 @@ func SPVProofFromHex(proofHex string, txID string) (*SPVProof, error) {
 	// get merkle proof for txID
 	merkleProofBytes, _ := hex.DecodeString(proofHex[160:])
 	reader := bytes.NewReader(merkleProofBytes)
-	pmt, err := readPartialMerkleTree(reader, merkleProofBytes)
+	pmt, err := readPartialMerkleTreeData(reader, merkleProofBytes)
+	
 	if err != nil {
 		return nil, err
 	}
-
+	
 	merkleProof, err := pmt.ComputeMerkleProof(txID)
 	if err != nil {
 		return nil, err

@@ -10,7 +10,6 @@ import (
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
-	"github.com/cometbft/cometbft/crypto/merkle"
 )
 
 // We verify a partial merkle tree proof. This logic is used in verifytxoutproof.
@@ -114,7 +113,7 @@ func emptyMekleProof() *MerkleProof {
 	}
 }
 
-func readPartialMerkleTree(r io.Reader, buf []byte) (PartialMerkleTreeData, error) {
+func readPartialMerkleTreeData(r io.Reader, buf []byte) (PartialMerkleTreeData, error) {
 	var pmt PartialMerkleTreeData
 
 	if _, err := io.ReadFull(r, buf[:4]); err != nil {
@@ -173,7 +172,7 @@ func ParialMerkleTreeFromHex(merkleTreeEncoded string) (PartialMerkleTreeData, e
 	}
 
 	r := bytes.NewReader(b)
-	return readPartialMerkleTree(r, b)
+	return readPartialMerkleTreeData(r, b)
 }
 
 func (pmt *PartialMerkleTreeData) CalcTreeWidth(height uint32) uint {
@@ -189,8 +188,9 @@ func (pmt *PartialMerkleTreeData) Height() uint32 {
 	return nHeight
 }
 
+
 // Port logic from gettxoutproof from bitcoin-core
-func (pmt *PartialMerkleTreeData) computeMerkleProofRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, txID *chainhash.Hash) (*MerkleProof, error) {
+func (pmt *PartialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, merkleTree *PartialMerkleTree) (*chainhash.Hash, error) {
 	if int(*nBitUsed) >= len(pmt.vBits) {
 		return nil, fmt.Errorf("Out-bound of vBits")
 	}
@@ -203,62 +203,35 @@ func (pmt *PartialMerkleTreeData) computeMerkleProofRecursive(height, pos uint32
 		if int(*nHashUsed) >= len(pmt.vHash) {
 			return nil, fmt.Errorf("Out-bound of vHash")
 		}
-
 		hash := pmt.vHash[*nHashUsed]
 		*nHashUsed++
-		if height == 0 && fParentOfMatch {
-			return merkleProofAtLeaf(*hash, pos), nil
-		}
-
-		return emptyMekleProof(), nil
+		merkleTree.nodesAtHeight[height][pos] = *hash
+		return hash, nil
 	} else {
-		left, err := pmt.computeMerkleProofRecursive(height-1, pos*2, nBitUsed, nHashUsed, txID)
-		var right *MerkleProof
+		left, err := pmt.buildMerkleTreeRecursive(height-1, pos*2, nBitUsed, nHashUsed, merkleTree)
 		if err != nil {
 			return nil, err
 		}
+
+		var right *chainhash.Hash
 		if uint(pos*2+1) < pmt.CalcTreeWidth(height-1) {
-			right, err = pmt.computeMerkleProofRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, txID)
+			right, err = pmt.buildMerkleTreeRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, merkleTree)
 			if err != nil {
 				return nil, err
 			}
 
-			if left.merkleRoot.IsEqual(&right.merkleRoot) {
+			if left.IsEqual(right) {
 				return nil, fmt.Errorf("In the case tree width is old, the last hash must be duplicate")
 			}
 		} else {
 			right = left
 		}
 
-		nodeValue := HashNodes(&left.merkleRoot, &right.merkleRoot)
-		// Compute new proof
-		if left.pos != uint32(pmt.numberTransactions) {
-			// txID on the left side
-			return &MerkleProof{
-				merkleRoot: *nodeValue,
-				pos:        left.pos,
-				merklePath: append(left.merklePath, right.merkleRoot),
-			}, nil
-		}
-		// TxID on right side
-		return &MerkleProof{
-			merkleRoot: *nodeValue,
-			pos:        right.pos,
-			merklePath: append(right.merklePath, left.merkleRoot),
-		}, nil
+		nodeValue := HashNodes(left, right)
+		return nodeValue, nil
 	}
 }
 
-func (pmt *PartialMerkleTreeData) ComputeMerkleProof(txID string) (*MerkleProof, error) {
-	txIDHash, err := chainhash.NewHashFromStr(txID)
-	if err != nil {
-		return nil, err
-	}
-	height := pmt.Height()
-	nUsedBit := uint32(0)
-	nUsedHash := uint32(0)
-	return pmt.computeMerkleProofRecursive(height, 0, &nUsedBit, &nUsedHash, txIDHash)
-}
 
 func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
 	h := make([]byte, 0, chainhash.HashSize*2)

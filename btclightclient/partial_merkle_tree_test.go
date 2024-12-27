@@ -14,7 +14,7 @@ func TestComputeMerkleProof(t *testing.T) {
 	proof, err := hex.DecodeString(hexStr[160:])
 	assert.NilError(t, err)
 	reader := bytes.NewReader(proof)
-	pmk, err := readPartialMerkleTree(reader, proof)
+	pmk, err := readPartialMerkleTreeData(reader, proof)
 	assert.NilError(t, err)
 
 	merkleProof, err := pmk.ComputeMerkleProof("0bf82c1d62b73497de2d796636cb1ce64415d25982332436007c0f51b5a75a62")
