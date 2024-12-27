@@ -20,7 +20,7 @@ func main() {
 		log.Error().Msg("Missing filename.\nUsage: bitcoin-lightclient <sample_file.json>")
 		return
 	}
-	dataFilePath := os.Args[1]
+	sampleFilename := os.Args[1]
 
 	if _, err := os.Stat(dataFilePath); os.IsNotExist(err) {
 		log.Error().Msgf("Data file does not exist: %s", dataFilePath)
