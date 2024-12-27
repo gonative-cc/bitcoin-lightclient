@@ -20,7 +20,6 @@ func ReadJson(jsonFilePath string) (int64, []string, error) {
 	}
 	defer jsonFile.Close()
 
-	// Read the file contents
 	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
 		log.Fatalf("Failed to read file: %v", err)
