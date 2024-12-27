@@ -11,7 +11,7 @@ const MaxForkAge = 8
 
 type Store interface {
 	LightBlockAtHeight(int64) *LightBlock
-	LatestHeight() int64
+	LatestFinalizedHeight() int64
 	LightBlockByHash(hash chainhash.Hash) *LightBlock
 	// check hash h is hash of latest block in remind fork sets.
 	IsForkHead(h chainhash.Hash) bool
@@ -60,7 +60,7 @@ func (s *MemStore) LightBlockAtHeight(height int64) *LightBlock {
 	return s.lightblockMap[height]
 }
 
-func (s *MemStore) LatestHeight() int64 {
+func (s *MemStore) LatestFinalizedHeight() int64 {
 	return int64(s.latestcheckpoint.Height)
 }
 
