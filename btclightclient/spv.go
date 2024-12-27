@@ -74,7 +74,7 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 	}
 
 	// in the case the block not finalize
-	if lc.btcStore.LatestHeight() < int64(lightBlock.Height) {
+	if lc.btcStore.LatestFinalizedHeight() < int64(lightBlock.Height) {
 		return PartialValidSPVProof
 	}
 
