@@ -8,14 +8,14 @@ import (
 )
 
 type SPVProof struct {
-	blockHash   chainhash.Hash
-	txId        string
-	txIndex     uint
+	blockHash  chainhash.Hash
+	txId       string
+	txIndex    uint
 	merklePath []chainhash.Hash
 }
 
-
 type SPVStatus int
+
 const (
 	// proof is complete wrong
 	InvalidSPVProof SPVStatus = iota
@@ -47,22 +47,21 @@ func SPVProofFromHex(proofHex string, txID string) (*SPVProof, error) {
 	}
 
 	return &SPVProof{
-		blockHash:   blockheader.BlockHash(),
-		txId:        txID,
-		txIndex:     uint(merkleProof.pos),
+		blockHash:  blockheader.BlockHash(),
+		txId:       txID,
+		txIndex:    uint(merkleProof.pos),
 		merklePath: merkleProof.merklePath,
 	}, nil
 }
 
 func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
-	hashValue := &spvProof.merklePath[0];
-	numberSteps := len(spvProof.merklePath);
+	hashValue := &spvProof.merklePath[0]
+	numberSteps := len(spvProof.merklePath)
 	for i := 1; i < numberSteps; i++ {
-		hashValue = HashNodes(hashValue, &spvProof.merklePath[i]);
+		hashValue = HashNodes(hashValue, &spvProof.merklePath[i])
 	}
 	return *hashValue
 }
-
 
 func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 	lightBlock := lc.btcStore.LightBlockByHash(spvProof.blockHash)
