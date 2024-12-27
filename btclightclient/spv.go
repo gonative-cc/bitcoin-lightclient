@@ -1,8 +1,6 @@
 package btclightclient
 
 import (
-	"bytes"
-	"encoding/hex"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
@@ -26,23 +24,21 @@ const (
 )
 
 // / Get SPV proof from gettxoutproof Bitcoin API.
-func SPVProofFromHex(proofHex string, txID string) (*SPVProof, error) {
+func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
 	// get block header
-	blockheader, err := BlockHeaderFromHex(proofHex[:160])
+	blockheader, err := BlockHeaderFromHex(txoutProof[:160])
 	if err != nil {
 		return nil, err
 	}
 
 	// get merkle proof for txID
-	merkleProofBytes, _ := hex.DecodeString(proofHex[160:])
-	reader := bytes.NewReader(merkleProofBytes)
-	pmt, err := readPartialMerkleTreeData(reader, merkleProofBytes)
-	
+	pmt, err := PartialMerkleTreeFromHex(txoutProof[160:])
 	if err != nil {
-		return nil, err
+		return nil, err; 
 	}
-	
-	merkleProof, err := pmt.ComputeMerkleProof(txID)
+
+	// compute merkle proof
+	merkleProof, err := pmt.GetProof(txID)	
 	if err != nil {
 		return nil, err
 	}
