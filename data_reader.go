@@ -26,7 +26,6 @@ func ReadJson(jsonFilePath string) (int64, []string, error) {
 		return 0, nil, err
 	}
 
-	// Unmarshal the JSON data into the struct
 	var dataContent DataContent
 	if err := json.Unmarshal(byteValue, &dataContent); err != nil {
 		log.Fatalf("Failed to unmarshal JSON: %v", err)
