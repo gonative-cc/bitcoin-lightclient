@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-type DataContent struct {
+type Sample struct {
 	StartHeight   int64    `json:"start_height"`
 	HeaderStrings []string `json:"header_strings"`
 }
