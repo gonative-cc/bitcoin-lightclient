@@ -23,7 +23,7 @@ func main() {
 	sampleFilename := os.Args[1]
 
 	if _, err := os.Stat(dataFilePath); os.IsNotExist(err) {
-		log.Error().Msgf("Data file does not exist: %s", dataFilePath)
+		log.Error().Msgf("Sample file does not exist: %s", dataFilePath)
 		return
 	}
 
