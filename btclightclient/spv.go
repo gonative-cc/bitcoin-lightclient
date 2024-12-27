@@ -1,6 +1,7 @@
 package btclightclient
 
 import (
+	"fmt"
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
@@ -70,6 +71,8 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 
 	blockMerkleRoot := lightBlock.Header.MerkleRoot
 	spvMerkleRoot := spvProof.MerkleRoot()
+	fmt.Println(blockMerkleRoot, "block")
+	fmt.Println(spvMerkleRoot, "spv")
 	if !spvMerkleRoot.IsEqual(&blockMerkleRoot) {
 		return InvalidSPVProof
 	}

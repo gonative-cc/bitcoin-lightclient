@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 
-
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/wire"
 )
@@ -49,7 +48,6 @@ type PartialMerkleTree struct {
 func (mk PartialMerkleTree) getLeafNodeIndex(txID *chainhash.Hash) (uint32, error) {
 	// TODO(vu): Should we use reverse map to find position of merkle leaf?
 	for leafIndex, leafValue := range mk.nodesAtHeight[0] {
-		fmt.Println("str", leafValue);
 		if leafValue.IsEqual(txID) {
 			return leafIndex, nil
 		}
@@ -69,11 +67,12 @@ func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
 		return nil, err
 	}
 
-	merklePath := []chainhash.Hash{}
+	merklePath := []chainhash.Hash{*txHash}
 	h := len(mk.nodesAtHeight)
 
 	position := txIndex
-	for i := h - 1; i > 0; i-- {
+
+	for i := 0; i < h - 1; i++ {
 		if txIndex%2 == 0 {
 			merklePath = append(merklePath, mk.nodesAtHeight[i][txIndex+1])
 		} else {
@@ -82,6 +81,8 @@ func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
 		txIndex = txIndex / 2
 	}
 
+	fmt.Println(len(merklePath))
+	fmt.Println(mk.nodesAtHeight[h - 1][0]);
 	return &MerkleProof{
 		merkleRoot: mk.nodesAtHeight[h - 1][0],
 		merklePath: merklePath,
