@@ -56,6 +56,7 @@ type MerkleProof struct {
 
 const maxAllowBytes = 65536
 
+
 // Read data for parse merkle tree. Follow encode/decode format:
 // *  - uint32     total_transactions (4 bytes)
 // *  - varint     number of hashes   (1-3 bytes)
@@ -63,18 +64,22 @@ const maxAllowBytes = 65536
 // *  - varint     number of bytes of flag bits (1-3 bytes)
 // *  - byte[]     flag bits, packed per 8 in a byte, least significant bit first (<= 2*N-1 bits)
 // This is reference from bitcoin-code.
-func readPartialMerkleTreeData(r io.Reader, buf []byte) (partialMerkleTreeData, error) {
+func readPartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
 	var pmt partialMerkleTreeData
+	
+	r := bytes.NewReader(buf)
 
+
+	// read number transaction
 	if _, err := io.ReadFull(r, buf[:4]); err != nil {
 		return pmt, err
 	}
-
 	numberTransactions := uint(binary.LittleEndian.Uint32(buf[:4]))
+
+	// read vhash
 	var pver uint32 // pversion but btcd don't use this in those function we want.
 	var vHash []*chainhash.Hash
-
-	numberOfHashes, err := wire.ReadVarIntBuf(r, pver, buf)
+	numberOfHashes, err := wire.ReadVarInt(r, pver)
 	if err != nil {
 		return pmt, err
 	}
@@ -94,6 +99,7 @@ func readPartialMerkleTreeData(r io.Reader, buf []byte) (partialMerkleTreeData, 
 		}
 	}
 
+	// Read vBits
 	var vBits []bool
 	vBytes, err := wire.ReadVarBytes(r, pver, uint32(maxAllowBytes), "vBits")
 	if err != nil {
@@ -119,8 +125,8 @@ func parialMerkleTreeDataFromHex(merkleTreeEncoded string) (partialMerkleTreeDat
 	if err != nil {
 		return partialMerkleTreeData{}, err
 	}
-	r := bytes.NewReader(b)
-	return readPartialMerkleTreeData(r, b)
+
+	return readPartialMerkleTreeData(b)
 }
 
 
