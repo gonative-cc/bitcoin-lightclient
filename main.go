@@ -27,7 +27,6 @@ func main() {
 		return
 	}
 
-	// populate the json file values into startHeight and headerStrings
 	startHeight, headerStrings, err := ReadJson(dataFilePath)
 	if err != nil {
 		log.Error().Msgf("Error reading data file: %s", err)
