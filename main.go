@@ -8,6 +8,8 @@ import (
 	"github.com/gonative-cc/bitcoin-lightclient/btclightclient"
 	"github.com/gonative-cc/bitcoin-lightclient/rpcserver"
 
+	"github.com/gonative-cc/bitcoin-lightclient/data"
+
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/rs/zerolog/log"
@@ -22,12 +24,12 @@ func main() {
 	}
 	sampleFilename := os.Args[1]
 
-	if _, err := os.Stat(dataFilePath); os.IsNotExist(err) {
-		log.Error().Msgf("Sample file does not exist: %s", dataFilePath)
+	if _, err := os.Stat(sampleFilename); os.IsNotExist(err) {
+		log.Error().Msgf("Sample file does not exist: %s", sampleFilename)
 		return
 	}
 
-	startHeight, headerStrings, err := ReadJson(dataFilePath)
+	startHeight, headerStrings, err := data.ReadJson(sampleFilename)
 	if err != nil {
 		log.Error().Msgf("Error reading data file: %s", err)
 		return
