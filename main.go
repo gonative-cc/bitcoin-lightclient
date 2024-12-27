@@ -17,7 +17,7 @@ func main() {
 	// read the json file
 	// example: ./data/sample.json
 	if len(os.Args) < 2 {
-		log.Error().Msg("Missing data file path")
+		log.Error().Msg("Missing filename.\nUsage: bitcoin-lightclient <sample_file.json>")
 		return
 	}
 	dataFilePath := os.Args[1]
