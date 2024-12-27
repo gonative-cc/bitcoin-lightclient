@@ -28,66 +28,17 @@ import (
 // level h - 2              (h - 2, 0)  (h - 2, 1)  (h - 2, 2)  (h - 2, 3)
 //                             .................................
 // level 0            (0, 0)  (0, 1)  (0, 2)  (0, 3) ... (0, numberTransactions - 1)
+
+
+
 // We travel the tree in depth-first order. A vBits[i] is true if node i-th in DFS
 // is parent of leaf node which is we want to verify, otherwise this value is false.
 // vHash store hash value at node i in DFS order. Follow the vBits and vHash,
 // we can rebuild the tree and extract merkle path we want.
-
 type partialMerkleTreeData struct {
-	numberTransactions uint
+	numberTransactions uint 
 	vBits              []bool
 	vHash              []*chainhash.Hash
-}
-
-type merkleNodes map[uint32]chainhash.Hash
-
-type PartialMerkleTree struct {
-	nodesAtHeight []merkleNodes
-}
-
-func (mk PartialMerkleTree) getLeafNodeIndex(txID *chainhash.Hash) (uint32, error) {
-	// TODO(vu): Should we use reverse map to find position of merkle leaf?
-	for leafIndex, leafValue := range mk.nodesAtHeight[0] {
-		if leafValue.IsEqual(txID) {
-			return leafIndex, nil
-		}
-	}
-	return 0, errors.New("Node value doesn't exist in merkle tree")
-
-}
-
-func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
-	txHash, err := chainhash.NewHashFromStr(txID)
-	if err != nil {
-		return nil, err
-	}
-
-	txIndex, err := mk.getLeafNodeIndex(txHash)
-	if err != nil {
-		return nil, err
-	}
-
-	merklePath := []chainhash.Hash{*txHash}
-	h := len(mk.nodesAtHeight)
-
-	position := txIndex
-
-	for i := 0; i < h - 1; i++ {
-		if txIndex%2 == 0 {
-			merklePath = append(merklePath, mk.nodesAtHeight[i][txIndex+1])
-		} else {
-			merklePath = append(merklePath, mk.nodesAtHeight[i][txIndex-1])
-		}
-		txIndex = txIndex / 2
-	}
-
-	fmt.Println(len(merklePath))
-	fmt.Println(mk.nodesAtHeight[h - 1][0]);
-	return &MerkleProof{
-		merkleRoot: mk.nodesAtHeight[h - 1][0],
-		merklePath: merklePath,
-		pos:        position,
-	}, nil
 }
 
 // Merkle proof use for rebuild the merkle tree and extract merkle proof for
@@ -98,13 +49,20 @@ type MerkleProof struct {
 	// merkle path if the txID we want to build merkle proof in this subtree
 	// if not this is empty
 	merklePath []chainhash.Hash
-	// position in the level 0. We use this for check "left, right" when
+	// transaction index. We use this for check "left, right" when
 	// compute merkle root.
-	pos uint32
+	transactionIndex uint32
 }
 
 const maxAllowBytes = 65536
 
+// Read data for parse merkle tree. Follow encode/decode format:
+// *  - uint32     total_transactions (4 bytes)
+// *  - varint     number of hashes   (1-3 bytes)
+// *  - uint256[]  hashes in depth-first order (<= 32*N bytes)
+// *  - varint     number of bytes of flag bits (1-3 bytes)
+// *  - byte[]     flag bits, packed per 8 in a byte, least significant bit first (<= 2*N-1 bits)
+// This is reference from bitcoin-code.
 func readPartialMerkleTreeData(r io.Reader, buf []byte) (partialMerkleTreeData, error) {
 	var pmt partialMerkleTreeData
 
@@ -161,74 +119,50 @@ func parialMerkleTreeDataFromHex(merkleTreeEncoded string) (partialMerkleTreeDat
 	if err != nil {
 		return partialMerkleTreeData{}, err
 	}
-
 	r := bytes.NewReader(b)
 	return readPartialMerkleTreeData(r, b)
 }
 
-func PartialMerkleTreeFromHex(mtData string) (PartialMerkleTree, error) {
-	var pmt PartialMerkleTree
 
-	// decode information for build partial merkle tree
-	pmtInfo, err := parialMerkleTreeDataFromHex(mtData)
-	if err != nil {
-		return pmt, err
-	}
-
-	nBitUsed := uint32(0)
-	nHashUsed := uint32(0)
-	height := pmtInfo.Height()
-	pmt.nodesAtHeight = make([]merkleNodes, height + 1);
-	for i := 0; i <= int(height); i++ {
-		pmt.nodesAtHeight[i] = make(map[uint32]chainhash.Hash)
-	}
-	if _, err := pmtInfo.buildMerkleTreeRecursive(height, 0, &nBitUsed, &nHashUsed, &pmt); err != nil {
-		return pmt, err
-	}
-	return pmt, nil
+func (pmtd *partialMerkleTreeData) calcTreeWidth(height uint32) uint {
+	return (pmtd.numberTransactions + (1 << height) - 1) >> height
 }
 
-func (pmt *partialMerkleTreeData) CalcTreeWidth(height uint32) uint {
-	return (pmt.numberTransactions + (1 << height) - 1) >> height
-}
-
-// MinHeight returns the minimum height of a Merkele tree to fit `pmt.numberTransactions`.
-func (pmt *partialMerkleTreeData) Height() uint32 {
+// returns the minimum height of a Merkele tree to fit `pmt.numberTransactions`.
+func (pmtd *partialMerkleTreeData) height() uint32 {
 	var nHeight uint32 = 0
-	for pmt.CalcTreeWidth(nHeight) > 1 {
+	for pmtd.calcTreeWidth(nHeight) > 1 {
 		nHeight++
 	}
 	return nHeight
 }
 
-// Port logic from gettxoutproof from bitcoin-core
-func (pmt *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, merkleTree *PartialMerkleTree) (*chainhash.Hash, error) {
-	if int(*nBitUsed) >= len(pmt.vBits) {
+func (pmtd *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, merkleTree *PartialMerkleTree) (*chainhash.Hash, error) {
+	if int(*nBitUsed) >= len(pmtd.vBits) {
 		return nil, fmt.Errorf("Out-bound of vBits")
 	}
 
-	fParentOfMatch := pmt.vBits[*nBitUsed]
+	fParentOfMatch := pmtd.vBits[*nBitUsed]
 	*nBitUsed = *nBitUsed + 1
 
 	// handle leaf
 	if height == 0 || !fParentOfMatch {
-		if int(*nHashUsed) >= len(pmt.vHash) {
-			fmt.Println(len(pmt.vHash));
+		if int(*nHashUsed) >= len(pmtd.vHash) {
+			fmt.Println(len(pmtd.vHash));
 			return nil, fmt.Errorf("Out-bound of vHash")
 		}
-		hash := pmt.vHash[*nHashUsed]
+		hash := pmtd.vHash[*nHashUsed]
 		*nHashUsed++
 		merkleTree.nodesAtHeight[height][pos] = *hash
 		return hash, nil
 	} else {
-		left, err := pmt.buildMerkleTreeRecursive(height-1, pos*2, nBitUsed, nHashUsed, merkleTree)
+		left, err := pmtd.buildMerkleTreeRecursive(height-1, pos*2, nBitUsed, nHashUsed, merkleTree)
 		if err != nil {
 			return nil, err
 		}
-
 		var right *chainhash.Hash
-		if uint(pos*2+1) < pmt.CalcTreeWidth(height-1) {
-			right, err = pmt.buildMerkleTreeRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, merkleTree)
+		if uint(pos*2+1) < pmtd.calcTreeWidth(height-1) {
+			right, err = pmtd.buildMerkleTreeRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, merkleTree)
 			if err != nil {
 				return nil, err
 			}
@@ -252,4 +186,80 @@ func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
 	h = append(h, r.CloneBytes()...)
 	newHash := chainhash.DoubleHashH(h)
 	return &newHash
+}
+
+
+type merkleNodes map[uint32]chainhash.Hash
+type PartialMerkleTree struct {
+	// nodes at level or height.
+	// check 
+	nodesAtHeight []merkleNodes
+}
+
+func (mk PartialMerkleTree) getLeafNodeIndex(txID *chainhash.Hash) (uint32, error) {
+	// TODO(vu): Should we use reverse map to find position of merkle leaf?
+	for leafIndex, leafValue := range mk.nodesAtHeight[0] {
+		if leafValue.IsEqual(txID) {
+			return leafIndex, nil
+		}
+	}
+	return 0, errors.New("Node value doesn't exist in merkle tree")
+
+}
+
+// Return merkle proof of txID.
+// Return error this txID doesn't exist in merkle tree
+func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
+	txHash, err := chainhash.NewHashFromStr(txID)
+	if err != nil {
+		return nil, err
+	}
+
+	txIndex, err := mk.getLeafNodeIndex(txHash)
+	if err != nil {
+		return nil, err
+	}
+
+	merklePath := []chainhash.Hash{*txHash}
+	h := len(mk.nodesAtHeight)
+
+	position := txIndex
+
+	for i := 0; i < h - 1; i++ {
+		if txIndex%2 == 0 {
+			merklePath = append(merklePath, mk.nodesAtHeight[i][txIndex+1])
+		} else {
+			merklePath = append(merklePath, mk.nodesAtHeight[i][txIndex-1])
+		}
+		txIndex = txIndex / 2
+	}
+
+	return &MerkleProof{
+		merkleRoot: mk.nodesAtHeight[h - 1][0],
+		merklePath: merklePath,
+		transactionIndex:        position,
+	}, nil
+}
+
+// Parse hex data(gextxoutproof) to PartialMerkleTree
+func PartialMerkleTreeFromHex(mtData string) (PartialMerkleTree, error) {
+	var pmt PartialMerkleTree
+
+	// decode information for build partial merkle tree
+	pmtInfo, err := parialMerkleTreeDataFromHex(mtData)
+	if err != nil {
+		return pmt, err
+	}
+
+	nBitUsed := uint32(0)
+	nHashUsed := uint32(0)
+	height := pmtInfo.height()
+	pmt.nodesAtHeight = make([]merkleNodes, height + 1);
+	for i := 0; i <= int(height); i++ {
+		pmt.nodesAtHeight[i] = make(map[uint32]chainhash.Hash)
+	}
+	if _, err := pmtInfo.buildMerkleTreeRecursive(height, 0, &nBitUsed, &nHashUsed, &pmt); err != nil {
+		return pmt, err
+	}
+	return pmt, nil
 }
