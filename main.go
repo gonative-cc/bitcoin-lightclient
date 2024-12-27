@@ -22,7 +22,6 @@ func main() {
 	}
 	dataFilePath := os.Args[1]
 
-	// Check if data file exists
 	if _, err := os.Stat(dataFilePath); os.IsNotExist(err) {
 		log.Error().Msgf("Data file does not exist: %s", dataFilePath)
 		return
