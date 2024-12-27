@@ -44,8 +44,12 @@ func main() {
 	btcLC := btclightclient.NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, int(startHeight))
 	btcLC.Status()
 
-	rpcService := rpcserver.NewRPCServer(btcLC)
-	log.Info().Msgf("RPC server running at: %s", rpcService.URL)
+	rpcService, err := rpcserver.NewRPCServer(btcLC)
+	if err != nil {
+		log.Error().Msgf("Error creating RPC server: %s", err)
+		return
+	}
+	log.Info().Msgf("RPC server running at: %s", rpcService.Addr)
 
 	// Create channel to listen for interrupt signal
 	// Wait for interrupt signal
