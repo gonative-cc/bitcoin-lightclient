@@ -2,8 +2,6 @@ package main
 
 import (
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/gonative-cc/bitcoin-lightclient/btclightclient"
 	"github.com/gonative-cc/bitcoin-lightclient/rpcserver"
@@ -44,16 +42,9 @@ func main() {
 	btcLC := btclightclient.NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, int(startHeight))
 	btcLC.Status()
 
-	rpcService, err := rpcserver.NewRPCServer(btcLC)
+	err = rpcserver.NewRPCServer(btcLC)
 	if err != nil {
 		log.Error().Msgf("Error creating RPC server: %s", err)
 		return
 	}
-	log.Info().Msgf("RPC server running at: %s", rpcService.Addr)
-
-	// Create channel to listen for interrupt signal
-	// Wait for interrupt signal
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	<-sigChan
 }

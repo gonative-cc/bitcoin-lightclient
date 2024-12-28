@@ -13,7 +13,7 @@ import (
 )
 
 type Block struct {
-	Hash   string
+	Hash   *chainhash.Hash
 	Height int64
 }
 
@@ -54,14 +54,14 @@ func (h *RPCServerHandler) GetBTCHeaderChainTip() (*Block, error) {
 
 	latestFinalizedBlock := &Block{
 		Height: latestFinalizedBlockHeight,
-		Hash:   latestFinalizedBlockHash.String(),
+		Hash:   &latestFinalizedBlockHash,
 	}
 
 	return latestFinalizedBlock, nil
 }
 
 // NewRPCServer creates a new instance of the rpcServer and starts listening
-func NewRPCServer(btcLC *btclightclient.BTCLightClient) (*http.Server, error) {
+func NewRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	rpcServer := jsonrpc.NewServer()
 	serverHandler := &RPCServerHandler{
 		btcLC: btcLC,
@@ -79,10 +79,11 @@ func NewRPCServer(btcLC *btclightclient.BTCLightClient) (*http.Server, error) {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
+	log.Info().Msgf("RPC server running at: %s", server.Addr)
 
 	if err := server.ListenAndServe(); err != nil {
-		return nil, err
+		return err
 	}
 
-	return server, nil
+	return nil
 }
