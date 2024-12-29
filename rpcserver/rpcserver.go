@@ -81,9 +81,5 @@ func NewRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	}
 	log.Info().Msgf("RPC server running at: %s", server.Addr)
 
-	if err := server.ListenAndServe(); err != nil {
-		return err
-	}
-
-	return nil
+	return server.ListenAndServe()
 }
