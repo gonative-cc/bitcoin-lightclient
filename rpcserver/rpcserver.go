@@ -61,7 +61,7 @@ func (h *RPCServerHandler) GetBTCHeaderChainTip() (*Block, error) {
 }
 
 // NewRPCServer creates a new instance of the rpcServer and starts listening
-func NewRPCServer(btcLC *btclightclient.BTCLightClient) error {
+func StartRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	rpcServer := jsonrpc.NewServer()
 	serverHandler := &RPCServerHandler{
 		btcLC: btcLC,
