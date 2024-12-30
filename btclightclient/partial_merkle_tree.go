@@ -71,7 +71,6 @@ func decodePartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
 	}
 	numberTransactions := uint(binary.LittleEndian.Uint32(buf[:4]))
 
-	// read vhash
 	var pver uint32 // pversion but btcd don't use this in those function we want.
 	var vHash []*chainhash.Hash
 	numberOfHashes, err := wire.ReadVarInt(r, pver)
