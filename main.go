@@ -42,7 +42,7 @@ func main() {
 	btcLC := btclightclient.NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, int(startHeight))
 	btcLC.Status()
 
-	err = rpcserver.NewRPCServer(btcLC)
+	err = rpcserver.StartRPCServer(btcLC)
 	if err != nil {
 		log.Error().Msgf("Error creating RPC server: %s", err)
 		return
