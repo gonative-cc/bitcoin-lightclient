@@ -29,14 +29,12 @@ import (
 //                             .................................
 // level 0            (0, 0)  (0, 1)  (0, 2)  (0, 3) ... (0, numberTransactions - 1)
 
-
-
 // We travel the tree in depth-first order. A vBits[i] is true if node i-th in DFS
 // is parent of leaf node which is we want to verify, otherwise this value is false.
 // vHash store hash value at node i in DFS order. Follow the vBits and vHash,
 // we can rebuild the tree and extract merkle path we want.
 type partialMerkleTreeData struct {
-	numberTransactions uint 
+	numberTransactions uint
 	vBits              []bool
 	vHash              []*chainhash.Hash
 }
@@ -56,7 +54,6 @@ type MerkleProof struct {
 
 const maxAllowBytes = 65536
 
-
 // Read data for parse merkle tree. Follow encode/decode format:
 // *  - uint32     total_transactions (4 bytes)
 // *  - varint     number of hashes   (1-3 bytes)
@@ -66,9 +63,8 @@ const maxAllowBytes = 65536
 // This is reference from bitcoin-code.
 func readPartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
 	var pmt partialMerkleTreeData
-	
-	r := bytes.NewReader(buf)
 
+	r := bytes.NewReader(buf)
 
 	// read number transaction
 	if _, err := io.ReadFull(r, buf[:4]); err != nil {
@@ -129,7 +125,6 @@ func parialMerkleTreeDataFromHex(merkleTreeEncoded string) (partialMerkleTreeDat
 	return readPartialMerkleTreeData(b)
 }
 
-
 func (pmtd *partialMerkleTreeData) calcTreeWidth(height uint32) uint {
 	return (pmtd.numberTransactions + (1 << height) - 1) >> height
 }
@@ -154,7 +149,7 @@ func (pmtd *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, 
 	// handle leaf
 	if height == 0 || !fParentOfMatch {
 		if int(*nHashUsed) >= len(pmtd.vHash) {
-			fmt.Println(len(pmtd.vHash));
+			fmt.Println(len(pmtd.vHash))
 			return nil, fmt.Errorf("Out-bound of vHash")
 		}
 		hash := pmtd.vHash[*nHashUsed]
@@ -194,11 +189,10 @@ func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
 	return &newHash
 }
 
-
 type merkleNodes map[uint32]chainhash.Hash
 type PartialMerkleTree struct {
 	// nodes at level or height.
-	// check 
+	// check
 	nodesAtHeight []merkleNodes
 }
 
@@ -221,7 +215,7 @@ func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
 		return nil, err
 	}
 
-	txIndex, err := mk.getLeafNodeIndex(txHash)
+	transactionIndex, err := mk.getLeafNodeIndex(txHash)
 	if err != nil {
 		return nil, err
 	}
@@ -229,21 +223,35 @@ func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
 	merklePath := []chainhash.Hash{*txHash}
 	h := len(mk.nodesAtHeight)
 
-	position := txIndex
-
-	for i := 0; i < h - 1; i++ {
-		if txIndex%2 == 0 {
-			merklePath = append(merklePath, mk.nodesAtHeight[i][txIndex+1])
+	// We have merkle tree below:
+	// level h                              (h, 0)
+	//                                  /              \
+	// level h - 1                  (h-1, 0)             (h- 1, 1)
+	//                             /       \             /         \
+	// level h - 2              (h - 2, 0)  (h - 2, 1)  (h - 2, 2)  (h - 2, 3)
+	//                             .................................
+	// level 0            (0, 0)  (0, 1)  (0, 2)  (0, transactionIndex) ... (0, numberTransactions - 1)
+	// Easy obvious:
+	// - if position is event, we need the sibling at position + 1 to compute the parent's hash.
+	// - if position is odd, we need the sibling at position - 1 to compute the parent's hash.
+	position := transactionIndex
+	// The node at level 0 is merkle root :D 
+	for i := 0; i < h-1; i++ {
+		var siblingHash chainhash.Hash
+		if position%2 == 0 {
+			siblingHash = mk.nodesAtHeight[i][position+1]
 		} else {
-			merklePath = append(merklePath, mk.nodesAtHeight[i][txIndex-1])
+			siblingHash = mk.nodesAtHeight[i][position-1]
 		}
-		txIndex = txIndex / 2
+		
+		merklePath = append(merklePath, siblingHash)
+		position = position / 2
 	}
 
 	return &MerkleProof{
-		merkleRoot: mk.nodesAtHeight[h - 1][0],
-		merklePath: merklePath,
-		transactionIndex:        position,
+		merkleRoot:       mk.nodesAtHeight[h-1][0],
+		merklePath:       merklePath,
+		transactionIndex: transactionIndex,
 	}, nil
 }
 
@@ -260,7 +268,7 @@ func PartialMerkleTreeFromHex(mtData string) (PartialMerkleTree, error) {
 	nBitUsed := uint32(0)
 	nHashUsed := uint32(0)
 	height := pmtInfo.height()
-	pmt.nodesAtHeight = make([]merkleNodes, height + 1);
+	pmt.nodesAtHeight = make([]merkleNodes, height+1)
 	for i := 0; i <= int(height); i++ {
 		pmt.nodesAtHeight[i] = make(map[uint32]chainhash.Hash)
 	}
