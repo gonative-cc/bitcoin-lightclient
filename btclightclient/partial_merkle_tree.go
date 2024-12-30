@@ -44,8 +44,7 @@ type partialMerkleTreeData struct {
 type MerkleProof struct {
 	// merkle node value at this sub tree
 	merkleRoot chainhash.Hash
-	// merkle path if the txID we want to build merkle proof in this subtree
-	// if not this is empty
+	// proof that a tx ID is part of the Markle Tree with root = merkleRoot
 	merklePath []chainhash.Hash
 	// transaction index. We use this for check "left, right" when
 	// compute merkle root.
@@ -54,14 +53,14 @@ type MerkleProof struct {
 
 const maxAllowBytes = 65536
 
-// Read data for parse merkle tree. Follow encode/decode format:
+// parse merkle tree. Follow encode/decode format:
 // *  - uint32     total_transactions (4 bytes)
 // *  - varint     number of hashes   (1-3 bytes)
 // *  - uint256[]  hashes in depth-first order (<= 32*N bytes)
 // *  - varint     number of bytes of flag bits (1-3 bytes)
 // *  - byte[]     flag bits, packed per 8 in a byte, least significant bit first (<= 2*N-1 bits)
 // This is reference from bitcoin-code.
-func readPartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
+func decodePartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
 	var pmt partialMerkleTreeData
 
 	r := bytes.NewReader(buf)
@@ -95,7 +94,6 @@ func readPartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
 		}
 	}
 
-	// Read vBits
 	var vBits []bool
 	vBytes, err := wire.ReadVarBytes(r, pver, uint32(maxAllowBytes), "vBits")
 	if err != nil {
