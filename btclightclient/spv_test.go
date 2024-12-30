@@ -21,7 +21,7 @@ func TestSPVMerkleRoot(t *testing.T) {
 		txIdHash    string
 		merkleRoot  string
 		merkleProof []string
-		index       uint
+		index       uint32
 	}
 
 	run := func(t *testing.T, tc testCase) {

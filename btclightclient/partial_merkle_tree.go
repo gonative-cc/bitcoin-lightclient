@@ -55,6 +55,18 @@ type MerkleProof struct {
 	merklePath []chainhash.Hash
 	// transaction index. We use this for check "left, right" when
 	// compute merkle root.
+	// We have merkle tree below:
+	// level h                              (h, 0)
+	//                                  /              \
+	// level h - 1                  (h-1, 0)             (h- 1, 1)
+	//                             /       \             /         \
+	// level h - 2              (h - 2, 0)  (h - 2, 1)  (h - 2, 2)  (h - 2, 3)
+	//                             .................................
+	// level 0            (0, 0)  (0, 1)  (0, 2)  (0, transactionIndex) ... (0, numberTransactions - 1)
+	// At level 0 postion of node is transaction index. the next level postion is transactionIndex / (2 ^ level).
+	// Easy obvious:
+	// - if position is event, we need the sibling at position + 1 to compute the parent's hash.
+	// - if position is odd, we need the sibling at position - 1 to compute the parent's hash.
 	transactionIndex uint32
 }
 
@@ -170,24 +182,27 @@ func (pmtd *partialMerkleTreeData) buildTreeRecursive(height, pos uint32, merkle
 	}
 
 	// handle internal node
+	// we go to left of tree 
 	left, err := pmtd.buildTreeRecursive(height-1, pos*2, merkleTree)
 	if err != nil {
 		return nil, err
 	}
 	var right *chainhash.Hash
+	// Check right node exists and jump to this
 	if pos*2+1 < pmtd.calcTreeWidth(height-1) {
 		right, err = pmtd.buildTreeRecursive(height-1, pos*2+1, merkleTree)
 		if err != nil {
 			return nil, err
 		}
-
 		if left.IsEqual(right) {
-			return nil, fmt.Errorf("In the case tree width is old, the last hash must be duplicate")
+			return nil, fmt.Errorf("Right node never identical with left node")
 		}
 	} else {
+		// Right node doesn't exist, it's assigned value by left node.
 		right = left
 	}
 
+	// compute internal node value
 	nodeValue := HashNodes(left, right)
 	merkleTree.nodesAtHeight[height][pos] = *nodeValue
 	return nodeValue, nil
@@ -201,6 +216,7 @@ func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
 	newHash := chainhash.DoubleHashH(h)
 	return &newHash
 }
+
 
 type merkleNodes map[uint32]chainhash.Hash
 type PartialMerkleTree struct {
@@ -235,24 +251,16 @@ func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
 	merklePath := []chainhash.Hash{*txHash}
 	h := len(mk.nodesAtHeight)
 
-	// We have merkle tree below:
-	// level h                              (h, 0)
-	//                                  /              \
-	// level h - 1                  (h-1, 0)             (h- 1, 1)
-	//                             /       \             /         \
-	// level h - 2              (h - 2, 0)  (h - 2, 1)  (h - 2, 2)  (h - 2, 3)
-	//                             .................................
-	// level 0            (0, 0)  (0, 1)  (0, 2)  (0, transactionIndex) ... (0, numberTransactions - 1)
-	// Easy obvious:
-	// - if position is event, we need the sibling at position + 1 to compute the parent's hash.
-	// - if position is odd, we need the sibling at position - 1 to compute the parent's hash.
+
 	position := transactionIndex
-	// The node at level 0 is merkle root :D
+	// The node at level 0 is merkle root.
 	for i := 0; i < h-1; i++ {
 		var siblingHash chainhash.Hash
 		if position%2 == 0 {
+			// current node is left node, push right node
 			siblingHash = mk.nodesAtHeight[i][position+1]
 		} else {
+			//currect node is right node push left node 
 			siblingHash = mk.nodesAtHeight[i][position-1]
 		}
 

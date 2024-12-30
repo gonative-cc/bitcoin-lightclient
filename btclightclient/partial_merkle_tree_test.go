@@ -30,7 +30,7 @@ func TestPartialMerkleTree(t *testing.T) {
 		}
 
 		if len(tc.expectedErrorMessage) > 0 {
-			t.Fatalf("Should return this error")
+			t.Fatalf("Should return error")
 		}
 
 		assert.Equal(t, merkleProof.merkleRoot.String(), tc.root)

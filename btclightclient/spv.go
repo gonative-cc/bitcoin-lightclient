@@ -4,15 +4,17 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
+// SPV proof. We use this for verify transaction inclusives in block.
+// We are verify for single transaction in this version.
 type SPVProof struct {
-	blockHash  chainhash.Hash
-	txId       string
-	txIndex    uint
-	merklePath []chainhash.Hash
+	blockHash  chainhash.Hash 
+	txId       string // 32bytes hash value in string hex format
+	txIndex    uint32 // index of transaction in block 
+	merklePath []chainhash.Hash 
 }
 
-type SPVStatus int
 
+type SPVStatus int
 const (
 	// proof is complete wrong
 	InvalidSPVProof SPVStatus = iota
@@ -22,7 +24,7 @@ const (
 	ValidSPVProof
 )
 
-// / Get SPV proof from gettxoutproof Bitcoin API.
+// Get SPV proof from gettxoutproof Bitcoin API.
 func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
 	blockheader, err := BlockHeaderFromHex(txoutProof[:160])
 	if err != nil {
@@ -41,7 +43,7 @@ func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
 	return &SPVProof{
 		blockHash:  blockheader.BlockHash(),
 		txId:       txID,
-		txIndex:    uint(merkleProof.transactionIndex),
+		txIndex:    merkleProof.transactionIndex,
 		merklePath: merkleProof.merklePath,
 	}, nil
 }
