@@ -63,9 +63,9 @@ type MerkleProof struct {
 	// level h - 2              (h - 2, 0)  (h - 2, 1)  (h - 2, 2)  (h - 2, 3)
 	//                             .................................
 	// level 0            (0, 0)  (0, 1)  (0, 2)  (0, transactionIndex) ... (0, numberTransactions - 1)
-	// At level 0 postion of node is transaction index. the next level postion is transactionIndex / (2 ^ level).
+	// At level 0 postion of node is transaction index. the postion at level h is transactionIndex / (2 ^ h).
 	// Easy obvious:
-	// - if position is event, we need the sibling at position + 1 to compute the parent's hash.
+	// - if position is even, we need the sibling at position + 1 to compute the parent's hash.
 	// - if position is odd, we need the sibling at position - 1 to compute the parent's hash.
 	transactionIndex uint32
 }
