@@ -1,6 +1,8 @@
 package btclightclient
 
 import (
+	"fmt"
+
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
@@ -53,8 +55,14 @@ func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
 func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
 	hashValue := &spvProof.merklePath[0]
 	numberSteps := len(spvProof.merklePath)
+	transactionIndex := spvProof.txIndex
 	for i := 1; i < numberSteps; i++ {
-		hashValue = HashNodes(hashValue, &spvProof.merklePath[i])
+		if transactionIndex % 2 == 0 {
+			hashValue = HashNodes(hashValue, &spvProof.merklePath[i])
+		} else {
+			hashValue = HashNodes(&spvProof.merklePath[i], hashValue);
+		}
+		transactionIndex /= 2
 	}
 	return *hashValue
 }
@@ -69,6 +77,7 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 
 	blockMerkleRoot := lightBlock.Header.MerkleRoot
 	spvMerkleRoot := spvProof.MerkleRoot()
+
 	if !spvMerkleRoot.IsEqual(&blockMerkleRoot) {
 		return InvalidSPVProof
 	}
