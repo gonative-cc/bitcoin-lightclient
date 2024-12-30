@@ -1,8 +1,6 @@
 package btclightclient
 
 import (
-	"fmt"
-
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
