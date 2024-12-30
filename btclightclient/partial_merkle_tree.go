@@ -40,10 +40,10 @@ type partialMerkleTreeData struct {
 	vHash              []*chainhash.Hash
 	// count number vBits we use for build merkle tree
 	// Need reset value to zero before we build merkle tree.
-	nBitUsed          uint32
+	nBitUsed uint32
 	// count number vHash we use for build merkle tree.
 	// Need reset value to zero before we build merkle tree.
-	nHashUsed        uint32
+	nHashUsed uint32
 }
 
 // Merkle proof use for rebuild the merkle tree and extract merkle proof for
@@ -155,14 +155,13 @@ func (pmtd *partialMerkleTreeData) height() uint32 {
 	return uint32(math.Ceil(math.Log2(float64(pmtd.numberTransactions))))
 }
 
-
-func (pmtd *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, merkleTree *PartialMerkleTree) (*chainhash.Hash, error) {
+func (pmtd *partialMerkleTreeData) buildTreeRecursive(height, pos uint32, merkleTree *PartialMerkleTree) (*chainhash.Hash, error) {
 
 	fParentOfMatch, err := pmtd.nextBit()
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// handle leaf
 	if height == 0 || !fParentOfMatch {
 		hash, err := pmtd.nextHash()
@@ -171,29 +170,31 @@ func (pmtd *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, 
 		}
 		merkleTree.nodesAtHeight[height][pos] = *hash
 		return hash, nil
-	} else {
-		left, err := pmtd.buildMerkleTreeRecursive(height-1, pos*2, merkleTree)
+	}
+
+	// handle internal node
+	left, err := pmtd.buildTreeRecursive(height-1, pos*2, merkleTree)
+	if err != nil {
+		return nil, err
+	}
+	var right *chainhash.Hash
+	if pos*2+1 < pmtd.calcTreeWidth(height-1) {
+		right, err = pmtd.buildTreeRecursive(height-1, pos*2+1, merkleTree)
 		if err != nil {
 			return nil, err
 		}
-		var right *chainhash.Hash
-		if pos*2+1 < pmtd.calcTreeWidth(height-1) {
-			right, err = pmtd.buildMerkleTreeRecursive(height-1, pos*2+1, merkleTree)
-			if err != nil {
-				return nil, err
-			}
 
-			if left.IsEqual(right) {
-				return nil, fmt.Errorf("In the case tree width is old, the last hash must be duplicate")
-			}
-		} else {
-			right = left
+		if left.IsEqual(right) {
+			return nil, fmt.Errorf("In the case tree width is old, the last hash must be duplicate")
 		}
-
-		nodeValue := HashNodes(left, right)
-		merkleTree.nodesAtHeight[height][pos] = *nodeValue
-		return nodeValue, nil
+	} else {
+		right = left
 	}
+
+	nodeValue := HashNodes(left, right)
+	merkleTree.nodesAtHeight[height][pos] = *nodeValue
+	return nodeValue, nil
+
 }
 
 func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
@@ -284,7 +285,7 @@ func PartialMerkleTreeFromHex(mtData string) (PartialMerkleTree, error) {
 	for i := 0; i <= int(height); i++ {
 		pmt.nodesAtHeight[i] = make(map[uint32]chainhash.Hash)
 	}
-	if _, err := pmtInfo.buildMerkleTreeRecursive(height, 0, &pmt); err != nil {
+	if _, err := pmtInfo.buildTreeRecursive(height, 0, &pmt); err != nil {
 		return pmt, err
 	}
 	return pmt, nil
