@@ -24,19 +24,15 @@ const (
 
 // / Get SPV proof from gettxoutproof Bitcoin API.
 func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
-	// get block header
 	blockheader, err := BlockHeaderFromHex(txoutProof[:160])
 	if err != nil {
 		return nil, err
 	}
 
-	// Build partial merkle tree
 	pmt, err := PartialMerkleTreeFromHex(txoutProof[160:])
 	if err != nil {
 		return nil, err; 
 	}
-
-	// compute merkle proof
 	merkleProof, err := pmt.GetProof(txID)	
 	if err != nil {
 		return nil, err

@@ -69,10 +69,7 @@ const maxAllowBytes = 65536
 // This is reference from bitcoin-code.
 func decodePartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
 	var pmt partialMerkleTreeData
-
 	r := bytes.NewReader(buf)
-
-	// read number transaction
 	if _, err := io.ReadFull(r, buf[:4]); err != nil {
 		return pmt, err
 	}
