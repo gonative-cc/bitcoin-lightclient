@@ -155,7 +155,8 @@ func (pmtd *partialMerkleTreeData) height() uint32 {
 	return uint32(math.Ceil(math.Log2(float64(pmtd.numberTransactions))))
 }
 
-func (pmtd *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, nBitUsed, nHashUsed *uint32, merkleTree *PartialMerkleTree) (*chainhash.Hash, error) {
+
+func (pmtd *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, merkleTree *PartialMerkleTree) (*chainhash.Hash, error) {
 
 	fParentOfMatch, err := pmtd.nextBit()
 	if err != nil {
@@ -171,13 +172,13 @@ func (pmtd *partialMerkleTreeData) buildMerkleTreeRecursive(height, pos uint32, 
 		merkleTree.nodesAtHeight[height][pos] = *hash
 		return hash, nil
 	} else {
-		left, err := pmtd.buildMerkleTreeRecursive(height-1, pos*2, nBitUsed, nHashUsed, merkleTree)
+		left, err := pmtd.buildMerkleTreeRecursive(height-1, pos*2, merkleTree)
 		if err != nil {
 			return nil, err
 		}
 		var right *chainhash.Hash
 		if pos*2+1 < pmtd.calcTreeWidth(height-1) {
-			right, err = pmtd.buildMerkleTreeRecursive(height-1, pos*2+1, nBitUsed, nHashUsed, merkleTree)
+			right, err = pmtd.buildMerkleTreeRecursive(height-1, pos*2+1, merkleTree)
 			if err != nil {
 				return nil, err
 			}
@@ -278,14 +279,12 @@ func PartialMerkleTreeFromHex(mtData string) (PartialMerkleTree, error) {
 		return pmt, err
 	}
 
-	nBitUsed := uint32(0)
-	nHashUsed := uint32(0)
 	height := pmtInfo.height()
 	pmt.nodesAtHeight = make([]merkleNodes, height+1)
 	for i := 0; i <= int(height); i++ {
 		pmt.nodesAtHeight[i] = make(map[uint32]chainhash.Hash)
 	}
-	if _, err := pmtInfo.buildMerkleTreeRecursive(height, 0, &nBitUsed, &nHashUsed, &pmt); err != nil {
+	if _, err := pmtInfo.buildMerkleTreeRecursive(height, 0, &pmt); err != nil {
 		return pmt, err
 	}
 	return pmt, nil
