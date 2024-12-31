@@ -73,11 +73,18 @@ func (h *RPCServerHandler) VerifySPV(spvProof btclightclient.SPVProof) (btclight
 
 	if checkSPV == btclightclient.ValidSPVProof {
 		log.Info().Msgf(
-			"SPV proof for txId: %s with blockHash: %s is valid", spvProof.TxID(), spvProof.BlockHash(),
+			"SPV proof for txId: %s with blockHash: %s is valid",
+			spvProof.TxID(), spvProof.BlockHash(),
+		)
+	} else if checkSPV == btclightclient.PartialValidSPVProof {
+		log.Info().Msgf(
+			"SPV proof for txId: %s with blockHash: %s is valid but block not finalised",
+			spvProof.TxID(), spvProof.BlockHash(),
 		)
 	} else {
 		log.Info().Msgf(
-			"SPV proof for txId: %s with blockHash: %s is invalid", spvProof.TxID(), spvProof.BlockHash(),
+			"SPV proof for txId: %s with blockHash: %s is invalid",
+			spvProof.TxID(), spvProof.BlockHash(),
 		)
 	}
 
