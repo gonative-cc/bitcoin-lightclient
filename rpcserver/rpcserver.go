@@ -48,11 +48,11 @@ func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, er
 }
 
 // returns the block height and hash of tip block stored in babylon chain
-func (h *RPCServerHandler) GetBTCHeaderChainTip() (*Block, error) {
+func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
 	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
 
-	latestFinalizedBlock := &Block{
+	latestFinalizedBlock := Block{
 		Height: latestFinalizedBlockHeight,
 		Hash:   &latestFinalizedBlockHash,
 	}
