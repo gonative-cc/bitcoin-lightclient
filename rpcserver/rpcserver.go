@@ -26,7 +26,7 @@ func (h *RPCServerHandler) Ping(in int) int {
 	return in
 }
 
-// txn to insert bitcoin block headers to babylon chain
+// txn to insert bitcoin block headers to light client
 func (h *RPCServerHandler) InsertHeaders(
 	blockHeaders []*wire.BlockHeader,
 ) error {
@@ -40,6 +40,9 @@ func (h *RPCServerHandler) InsertHeaders(
 		}
 	}
 
+	// update last checkpointed block height
+	h.btcLC.CleanUpFork()
+
 	return nil
 }
 
@@ -47,7 +50,7 @@ func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, er
 	return h.btcLC.IsBlockPresent(*blockHash), nil
 }
 
-// returns the block height and hash of tip block stored in babylon chain
+// returns the block height and hash of tip block stored in light client
 func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
 	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
