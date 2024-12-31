@@ -1,22 +1,20 @@
 package btclightclient
 
 import (
-	"errors"
-
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 )
 
 // SPV proof. We use this for verify transaction inclusives in block.
 // We are verify for single transaction in this version.
 type SPVProof struct {
-	blockHash  chainhash.Hash
+	blockHash  chainhash.Hash 
 	txId       string // 32bytes hash value in string hex format
-	txIndex    uint32 // index of transaction in block
-	merklePath []chainhash.Hash
+	txIndex    uint32 // index of transaction in block 
+	merklePath []chainhash.Hash 
 }
 
-type SPVStatus int
 
+type SPVStatus int
 const (
 	// proof is complete wrong
 	InvalidSPVProof SPVStatus = iota
@@ -35,9 +33,9 @@ func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
 
 	pmt, err := PartialMerkleTreeFromHex(txoutProof[160:])
 	if err != nil {
-		return nil, err
+		return nil, err; 
 	}
-	merkleProof, err := pmt.GetProof(txID)
+	merkleProof, err := pmt.GetProof(txID)	
 	if err != nil {
 		return nil, err
 	}
@@ -50,24 +48,19 @@ func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
 	}, nil
 }
 
-func (spvProof SPVProof) MerkleRoot() (chainhash.Hash, error) {
-	var currentHash chainhash.Hash
-	if len(spvProof.merklePath) == 0 {
-		return currentHash, errors.New("merkle path can't empty")
-	}
-
-	currentHash = spvProof.merklePath[0]
+func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
+	hashValue := &spvProof.merklePath[0]
 	numberSteps := len(spvProof.merklePath)
 	transactionIndex := spvProof.txIndex
 	for i := 1; i < numberSteps; i++ {
-		if transactionIndex%2 == 0 {
-			currentHash = *HashNodes(&currentHash, &spvProof.merklePath[i])
+		if transactionIndex % 2 == 0 {
+			hashValue = HashNodes(hashValue, &spvProof.merklePath[i])
 		} else {
-			currentHash = *HashNodes(&spvProof.merklePath[i], &currentHash)
+			hashValue = HashNodes(&spvProof.merklePath[i], hashValue);
 		}
 		transactionIndex /= 2
 	}
-	return currentHash, nil
+	return *hashValue
 }
 
 func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
@@ -78,15 +71,17 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 		return InvalidSPVProof
 	}
 
+	if len(spvProof.merklePath) == 0 {
+		return InvalidSPVProof
+	}
+	
 	if spvProof.txId != spvProof.merklePath[0].String() {
 		return InvalidSPVProof
 	}
-
+	
 	blockMerkleRoot := lightBlock.Header.MerkleRoot
-	spvMerkleRoot, err := spvProof.MerkleRoot()
-	if err != nil {
-		return InvalidSPVProof
-	}
+	spvMerkleRoot := spvProof.MerkleRoot()
+
 	if !spvMerkleRoot.IsEqual(&blockMerkleRoot) {
 		return InvalidSPVProof
 	}

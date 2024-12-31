@@ -38,8 +38,7 @@ func TestSPVMerkleRoot(t *testing.T) {
 			merklePath: merklePath,
 		}
 
-		actual, err := spv.MerkleRoot()
-		assert.NilError(t,err)
+		actual := spv.MerkleRoot()
 		assert.Assert(t, actual.String() == tc.merkleRoot)
 	}
 
