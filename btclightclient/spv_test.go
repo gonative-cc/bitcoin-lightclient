@@ -38,7 +38,8 @@ func TestSPVMerkleRoot(t *testing.T) {
 			merklePath: merklePath,
 		}
 
-		actual := spv.MerkleRoot()
+		actual, err := spv.MerkleRoot()
+		assert.NilError(t,err)
 		assert.Assert(t, actual.String() == tc.merkleRoot)
 	}
 
@@ -100,9 +101,15 @@ func TestSPVVerification(t *testing.T) {
 		},
 		// transactionIndex is odd
 		{
-			name:          "Valid SPV Test Case  odd transactionIndex",
+			name:          "Valid SPV Test Case odd transactionIndex",
 			gettxoutproof: "000000202834abd71bdd0d3298542af4506918ea168ce002936b040000000000000000001da8757e4d756e848245cacf3e103c1b9f6ed2405c6d818a73172c8ec72856d4db3864606fdf0c17dcc1000ccb0300000cb86343fc64abcdab51e530303a4ee2b420fa6b5a12b435c9c76fe953ca5471ca074a0bfaf4462cef0a5665b89fd7fd5e4f8536630cde6824d09b20400b2f65eed9f744b2dc695b0ea0c4afd06310a21b93ddd7270a781acd0ada1afdd23b5750aa59aac6bcb5a037cbc56b9efbfc159a36142a07d23e81c4b89d3dbbc31be1cefe0bb7b0369ffc3b1d530e234987543a2613bbb8b06c86f993a930dee7b9d87f661ef556adc0174c7f180aa28006ee93ce2291302801ecd045c234c00b186ea35ff1e77eac3f113492e2eb12f38b9df452f5831f55c861865ac8f3c7dd06be2377f859ba1d12dea2ec44987796a27d42d5727250c1e0181d6a251f8272f21b9a2034069a2471de43de655619904d43b4665f6ce38741320998dc97838c32c79f1ada066ddf7a441357d55cc42a8906970bff2d5342be694002476733ff593af26f320c10df7ba9a76355438f462c040b598868dfb67c5e88d6d9a426ec8cdd74337d42df6b29e9fb319410848f3ff7228d00dc539e2962d185348ab9663a112a03ff6e00",
 			txHash:        "ee652f0b40209bd02468de0c6336854f5efdd79fb865560aef2c46f4fa0b4a07",
+			spvStatus:     ValidSPVProof,
+		},
+		{
+			name:          "Single tx in block",
+			gettxoutproof: "00000030516567e505288fe41b2fc6be9b96318c406418c7d338168fe75a26111490eb2fec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a3f5b6167ffff7f20040000000100000001ec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a0101",
+			txHash:        "7aa62fee7f9f2a2ed3444a98a53aec578951af41c6a0532e8439aa02391c40ec",
 			spvStatus:     ValidSPVProof,
 		},
 	}
