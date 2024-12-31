@@ -71,6 +71,14 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 		return InvalidSPVProof
 	}
 
+	if len(spvProof.merklePath) == 0 {
+		return InvalidSPVProof
+	}
+	
+	if spvProof.txId != spvProof.merklePath[0].String() {
+		return InvalidSPVProof
+	}
+	
 	blockMerkleRoot := lightBlock.Header.MerkleRoot
 	spvMerkleRoot := spvProof.MerkleRoot()
 

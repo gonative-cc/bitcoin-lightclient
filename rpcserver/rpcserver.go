@@ -1,7 +1,8 @@
 package rpcserver
 
 import (
-	"net/http/httptest"
+	"net/http"
+	"time"
 
 	"github.com/gonative-cc/bitcoin-lightclient/btclightclient"
 
@@ -10,6 +11,11 @@ import (
 	"github.com/filecoin-project/go-jsonrpc"
 	"github.com/rs/zerolog/log"
 )
+
+type Block struct {
+	Hash   *chainhash.Hash
+	Height int64
+}
 
 // Have a type with some exported methods
 type RPCServerHandler struct {
@@ -42,15 +48,20 @@ func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, er
 }
 
 // returns the block height and hash of tip block stored in babylon chain
-func (h *RPCServerHandler) GetBTCHeaderChainTip() (int64, *chainhash.Hash, error) {
+func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
 	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
 
-	return latestFinalizedBlockHeight, &latestFinalizedBlockHash, nil
+	latestFinalizedBlock := Block{
+		Height: latestFinalizedBlockHeight,
+		Hash:   &latestFinalizedBlockHash,
+	}
+
+	return latestFinalizedBlock, nil
 }
 
 // NewRPCServer creates a new instance of the rpcServer and starts listening
-func NewRPCServer(btcLC *btclightclient.BTCLightClient) *httptest.Server {
+func StartRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	rpcServer := jsonrpc.NewServer()
 	serverHandler := &RPCServerHandler{
 		btcLC: btcLC,
@@ -62,5 +73,13 @@ func NewRPCServer(btcLC *btclightclient.BTCLightClient) *httptest.Server {
 	rpcServer.AliasMethod("contains_btc_block", "RPCServerHandler.ContainsBTCBlock")
 	rpcServer.AliasMethod("get_btc_header_chain_tip", "RPCServerHandler.GetBTCHeaderChainTip")
 
-	return httptest.NewServer(rpcServer)
+	server := &http.Server{
+		Addr:         ":9797",
+		Handler:      rpcServer,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+	log.Info().Msgf("RPC server running at: %s", server.Addr)
+
+	return server.ListenAndServe()
 }

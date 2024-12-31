@@ -1,4 +1,5 @@
 {
+    "network": "mainnet",
     "start_height": 1,
-    "header_strings": []
+    "blockheaders": []
 }
