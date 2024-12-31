@@ -8,10 +8,10 @@ build: .git/hooks/pre-commit
 	go build .
 
 start:
-	@./btclightclient
+	@./bitcoin-lightclient
 
 clean:
-	rm ./btclightclient
+	rm ./bitcoin-lightclient
 
 # used as pre-commit
 lint-git:
