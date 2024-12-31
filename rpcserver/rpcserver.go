@@ -64,27 +64,25 @@ func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 }
 
 // returns if the spvProof is valid or not
-func (h *RPCServerHandler) VerifySPV(spvProof btclightclient.SPVProof) (btclightclient.SPVStatus, error) {
-	log.Info().Msgf(
-		"Recieved spvProof for txId: %s with blockHash: %s", spvProof.TxID(), spvProof.BlockHash(),
-	)
+func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btclightclient.SPVStatus, error) {
+	log.Info().Msgf("Recieved spvProof %v", spvProof)
 
-	checkSPV := h.btcLC.VerifySPV(spvProof)
+	checkSPV := h.btcLC.VerifySPV(*spvProof)
 
 	if checkSPV == btclightclient.ValidSPVProof {
 		log.Info().Msgf(
-			"SPV proof for txId: %s with blockHash: %s is valid",
-			spvProof.TxID(), spvProof.BlockHash(),
+			"SPV proof: %v is valid",
+			spvProof,
 		)
 	} else if checkSPV == btclightclient.PartialValidSPVProof {
 		log.Info().Msgf(
-			"SPV proof for txId: %s with blockHash: %s is valid but block not finalised",
-			spvProof.TxID(), spvProof.BlockHash(),
+			"SPV proof: %v is valid but block not finalised",
+			spvProof,
 		)
 	} else {
 		log.Info().Msgf(
-			"SPV proof for txId: %s with blockHash: %s is invalid",
-			spvProof.TxID(), spvProof.BlockHash(),
+			"SPV proof: %v is invalid",
+			spvProof,
 		)
 	}
 

@@ -32,10 +32,10 @@ func TestSPVMerkleRoot(t *testing.T) {
 		}
 
 		spv := SPVProof{
-			blockHash:  hashFromString(t, "9d5369290c3d97f47d07a12e1b7f171c9c69ddfc876ecec6a16dfe3e94773a1c"), // dummy hash for testing only
-			txId:       tc.txIdHash,
-			txIndex:    tc.index,
-			merklePath: merklePath,
+			BlockHash:  hashFromString(t, "9d5369290c3d97f47d07a12e1b7f171c9c69ddfc876ecec6a16dfe3e94773a1c"), // dummy hash for testing only
+			TxId:       tc.txIdHash,
+			TxIndex:    tc.index,
+			MerklePath: merklePath,
 		}
 
 		actual := spv.MerkleRoot()
