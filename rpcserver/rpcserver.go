@@ -38,10 +38,10 @@ func (h *RPCServerHandler) InsertHeaders(
 		} else {
 			log.Info().Msgf("Inserted block header %s", blockHeader.BlockHash())
 		}
-	}
 
-	// update last checkpointed block height
-	h.btcLC.CleanUpFork()
+		// update last checkpointed block height
+		h.btcLC.CleanUpFork()
+	}
 
 	return nil
 }
