@@ -27,14 +27,14 @@ func main() {
 		return
 	}
 
-	startHeight, headerStrings, err := data.ReadJson(sampleFilename)
+	startHeight, blockHeaders, err := data.ReadJson(sampleFilename)
 	if err != nil {
 		log.Error().Msgf("Error reading data file: %s", err)
 		return
 	}
-	headers := make([]wire.BlockHeader, len(headerStrings))
+	headers := make([]wire.BlockHeader, len(blockHeaders))
 
-	for id, headerStr := range headerStrings {
+	for id, headerStr := range blockHeaders {
 		h, _ := btclightclient.BlockHeaderFromHex(headerStr)
 		headers[id] = h
 	}

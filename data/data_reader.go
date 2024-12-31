@@ -7,8 +7,8 @@ import (
 )
 
 type Sample struct {
-	StartHeight   int64    `json:"start_height"`
-	HeaderStrings []string `json:"header_strings"`
+	StartHeight  int64    `json:"start_height"`
+	BlockHeaders []string `json:"blockheaders"`
 }
 
 func ReadJson(jsonFilePath string) (int64, []string, error) {
@@ -28,5 +28,5 @@ func ReadJson(jsonFilePath string) (int64, []string, error) {
 		return 0, nil, err
 	}
 
-	return dataContent.StartHeight, dataContent.HeaderStrings, nil
+	return dataContent.StartHeight, dataContent.BlockHeaders, nil
 }
