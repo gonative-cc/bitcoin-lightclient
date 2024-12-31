@@ -2,15 +2,12 @@ package main
 
 import (
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/gonative-cc/bitcoin-lightclient/btclightclient"
 	"github.com/gonative-cc/bitcoin-lightclient/rpcserver"
 
 	"github.com/gonative-cc/bitcoin-lightclient/data"
 
-	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/rs/zerolog/log"
 )
@@ -29,27 +26,24 @@ func main() {
 		return
 	}
 
-	startHeight, headerStrings, err := data.ReadJson(sampleFilename)
+	networkParams, startHeight, blockHeaders, err := data.ReadJSON(sampleFilename)
 	if err != nil {
 		log.Error().Msgf("Error reading data file: %s", err)
 		return
 	}
-	headers := make([]wire.BlockHeader, len(headerStrings))
+	headers := make([]wire.BlockHeader, len(blockHeaders))
 
-	for id, headerStr := range headerStrings {
+	for id, headerStr := range blockHeaders {
 		h, _ := btclightclient.BlockHeaderFromHex(headerStr)
 		headers[id] = h
 	}
 
-	btcLC := btclightclient.NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, int(startHeight))
+	btcLC := btclightclient.NewBTCLightClientWithData(networkParams, headers, int(startHeight))
 	btcLC.Status()
 
-	rpcService := rpcserver.NewRPCServer(btcLC)
-	log.Info().Msgf("RPC server running at: %s", rpcService.URL)
-
-	// Create channel to listen for interrupt signal
-	// Wait for interrupt signal
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	<-sigChan
+	err = rpcserver.StartRPCServer(btcLC)
+	if err != nil {
+		log.Error().Msgf("Error creating RPC server: %s", err)
+		return
+	}
 }
