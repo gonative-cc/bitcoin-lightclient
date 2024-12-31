@@ -8,7 +8,6 @@ import (
 
 	"github.com/gonative-cc/bitcoin-lightclient/data"
 
-	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/rs/zerolog/log"
 )
@@ -27,7 +26,7 @@ func main() {
 		return
 	}
 
-	startHeight, blockHeaders, err := data.ReadJson(sampleFilename)
+	networkParams, startHeight, blockHeaders, err := data.ReadJSON(sampleFilename)
 	if err != nil {
 		log.Error().Msgf("Error reading data file: %s", err)
 		return
@@ -39,7 +38,7 @@ func main() {
 		headers[id] = h
 	}
 
-	btcLC := btclightclient.NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, int(startHeight))
+	btcLC := btclightclient.NewBTCLightClientWithData(networkParams, headers, int(startHeight))
 	btcLC.Status()
 
 	err = rpcserver.StartRPCServer(btcLC)

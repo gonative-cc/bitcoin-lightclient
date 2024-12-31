@@ -1,4 +1,5 @@
 {
+    "network": "regressionnet",
     "start_height": 1,
     "blockheaders": [
         "0000002006226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f2e91b7814e2378c96f614a8938c8effa5d546f36407815c7b2f12b5af79015be1c5b6167ffff7f2000000000",
