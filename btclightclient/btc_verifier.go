@@ -1,8 +1,6 @@
 package btclightclient
 
-
 type UTXOProof struct {
-	
 }
 
 func (lc *BTC) verifyUTXOProof(utxoProof UTXOProof) bool {
