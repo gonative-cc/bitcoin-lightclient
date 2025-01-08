@@ -66,9 +66,7 @@ func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 // returns if the spvProof is valid or not
 func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btclightclient.SPVStatus, error) {
 	log.Debug().Msgf("Recieved spvProof %v", spvProof)
-
 	checkSPV := h.btcLC.VerifySPV(*spvProof)
-
 	if checkSPV == btclightclient.ValidSPVProof {
 		log.Info().Msgf(
 			"SPV proof: %v is valid",
