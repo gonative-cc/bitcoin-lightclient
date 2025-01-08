@@ -50,7 +50,7 @@ func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, er
 	return h.btcLC.IsBlockPresent(*blockHash), nil
 }
 
-// returns the block height and hash of tip block stored in light client
+// GetBTCHeaderChainTip returns the latest finalized block stored in light client
 func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
 	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
