@@ -67,22 +67,6 @@ func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btclightclient.SPVStatus, error) {
 	log.Debug().Msgf("Recieved spvProof %v", spvProof)
 	checkSPV := h.btcLC.VerifySPV(*spvProof)
-	if checkSPV == btclightclient.ValidSPVProof {
-		log.Info().Msgf(
-			"SPV proof: %v is valid",
-			spvProof,
-		)
-	} else if checkSPV == btclightclient.PartialValidSPVProof {
-		log.Info().Msgf(
-			"SPV proof: %v is valid but block not finalised",
-			spvProof,
-		)
-	} else {
-		log.Info().Msgf(
-			"SPV proof: %v is invalid",
-			spvProof,
-		)
-	}
 
 	return checkSPV, nil
 }
