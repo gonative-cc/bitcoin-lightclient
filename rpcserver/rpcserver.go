@@ -68,6 +68,8 @@ func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btcligh
 	log.Debug().Msgf("Recieved spvProof %v", spvProof)
 	checkSPV := h.btcLC.VerifySPV(*spvProof)
 
+	log.Info().Msgf("SPV proof: %v status %v", spvProof, checkSPV)
+
 	return checkSPV, nil
 }
 
