@@ -32,7 +32,7 @@ func (h *RPCServerHandler) InsertHeaders(
 ) error {
 	for _, blockHeader := range blockHeaders {
 		if err := h.btcLC.InsertHeader(*blockHeader); err != nil {
-			log.Err(err).Msg("Failed to insert block header")
+			log.Err(err).Msgf("Failed to insert block header %s", blockHeader.BlockHash())
 
 			return err
 		} else {
@@ -40,7 +40,19 @@ func (h *RPCServerHandler) InsertHeaders(
 		}
 
 		// update last checkpointed block height
-		h.btcLC.CleanUpFork()
+		if err := h.btcLC.CleanUpFork(); err != nil {
+			log.Err(err).Msgf(
+				"Failed to update fork choice after inserting block header %s",
+				blockHeader.BlockHash(),
+			)
+
+			return err
+		} else {
+			log.Info().Msgf(
+				"Updated fork choice after inserting block header %s",
+				blockHeader.BlockHash(),
+			)
+		}
 	}
 
 	return nil
