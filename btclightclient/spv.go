@@ -71,11 +71,11 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 		return InvalidSPVProof
 	}
 
-	if len(spvProof.merklePath) == 0 {
+	if len(spvProof.MerklePath) == 0 {
 		return InvalidSPVProof
 	}
-	
-	if spvProof.txId != spvProof.merklePath[0].String() {
+
+	if spvProof.TxId != spvProof.MerklePath[0].String() {
 		return InvalidSPVProof
 	}
 
