@@ -7,14 +7,14 @@ import (
 // SPV proof. We use this for verify transaction inclusives in block.
 // We are verify for single transaction in this version.
 type SPVProof struct {
-	blockHash  chainhash.Hash 
-	txId       string // 32bytes hash value in string hex format
-	txIndex    uint32 // index of transaction in block 
-	merklePath []chainhash.Hash 
+	BlockHash  chainhash.Hash
+	TxId       string // 32bytes hash value in string hex format
+	TxIndex    uint32 // index of transaction in block
+	MerklePath []chainhash.Hash
 }
 
-
 type SPVStatus int
+
 const (
 	// proof is complete wrong
 	InvalidSPVProof SPVStatus = iota
@@ -33,30 +33,30 @@ func SPVProofFromHex(txoutProof string, txID string) (*SPVProof, error) {
 
 	pmt, err := PartialMerkleTreeFromHex(txoutProof[160:])
 	if err != nil {
-		return nil, err; 
+		return nil, err
 	}
-	merkleProof, err := pmt.GetProof(txID)	
+	merkleProof, err := pmt.GetProof(txID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &SPVProof{
-		blockHash:  blockheader.BlockHash(),
-		txId:       txID,
-		txIndex:    merkleProof.transactionIndex,
-		merklePath: merkleProof.merklePath,
+		BlockHash:  blockheader.BlockHash(),
+		TxId:       txID,
+		TxIndex:    merkleProof.transactionIndex,
+		MerklePath: merkleProof.merklePath,
 	}, nil
 }
 
 func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
-	hashValue := &spvProof.merklePath[0]
-	numberSteps := len(spvProof.merklePath)
-	transactionIndex := spvProof.txIndex
+	hashValue := &spvProof.MerklePath[0]
+	numberSteps := len(spvProof.MerklePath)
+	transactionIndex := spvProof.TxIndex
 	for i := 1; i < numberSteps; i++ {
-		if transactionIndex % 2 == 0 {
-			hashValue = HashNodes(hashValue, &spvProof.merklePath[i])
+		if transactionIndex%2 == 0 {
+			hashValue = HashNodes(hashValue, &spvProof.MerklePath[i])
 		} else {
-			hashValue = HashNodes(&spvProof.merklePath[i], hashValue);
+			hashValue = HashNodes(&spvProof.MerklePath[i], hashValue)
 		}
 		transactionIndex /= 2
 	}
@@ -64,21 +64,21 @@ func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
 }
 
 func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
-	lightBlock := lc.btcStore.LightBlockByHash(spvProof.blockHash)
+	lightBlock := lc.btcStore.LightBlockByHash(spvProof.BlockHash)
 
 	// In the case light block not belong currect database
 	if lightBlock == nil {
 		return InvalidSPVProof
 	}
 
-	if len(spvProof.merklePath) == 0 {
+	if len(spvProof.MerklePath) == 0 {
 		return InvalidSPVProof
 	}
-	
-	if spvProof.txId != spvProof.merklePath[0].String() {
+
+	if spvProof.TxId != spvProof.MerklePath[0].String() {
 		return InvalidSPVProof
 	}
-	
+
 	blockMerkleRoot := lightBlock.Header.MerkleRoot
 	spvMerkleRoot := spvProof.MerkleRoot()
 

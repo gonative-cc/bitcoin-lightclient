@@ -26,17 +26,32 @@ func (h *RPCServerHandler) Ping(in int) int {
 	return in
 }
 
-// txn to insert bitcoin block headers to babylon chain
+// txn to insert bitcoin block headers to light client
 func (h *RPCServerHandler) InsertHeaders(
 	blockHeaders []*wire.BlockHeader,
 ) error {
 	for _, blockHeader := range blockHeaders {
 		if err := h.btcLC.InsertHeader(*blockHeader); err != nil {
-			log.Err(err).Msg("Failed to insert block header")
+			log.Err(err).Msgf("Failed to insert block header %s", blockHeader.BlockHash())
 
 			return err
 		} else {
 			log.Info().Msgf("Inserted block header %s", blockHeader.BlockHash())
+		}
+
+		// fork cleanup updates last checkpointed height
+		if err := h.btcLC.CleanUpFork(); err != nil {
+			log.Err(err).Msgf(
+				"Failed to update fork choice after inserting block header %s",
+				blockHeader.BlockHash(),
+			)
+
+			return err
+		} else {
+			log.Info().Msgf(
+				"Updated fork choice after inserting block header %s",
+				blockHeader.BlockHash(),
+			)
 		}
 	}
 
@@ -47,8 +62,8 @@ func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, er
 	return h.btcLC.IsBlockPresent(*blockHash), nil
 }
 
-// returns the block height and hash of tip block stored in babylon chain
-func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
+// GetHeaderChainTip returns the latest finalized block stored in light client
+func (h *RPCServerHandler) GetHeaderChainTip() (Block, error) {
 	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
 	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
 
@@ -58,6 +73,16 @@ func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
 	}
 
 	return latestFinalizedBlock, nil
+}
+
+// returns if the spvProof is valid or not
+func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btclightclient.SPVStatus, error) {
+	log.Debug().Msgf("Recieved spvProof %v", spvProof)
+	checkSPV := h.btcLC.VerifySPV(*spvProof)
+
+	log.Info().Msgf("SPV proof: %v status %v", spvProof, checkSPV)
+
+	return checkSPV, nil
 }
 
 // NewRPCServer creates a new instance of the rpcServer and starts listening
@@ -71,7 +96,8 @@ func StartRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	rpcServer.AliasMethod("ping", "RPCServerHandler.Ping")
 	rpcServer.AliasMethod("insert_headers", "RPCServerHandler.InsertHeaders")
 	rpcServer.AliasMethod("contains_btc_block", "RPCServerHandler.ContainsBTCBlock")
-	rpcServer.AliasMethod("get_btc_header_chain_tip", "RPCServerHandler.GetBTCHeaderChainTip")
+	rpcServer.AliasMethod("get_header_chain_tip", "RPCServerHandler.GetHeaderChainTip")
+	rpcServer.AliasMethod("verify_spv", "RPCServerHandler.VerifySPV")
 
 	server := &http.Server{
 		Addr:         ":9797",
