@@ -39,7 +39,7 @@ func (h *RPCServerHandler) InsertHeaders(
 			log.Info().Msgf("Inserted block header %s", blockHeader.BlockHash())
 		}
 
-		// update last checkpointed block height
+		// fork cleanup updates last checkpointed height
 		if err := h.btcLC.CleanUpFork(); err != nil {
 			log.Err(err).Msgf(
 				"Failed to update fork choice after inserting block header %s",
