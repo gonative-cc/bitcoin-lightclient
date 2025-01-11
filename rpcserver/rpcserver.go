@@ -62,7 +62,7 @@ func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, er
 	return h.btcLC.IsBlockPresent(*blockHash), nil
 }
 
-// GetBTCHeaderChainTip returns the latest finalized block stored in light client
+// GetHeaderChainTip returns the latest finalized block stored in light client
 func (h *RPCServerHandler) GetHeaderChainTip() (Block, error) {
 	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
 	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
@@ -96,7 +96,7 @@ func StartRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	rpcServer.AliasMethod("ping", "RPCServerHandler.Ping")
 	rpcServer.AliasMethod("insert_headers", "RPCServerHandler.InsertHeaders")
 	rpcServer.AliasMethod("contains_btc_block", "RPCServerHandler.ContainsBTCBlock")
-	rpcServer.AliasMethod("get_btc_header_chain_tip", "RPCServerHandler.GetBTCHeaderChainTip")
+	rpcServer.AliasMethod("get_header_chain_tip", "RPCServerHandler.GetHeaderChainTip")
 	rpcServer.AliasMethod("verify_spv", "RPCServerHandler.VerifySPV")
 
 	server := &http.Server{
