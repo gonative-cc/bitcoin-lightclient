@@ -63,7 +63,7 @@ func (h *RPCServerHandler) ContainsBTCBlock(blockHash *chainhash.Hash) (bool, er
 }
 
 // GetBTCHeaderChainTip returns the latest finalized block stored in light client
-func (h *RPCServerHandler) GetBTCHeaderChainTip() (Block, error) {
+func (h *RPCServerHandler) GetHeaderChainTip() (Block, error) {
 	latestFinalizedBlockHeight := h.btcLC.LatestFinalizedBlockHeight()
 	latestFinalizedBlockHash := h.btcLC.LatestFinalizedBlockHash()
 
