@@ -6,16 +6,34 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/btcsuite/btcd/btcec/v2"
+	"github.com/btcsuite/btcd/btcutil"
+	"github.com/btcsuite/btcd/btcutil/base58"
+	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 )
 
 
 func TestOutputExtraction(t *testing.T) {
-	txData := "020000000001017e10a9aacb82d088bbb9acbadfbd0a544d328bec62aea1b4135140aa06f86af31600000017160014ab454d6a2cc66c550a0d5cedb1a80164b31f163dffffffff01792f00000000000017a91424f4377fa4f486495beae33b64f915266d7fd1ba87024830450221009feec844f6556cfee7f3a9afdc96b3bc87ad23b43e92b4955e1ad1ba287ec360022013eee664a2d04f917d057f4d279822b7d1d20f9e8a168f7934616f0ee8b5c00201210357c4b37f213d01b463f6e9f1c816b6ff8ff6400cd4d7fcd1cd5db139b697bc0e00000000"
+	// txID = f82a618b2f6212f2134d2dc66aad26c0aa0a2ed7fa53a298c53736d0510ad69f
+	txData := "01000000014260bfba493220006a8141b162e5785c863149c043d7abf0030276c10d2a72e5010000008b483045022100d1424374bd4e6a0264dd55baf7de69a17bbe2416b20a55a1475fd3779799d13b02202e9249feb3b43cd82c8f097a1ffb5f98b06ca27595697bbc2acee4a5c255fd830141045408a52d4b3cdc9c78c14418c38d4a0fd6e0ed396f966d3f51c86164351bbd0e38426b922c9c1f79bca05dfeb72e08ba9d41eb5972e48db217301a9bf795aeadffffffff020065cd1d000000001976a914de526c004ab53c6d7ed3ff98789bca013797d33f88acf0ca8744000000001976a9148fd0e06ce84a4f108b1e259f5aeef21a16a2272c88ac00000000"
 	txBuf, _ := hex.DecodeString(txData)
 	rbuf := bytes.NewReader(txBuf)
 
 	var tx wire.MsgTx
 	tx.Deserialize(rbuf)
-	fmt.Println(tx)
+
+	
+	pk, netID, err := base58.CheckDecode("1MGXkMpTTA4Ue4wSDh4kGBKfLSwj93MHTq");
+	fmt.Println(pk, netID, err)
+	addr, _ := btcec.ParsePubKey(pk)
+	
+	fmt.Println(addr)
+	uaddr, _ := btcutil.NewAddressPubKey(pk, &chaincfg.MainNetParams);
+	fmt.Println(uaddr)
+
+	lc := NewBTCLightClient(&chaincfg.MainNetParams)
+	balance, err := lc.GetBalance(&tx, "1MGXkMpTTA4Ue4wSDh4kGBKfLSwj93MHTq");
+	fmt.Println(balance, err)
+	
 }
