@@ -20,4 +20,4 @@ RUN go build -o main .
 EXPOSE 9797
 
 # Command to run the executable
-CMD ["./main", "regtest.json"]
+CMD ["./main", "data/regtest.json"]
