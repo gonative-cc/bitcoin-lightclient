@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
-	"fmt"
 
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
@@ -87,15 +86,11 @@ func newWaitingConfirmBalance(balance int64) BalanceReport {
 // - return balance from tx
 func (lc *BTCLightClient) VerifyBalance(tx wire.MsgTx, addr string, spv SPVProof) (BalanceReport, error) {
 	txID := tx.TxID()
-
 	if spv.TxId != txID {
 		return newInvalidBalance(), errors.New("TX ID not match")
 	}
 
 	spvStatus := lc.VerifySPV(spv)
-
-	fmt.Println("spv status", spvStatus)
-
 	if spvStatus == InvalidSPVProof {
 		return newInvalidBalance(), errors.New("spv invalid")
 	}
