@@ -4,10 +4,6 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
-	// "fmt"
-
-	// "github.com/btcsuite/btcd/btcutil"
-	// "github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 )
@@ -28,7 +24,7 @@ func MsgTxFromHex(txData string) (wire.MsgTx, error) {
 }
 
 // Get balance of addr from tx
-func (lc *BTCLightClient) GetBalance(tx *wire.MsgTx, addr string) (int64, error) {
+func (lc *BTCLightClient) GetBalance(tx wire.MsgTx, addr string) (int64, error) {
 	balance := int64(0)
 	for _, output := range tx.TxOut {
 		_, addresses, _, err := txscript.ExtractPkScriptAddrs(
@@ -50,10 +46,10 @@ func (lc *BTCLightClient) GetBalance(tx *wire.MsgTx, addr string) (int64, error)
 // Verify addr balance in this block. We check:
 // - tx valid
 // - return balance from tx
-func (lc *BTCLightClient) VerifyBalance(tx *wire.MsgTx, addr string, spv SPVProof) (int64, error) {
+func (lc *BTCLightClient) VerifyBalance(tx wire.MsgTx, addr string, spv SPVProof) (int64, error) {
 	txID := tx.TxID()
 
-	if spv.txId != txID {
+	if spv.TxId != txID {
 		return 0, errors.New("TX ID not match")
 	}
 
