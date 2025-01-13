@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+	"fmt"
 
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
@@ -49,7 +50,7 @@ type BalanceStatus int
 const (
 	// return when user provide invalid proof of utxo
 	InvalidBalance BalanceStatus = iota
-	// return when block are waiting for block finalize 
+	// return when block are waiting for block finalize
 	WaitingForConfirmBalance
 	// return when balance valid (block finalize)
 	ValidBalance
@@ -92,20 +93,21 @@ func (lc *BTCLightClient) VerifyBalance(tx wire.MsgTx, addr string, spv SPVProof
 	}
 
 	spvStatus := lc.VerifySPV(spv)
+
+	fmt.Println("spv status", spvStatus)
+
 	if spvStatus == InvalidSPVProof {
 		return newInvalidBalance(), errors.New("spv invalid")
 	}
-	
-	balance, err := lc.GetBalance(tx, addr);
+
+	balance, err := lc.GetBalance(tx, addr)
 	if err != nil {
 		return newInvalidBalance(), err
 	}
-	
 
 	if spvStatus == PartialValidSPVProof {
 		return newWaitingConfirmBalance(balance), nil
 	}
 
-	
 	return newValidBalance(balance), nil
 }
