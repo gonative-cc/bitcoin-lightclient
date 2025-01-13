@@ -22,7 +22,7 @@ func TestVerifyBalance(t *testing.T) {
 		txData        string
 		txHash        string
 		addr          string
-		balance       int64
+		balance       BalanceReport
 	}
 
 	run := func(t *testing.T, tc testCase) {
@@ -48,7 +48,7 @@ func TestVerifyBalance(t *testing.T) {
 			txHash:        "ee652f0b40209bd02468de0c6336854f5efdd79fb865560aef2c46f4fa0b4a07",
 			txData:        "010000000001019dcfb29f9a915612fc334232f5bc2b03d710feb85ad4a39e08dc817a426712750100000000ffffffff0270c286000000000017a914a9c923dfcc27c61c114f2170492ccf1155a4484487487b850000000000220020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d040047304402202d211d83acb7cb9dc3c45f86960e39fb195aee33f53d9f2bb7a591b0b328acdc02207734781019fa0821773472e886fc4b73255b989ab3ea3c0c5561af7d7855e301014730440220205f9f2da387e2de609e2f7aeeab106930113cf273993bfe09f392255b8ddecd02203fbc7c7ba2ed262868783528a8e76784ac2a930eb54469a028316791c62d6240016952210375e00eb72e29da82b89367947f29ef34afb75e8654f6ea368e0acdfd92976b7c2103a1b26313f430c4b15bb1fdce663207659d8cac749a0e53d70eff01874496feff2103c96d495bfdd5ba4145e3e046fee45e84a8a48ad05bd8dbb395c011a32cf9f88053ae00000000",
 			addr:          "3HAm5RaZPeMWXH3qoAdF5oidXMrg2XCWow",
-			balance:       8831600,
+			balance:       newValidBalance(8831600),
 		},
 	}
 	for _, tc := range testCases {

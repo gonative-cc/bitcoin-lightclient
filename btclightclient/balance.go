@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 )
@@ -43,24 +44,68 @@ func (lc *BTCLightClient) GetBalance(tx wire.MsgTx, addr string) (int64, error) 
 	return balance, nil
 }
 
+type BalanceStatus int
+
+const (
+	// return when user provide invalid proof of utxo
+	InvalidBalance BalanceStatus = iota
+	// return when block are waiting for block finalize 
+	WaitingForConfirmBalance
+	// return when balance valid (block finalize)
+	ValidBalance
+)
+
+type BalanceReport struct {
+	balance int64
+	status  BalanceStatus
+}
+
+func newInvalidBalance() BalanceReport {
+	return BalanceReport{
+		balance: 0,
+		status:  InvalidBalance,
+	}
+}
+
+func newValidBalance(balance int64) BalanceReport {
+	return BalanceReport{
+		balance: balance,
+		status:  ValidBalance,
+	}
+}
+
+func newWaitingConfirmBalance(balance int64) BalanceReport {
+	return BalanceReport{
+		balance: balance,
+		status:  WaitingForConfirmBalance,
+	}
+}
+
 // Verify addr balance in this block. We check:
 // - tx valid
 // - return balance from tx
-func (lc *BTCLightClient) VerifyBalance(tx wire.MsgTx, addr string, spv SPVProof) (int64, error) {
+func (lc *BTCLightClient) VerifyBalance(tx wire.MsgTx, addr string, spv SPVProof) (BalanceReport, error) {
 	txID := tx.TxID()
 
 	if spv.TxId != txID {
-		return 0, errors.New("TX ID not match")
+		return newInvalidBalance(), errors.New("TX ID not match")
 	}
 
-	if spvStatus := lc.VerifySPV(spv); spvStatus != ValidSPVProof {
-		return 0, errors.New("spv not valid")
+	spvStatus := lc.VerifySPV(spv)
+	if spvStatus == InvalidSPVProof {
+		return newInvalidBalance(), errors.New("spv invalid")
 	}
-
-	balance, err := lc.GetBalance(tx, addr)
+	
+	balance, err := lc.GetBalance(tx, addr);
 	if err != nil {
-		return 0, err
+		return newInvalidBalance(), err
+	}
+	
+
+	if spvStatus == PartialValidSPVProof {
+		return newWaitingConfirmBalance(balance), nil
 	}
 
-	return balance, nil
+	
+	return newValidBalance(balance), nil
 }
