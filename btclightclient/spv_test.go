@@ -78,7 +78,7 @@ func TestSPVVerification(t *testing.T) {
 		spvStatus     SPVStatus
 	}
 
-	run := func(t *testing.T, tc testCase) {
+	runSingleSPV := func(t *testing.T, tc testCase) {
 		header, err := BlockHeaderFromHex(tc.gettxoutproof[:160])
 		assert.NilError(t, err)
 
@@ -87,6 +87,23 @@ func TestSPVVerification(t *testing.T) {
 		assert.NilError(t, err)
 		verifyStatus := lc.VerifySPV(*spvProof)
 		assert.Equal(t, verifyStatus, tc.spvStatus)
+	}
+
+	runMutipleSPV := func(t *testing.T, tcs []testCase) {
+		spvs := make([]SPVProof, len(tcs))
+		headers := make([]wire.BlockHeader, len(tcs))
+		results := make([]SPVStatus, len(tcs))
+
+		for i, tc := range tcs {
+			headers[i], _ = BlockHeaderFromHex(tc.gettxoutproof[:160])
+			spv, _ := SPVProofFromHex(tc.gettxoutproof, tc.txHash)
+			spvs[i] = *spv
+			results[i] = tc.spvStatus
+		}
+		lc := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, 1000)
+		actualResults := lc.VerifySPVs(spvs)
+
+		assert.DeepEqual(t, results, actualResults)
 	}
 
 	testCases := []testCase{
@@ -115,7 +132,11 @@ func TestSPVVerification(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			run(t, tc)
+			runSingleSPV(t, tc)
 		})
 	}
+
+	t.Run("Mutiple spv", func(t *testing.T) {
+		runMutipleSPV(t, testCases)
+	})
 }
