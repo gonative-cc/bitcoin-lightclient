@@ -78,7 +78,7 @@ func TestSPVVerification(t *testing.T) {
 		spvStatus     SPVStatus
 	}
 
-	run := func(t *testing.T, tc testCase) {
+	runSingleSPV := func(t *testing.T, tc testCase) {
 		header, err := BlockHeaderFromHex(tc.gettxoutproof[:160])
 		assert.NilError(t, err)
 
@@ -115,7 +115,52 @@ func TestSPVVerification(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			run(t, tc)
+			runSingleSPV(t, tc)
 		})
 	}
+}
+
+func TestBunchSPV(t *testing.T) {
+	type rawSPVTestData struct {
+		txoutproof string
+		status     SPVStatus
+		txHash     string
+	}
+
+	runMutipleSPV := func(t *testing.T, data []rawSPVTestData) {
+		n := len(data)
+		spvs := make([]SPVProof, n)
+		headers := make([]wire.BlockHeader, n)
+		results := make([]SPVStatus, n)
+
+		for i, rawSpv := range data {
+			headers[i], _ = BlockHeaderFromHex(rawSpv.txoutproof[:160])
+			results[i] = rawSpv.status
+			spv, _ := SPVProofFromHex(rawSpv.txoutproof, rawSpv.txHash)
+			spvs[i] = *spv
+
+		}
+		lc := NewBTCLightClientWithData(&chaincfg.MainNetParams, headers, 1000)
+		actualResults := lc.VerifySPVs(spvs)
+
+		assert.DeepEqual(t, results, actualResults)
+	}
+
+	data := []rawSPVTestData{
+		{
+			txoutproof: "0000003085bbc10dc8694fe36144c87f7737c35f9e3e8e304c61427a7cbce8b1e97004153fb8582bc04a0abb67965f6c139445bdc5d173ddc80008aa219929ab7285278f3f5b6167ffff7f200000000001000000013fb8582bc04a0abb67965f6c139445bdc5d173ddc80008aa219929ab7285278f0101",
+			status:     ValidSPVProof,
+			txHash:     "8f278572ab299921aa0800c8dd73d1c5bd4594136c5f9667bb0a4ac02b58b83f",
+		},
+		// this block after install this is not final yet
+		{
+			txoutproof: "00000030516567e505288fe41b2fc6be9b96318c406418c7d338168fe75a26111490eb2fec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a3f5b6167ffff7f20040000000100000001ec401c3902aa39842e53a0c641af518957ec3aa5984a44d32e2a9f7fee2fa67a0101",
+			status:     PartialValidSPVProof,
+			txHash:     "7aa62fee7f9f2a2ed3444a98a53aec578951af41c6a0532e8439aa02391c40ec",
+		},
+	}
+
+	t.Run("Mutiple spv", func(t *testing.T) {
+		runMutipleSPV(t, data)
+	})
 }

@@ -143,7 +143,7 @@ func (pmtd *partialMerkleTreeData) calcTreeWidth(height uint32) uint32 {
 
 func (pmtd *partialMerkleTreeData) nextBit() (bool, error) {
 	if int(pmtd.nBitUsed) >= len(pmtd.vBits) {
-		return false, fmt.Errorf("Out-bound of vBits")
+		return false, fmt.Errorf("out-bound of vBits")
 	}
 	bit := pmtd.vBits[pmtd.nBitUsed]
 	pmtd.nBitUsed++
@@ -152,7 +152,7 @@ func (pmtd *partialMerkleTreeData) nextBit() (bool, error) {
 
 func (pmtd *partialMerkleTreeData) nextHash() (*chainhash.Hash, error) {
 	if int(pmtd.nHashUsed) >= len(pmtd.vHash) {
-		return nil, fmt.Errorf("Out-bound of vHash")
+		return nil, fmt.Errorf("out-bound of vHash")
 	}
 	hash := pmtd.vHash[pmtd.nHashUsed]
 	pmtd.nHashUsed++
@@ -182,7 +182,7 @@ func (pmtd *partialMerkleTreeData) buildTreeRecursive(height, pos uint32, merkle
 	}
 
 	// handle internal node
-	// we go to left of tree
+	// we go to left of the tree
 	left, err := pmtd.buildTreeRecursive(height-1, pos*2, merkleTree)
 	if err != nil {
 		return nil, err
@@ -195,7 +195,7 @@ func (pmtd *partialMerkleTreeData) buildTreeRecursive(height, pos uint32, merkle
 			return nil, err
 		}
 		if left.IsEqual(right) {
-			return nil, fmt.Errorf("Right node never identical with left node")
+			return nil, fmt.Errorf("right node never identical with left node")
 		}
 	} else {
 		// Right node doesn't exist, it's assigned value by left node.
@@ -230,7 +230,7 @@ func (mk PartialMerkleTree) getLeafNodeIndex(txID *chainhash.Hash) (uint32, erro
 			return leafIndex, nil
 		}
 	}
-	return 0, errors.New("Node value doesn't exist in merkle tree")
+	return 0, errors.New("node value doesn't exist in merkle tree")
 
 }
 
