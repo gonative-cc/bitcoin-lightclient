@@ -70,7 +70,7 @@ func TestInsertHeader(t *testing.T) {
 		"Append a fork":                      nil,
 		"Create fork":                        nil,
 		"Insert failed because fork too old": errors.New("fork too old"),
-		"Block doesn't belong to any fork!":  errors.New("Block doesn't belong to any fork!"),
+		"Block doesn't belong to any fork!":  errors.New("block doesn't belong to any fork"),
 	}
 
 	run := func(t *testing.T, testcase string) {
@@ -84,14 +84,12 @@ func TestInsertHeader(t *testing.T) {
 		}
 		lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
 		lcErr := lc.InsertHeader(btcHeader)
-		fmt.Println(lcErr)
 
-		err := testCases[testcase]
-		if err == nil {
-			assert.Assert(t, lcErr == nil)
-			// TODO: fix bug can't compare 2 errors
-		} else if errors.Is(lcErr, err) {
-			t.Fatalf("Error not match")
+		expectedErr := testCases[testcase]
+		if expectedErr == nil {
+			assert.NilError(t, lcErr)
+		} else {
+			assert.Error(t, lcErr, expectedErr.Error())
 		}
 
 	}
