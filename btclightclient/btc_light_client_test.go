@@ -63,9 +63,7 @@ func CommonTestCases() testCaseMap {
 }
 
 func TestInsertHeader(t *testing.T) {
-
 	commonTestCase := CommonTestCases()
-
 	testCases := map[string]error{
 		"Append a fork":                      nil,
 		"Create fork":                        nil,
