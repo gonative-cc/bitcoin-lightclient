@@ -17,7 +17,7 @@ func BlockHeaderFromHex(hexStr string) (wire.BlockHeader, error) {
 	var header wire.BlockHeader
 
 	if len(hexStr) != BTCHeaderSize*2 {
-		return header, errors.New("invalid header size, must have 80 bytes")
+		return header, errors.New("invalid header size, must be 80 bytes")
 	}
 
 	data, err := hex.DecodeString(hexStr)
