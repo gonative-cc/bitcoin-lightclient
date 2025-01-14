@@ -182,7 +182,7 @@ func (pmtd *partialMerkleTreeData) buildTreeRecursive(height, pos uint32, merkle
 	}
 
 	// handle internal node
-	// we go to left of tree
+	// we go to left of the tree
 	left, err := pmtd.buildTreeRecursive(height-1, pos*2, merkleTree)
 	if err != nil {
 		return nil, err

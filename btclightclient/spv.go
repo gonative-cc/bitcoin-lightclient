@@ -66,7 +66,7 @@ func (spvProof SPVProof) MerkleRoot() chainhash.Hash {
 func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 	lightBlock := lc.btcStore.LightBlockByHash(spvProof.BlockHash)
 
-	// light block not belong currect database
+	// light block not found in database
 	if lightBlock == nil {
 		return InvalidSPVProof
 	}
@@ -86,7 +86,7 @@ func (lc *BTCLightClient) VerifySPV(spvProof SPVProof) SPVStatus {
 		return InvalidSPVProof
 	}
 
-	// the block not finalize
+	// the block not finalized
 	if lc.btcStore.LatestFinalizedHeight() < int64(lightBlock.Height) {
 		return PartialValidSPVProof
 	}
