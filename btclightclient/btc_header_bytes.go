@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
-	"fmt"
 
 	"github.com/btcsuite/btcd/wire"
 )
@@ -17,7 +16,6 @@ const BTCHeaderSize = 80
 func BlockHeaderFromHex(hexStr string) (wire.BlockHeader, error) {
 	var header wire.BlockHeader
 
-	fmt.Println(len(hexStr))
 	if len(hexStr) != BTCHeaderSize*2 {
 		return header, errors.New("invalid header size, must have 80 bytes")
 	}
