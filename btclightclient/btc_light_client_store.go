@@ -121,7 +121,6 @@ func (s *MemStore) SetIsNotHead(bh chainhash.Hash) {
 	delete(s.latestBlockHashOfFork, bh)
 }
 
-// TODO: convert to iterator rather than returning a map
 func (s *MemStore) LatestBlockHashOfFork() []chainhash.Hash {
 	hashes := []chainhash.Hash{}
 	for h := range s.latestBlockHashOfFork {

@@ -112,24 +112,16 @@ func TestCleanup(t *testing.T) {
 	// b1 <-b2 <- b3  .... b9
 	// run cleanup
 	// b2 <- b3  .... b9
-
 	data := tcs["Append a fork"]
 	btcHeader, _ := BlockHeaderFromHex(data.header)
-
 	beforeCheckpoint := lc.btcStore.LatestCheckPoint()
-
 	lcErr := lc.InsertHeader(btcHeader)
-
-	// we ignore this common test
 	if lcErr != nil {
 		t.Fatal("Should not return error when insert header")
 	}
-
 	err = lc.CleanUpFork()
 	assert.NilError(t, err)
-
 	afterCheckpoint := lc.btcStore.LatestCheckPoint()
-
 	assert.Assert(t, beforeCheckpoint.Height+1 == afterCheckpoint.Height)
 
 	// notthing change
@@ -139,16 +131,13 @@ func TestCleanup(t *testing.T) {
 	// run cleanup
 	// b3  ... b8 <- b9 <- b10
 	//                  \- c10
+
 	err = lc.CleanUpFork()
 	assert.NilError(t, err)
-
 	notupdateCheckpoint := lc.btcStore.LatestCheckPoint()
-
 	assert.Assert(t, notupdateCheckpoint == afterCheckpoint)
-
 	data = tcs["Create fork"]
 	btcHeader, _ = BlockHeaderFromHex(data.header)
-
 	err = lc.InsertHeader(btcHeader)
 	assert.NilError(t, err)
 
@@ -159,7 +148,6 @@ func TestCleanup(t *testing.T) {
 	// run cleanup
 	// b2 <- b3  .... b9
 	//    \- c3
-
 	headers := []string{
 		"000000201bb3e1c443436f66b4cd58bad75748ceddd9d5737cf8c28bfffe3be786e21f6df83b5f5af28fbbac9795e543e2ef0f97bf9137305483e6c2fe59771a59303d89e1bd3d67ffff7f2002000000",
 		"0000002029539cf7f719b9ab72fccace6bdf9429fa9e5b3a34338f674e82c697822ee0724dbbfdc4c44cccd0a450db68a4223e47c8ecd859c00759e98b7fd227d6ad7e21e1bd3d67ffff7f2000000000",
@@ -169,20 +157,16 @@ func TestCleanup(t *testing.T) {
 		"00000020f07faecc9a8a61cee690a7756f8112df5f5bfb94e5c64f39a3e61e4f8b8db35bbd276e146642e535fccf8bee242895bbdfefe92f2efcb5069e339366bf2c59e5e1bd3d67ffff7f200a000000",
 		"000000203325626e050e9f17884eb04c08f89d4c689879e86bae5518ba0e77535de63976e9413b0e69182999433ea49fc52e8bb29c8d3ff7ff69c58da5f3d7978e23ea5fe2bd3d67ffff7f2000000000",
 	}
-
 	for _, h := range headers {
 		btcHeader, _ := BlockHeaderFromHex(h)
 		lcErr := lc.InsertHeader(btcHeader)
 
-		// we ignore this common test
 		if lcErr != nil {
 			t.Fatal("Should not return error when insert header")
 		}
 		err := lc.CleanUpFork()
 		assert.NilError(t, err)
 	}
-
 	listFork := lc.btcStore.LatestBlockHashOfFork()
-
 	assert.Assert(t, len(listFork) == 1)
 }
