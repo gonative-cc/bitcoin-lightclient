@@ -182,7 +182,7 @@ func (pmtd *partialMerkleTreeData) buildTreeRecursive(height, pos uint32, merkle
 	}
 
 	// handle internal node
-	// we go to left of tree 
+	// we go to left of the tree
 	left, err := pmtd.buildTreeRecursive(height-1, pos*2, merkleTree)
 	if err != nil {
 		return nil, err
@@ -217,7 +217,6 @@ func HashNodes(l, r *chainhash.Hash) *chainhash.Hash {
 	return &newHash
 }
 
-
 type merkleNodes map[uint32]chainhash.Hash
 type PartialMerkleTree struct {
 	// nodes at level or height.
@@ -251,7 +250,6 @@ func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
 	merklePath := []chainhash.Hash{*txHash}
 	h := len(mk.nodesAtHeight)
 
-
 	position := transactionIndex
 	// The node at level 0 is merkle root.
 	for i := 0; i < h-1; i++ {
@@ -260,7 +258,7 @@ func (mk PartialMerkleTree) GetProof(txID string) (*MerkleProof, error) {
 			// current node is left node, push right node
 			siblingHash = mk.nodesAtHeight[i][position+1]
 		} else {
-			//currect node is right node push left node 
+			//currect node is right node push left node
 			siblingHash = mk.nodesAtHeight[i][position-1]
 		}
 
