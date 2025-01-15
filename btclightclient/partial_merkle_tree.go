@@ -188,7 +188,7 @@ func (pmtd *partialMerkleTreeData) buildTreeRecursive(height, pos uint32, merkle
 		return nil, err
 	}
 	var right *chainhash.Hash
-	// Check right node exists and traverse to the this node if this exists
+	// Check if right node exists and traverse to this node if it exists
 	if pos*2+1 < pmtd.calcTreeWidth(height-1) {
 		right, err = pmtd.buildTreeRecursive(height-1, pos*2+1, merkleTree)
 		if err != nil {
