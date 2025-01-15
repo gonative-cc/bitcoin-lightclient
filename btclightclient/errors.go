@@ -11,4 +11,5 @@ var ErrBlockIsNotForkHead = errors.New("block is not a fork head")
 
 // SPV errors
 var ErrValueIsNotMerkleLeaf = errors.New("value doesn't exist in merkle tree")
-var ErrOutboundDecodeMerkleTree = errors.New("out-bound of vHash")
+var ErrMerkleDecodeOutbound = errors.New("out-bound of vHash")
+var ErrMerkleDecodeHashNumberInvalid = errors.New("number of hashes reach to limit")

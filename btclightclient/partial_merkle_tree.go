@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -94,7 +93,7 @@ func decodePartialMerkleTreeData(buf []byte) (partialMerkleTreeData, error) {
 		return pmt, err
 	}
 	if numberOfHashes*chainhash.HashSize > maxAllowBytes {
-		return pmt, errors.New("number of hashes is too big")
+		return pmt, ErrMerkleDecodeHashNumberInvalid
 	}
 
 	bytes := make([]byte, numberOfHashes*chainhash.HashSize)
