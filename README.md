@@ -30,3 +30,8 @@ Check out [SECURITY.md](./SECURITY.md) for security concerns.
 1. Build the project: `make build`
 
 To build and start you can run: `make build start`
+
+## Running as a docker container
+
+1. Build the image `docker build -t bitcoin-lightclient .`
+2. Run the container `docker run -e DATA_FILE_PATH=/custom/path/data.json bitcoin-lightclient`
