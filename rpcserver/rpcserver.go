@@ -85,6 +85,15 @@ func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btcligh
 	return checkSPV, nil
 }
 
+func (h *RPCServerHandler) VerifySPVs(spvProofs []btclightclient.SPVProof) ([]btclightclient.SPVStatus, error) {
+	log.Debug().Msgf("Received list of SPV %v", spvProofs)
+	status := h.btcLC.VerifySPVs(spvProofs)
+
+	log.Info().Msgf("SPV status status: %v status %v", spvProofs, status)
+
+	return status, nil
+}
+
 // NewRPCServer creates a new instance of the rpcServer and starts listening
 func StartRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	rpcServer := jsonrpc.NewServer()
