@@ -70,4 +70,3 @@ func TestPartialMerkleTree(t *testing.T) {
 	}
 
 }
-
