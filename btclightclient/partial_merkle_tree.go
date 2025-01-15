@@ -230,7 +230,7 @@ func (mk PartialMerkleTree) getLeafNodeIndex(txID *chainhash.Hash) (uint32, erro
 			return leafIndex, nil
 		}
 	}
-	return 0, errors.New("node value doesn't exist in merkle tree")
+	return 0, ErrValueIsNotMerkleLeaf
 
 }
 

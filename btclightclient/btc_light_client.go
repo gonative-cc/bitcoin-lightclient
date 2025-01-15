@@ -1,7 +1,6 @@
 package btclightclient
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
 	"time"
@@ -168,7 +167,7 @@ func (lc *BTCLightClient) ForkAge(bh chainhash.Hash) (int32, error) {
 	}
 
 	if !lc.btcStore.IsForkHead(bh) {
-		return 0, errors.New("hash not a latest block in forks")
+		return 0, ErrBlockIsNotForkHead
 	}
 
 	checkpoint := lc.btcStore.LatestCheckPoint()
