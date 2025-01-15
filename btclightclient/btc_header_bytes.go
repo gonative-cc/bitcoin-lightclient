@@ -8,6 +8,9 @@ import (
 )
 
 const BTCHeaderSize = 80 // 80 bytes
+
+// Utils for convert hex string to header
+// The input must be 80 bytes hex string type
 func BlockHeaderFromHex(hexStr string) (wire.BlockHeader, error) {
 	var header wire.BlockHeader
 
