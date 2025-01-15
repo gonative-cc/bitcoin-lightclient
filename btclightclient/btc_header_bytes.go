@@ -7,14 +7,23 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-// We don't want to make it compilicated yet :D
-// type BTCHeaderBytes []byte
-// const BTCHeaderSize = 80
+const BTCHeaderSize = 80 // 80 bytes
 
+// Utils for converting hex string to header
+// The input must be 80 bytes hex string type
 func BlockHeaderFromHex(hexStr string) (wire.BlockHeader, error) {
-	data, _ := hex.DecodeString(hexStr)
 	var header wire.BlockHeader
+
+	if len(hexStr) != BTCHeaderSize*2 {
+		return header, ErrInvalidHeaderSize
+	}
+
+	data, err := hex.DecodeString(hexStr)
+	if err != nil {
+		return header, err
+	}
+
 	reader := bytes.NewReader(data)
-	err := header.Deserialize(reader)
+	err = header.Deserialize(reader)
 	return header, err
 }
