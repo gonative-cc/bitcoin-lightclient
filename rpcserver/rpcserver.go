@@ -75,7 +75,7 @@ func (h *RPCServerHandler) GetHeaderChainTip() (Block, error) {
 	return latestFinalizedBlock, nil
 }
 
-// returns if the spvProof is valid or not
+// Verify SPV proof for bitcoin transaction inclusive to a block
 func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btclightclient.SPVStatus, error) {
 	log.Debug().Msgf("Recieved spvProof %v", spvProof)
 	checkSPV := h.btcLC.VerifySPV(*spvProof)
@@ -85,6 +85,7 @@ func (h *RPCServerHandler) VerifySPV(spvProof *btclightclient.SPVProof) (btcligh
 	return checkSPV, nil
 }
 
+// Verify a bunch SPV proof for bitcoin transactions inclusive to a block
 func (h *RPCServerHandler) VerifySPVs(spvProofs []btclightclient.SPVProof) ([]btclightclient.SPVStatus, error) {
 	log.Debug().Msgf("Received list of SPV %v", spvProofs)
 	status := h.btcLC.VerifySPVs(spvProofs)
@@ -107,6 +108,7 @@ func StartRPCServer(btcLC *btclightclient.BTCLightClient) error {
 	rpcServer.AliasMethod("contains_btc_block", "RPCServerHandler.ContainsBTCBlock")
 	rpcServer.AliasMethod("get_header_chain_tip", "RPCServerHandler.GetHeaderChainTip")
 	rpcServer.AliasMethod("verify_spv", "RPCServerHandler.VerifySPV")
+	rpcServer.AliasMethod("verify_spvs", "RPCServerHandler.VerifySPVs")
 
 	server := &http.Server{
 		Addr:         ":9797",
