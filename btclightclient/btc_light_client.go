@@ -53,13 +53,13 @@ func (lc *BTCLightClient) FindPreviousCheckpoint() (blockchain.HeaderCtx, error)
 func (lc *BTCLightClient) InsertHeader(header wire.BlockHeader) error {
 
 	if lb := lc.btcStore.LightBlockByHash(header.BlockHash()); lb != nil {
-		return errors.New("parent block not found")
+		return ErrBlockNotInChain
 	}
 
 	parentHash := header.PrevBlock
 	parent := lc.btcStore.LightBlockByHash(parentHash)
 	if parent == nil {
-		return errors.New("block doesn't belong to any fork")
+		return ErrParentBlockNotInChain
 	}
 
 	// we need to handle 2 cases:
@@ -89,7 +89,7 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 	for count := 0; count <= MaxForkAge; count++ {
 		curr := lc.btcStore.LightBlockByHash(bh)
 		if checkpoint.Height > curr.Height {
-			return nil, errors.New("fork too old")
+			return nil, ErrForkTooOld
 		}
 		fork = append(fork, curr)
 		if bh.IsEqual(&checkpointHash) {
@@ -98,7 +98,7 @@ func (lc *BTCLightClient) forkOfBlockhash(bh chainhash.Hash) ([]*LightBlock, err
 		bh = curr.Header.PrevBlock
 	}
 
-	return nil, errors.New("block not found or too old")
+	return nil, ErrForkTooOld
 }
 
 // We follow:
@@ -163,15 +163,15 @@ func (lc *BTCLightClient) CreateNewFork(parent *LightBlock, header wire.BlockHea
 
 func (lc *BTCLightClient) ForkAge(bh chainhash.Hash) (int32, error) {
 	lb := lc.btcStore.LightBlockByHash(bh)
-	checkpoint := lc.btcStore.LatestCheckPoint()
 	if lb == nil {
-		return 0, errors.New("hash doesn't belong to db")
+		return 0, ErrBlockNotInChain
 	}
 
 	if !lc.btcStore.IsForkHead(bh) {
 		return 0, errors.New("hash not a latest block in forks")
 	}
 
+	checkpoint := lc.btcStore.LatestCheckPoint()
 	age := lb.Height - checkpoint.Height
 	return age, nil
 }

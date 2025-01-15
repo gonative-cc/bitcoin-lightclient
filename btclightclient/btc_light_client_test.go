@@ -1,8 +1,6 @@
 package btclightclient
 
 import (
-	"errors"
-
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 	"gotest.tools/assert"
@@ -65,8 +63,8 @@ func TestInsertHeader(t *testing.T) {
 	testCases := map[string]error{
 		"Append a fork":                      nil,
 		"Create fork":                        nil,
-		"Insert failed because fork too old": errors.New("fork too old"),
-		"Block doesn't belong to any fork!":  errors.New("block doesn't belong to any fork"),
+		"Insert failed because fork too old": ErrForkTooOld,
+		"Block doesn't belong to any fork!":  ErrParentBlockNotInChain,
 	}
 
 	run := func(t *testing.T, testcase string) {
