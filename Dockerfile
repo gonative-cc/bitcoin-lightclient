@@ -1,5 +1,7 @@
 FROM golang:1.23.1-alpine
 
+ENV DATA_FILE_PATH=./data/regtest.json
+
 WORKDIR /app
 EXPOSE 9797
 
@@ -9,4 +11,4 @@ COPY . .
 
 RUN go build -o main .
 
-CMD ["./main", "data/regtest.json"]
+CMD ["./main", "${DATA_FILE_PATH}"]
