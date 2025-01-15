@@ -90,7 +90,7 @@ func (h *RPCServerHandler) VerifySPVs(spvProofs []btclightclient.SPVProof) ([]bt
 	log.Debug().Msgf("Received list of SPV %v", spvProofs)
 	status := h.btcLC.VerifySPVs(spvProofs)
 
-	log.Info().Msgf("SPV status status: %v status %v", spvProofs, status)
+	log.Info().Msgf("SPVs: %v status %v", spvProofs, status)
 
 	return status, nil
 }
