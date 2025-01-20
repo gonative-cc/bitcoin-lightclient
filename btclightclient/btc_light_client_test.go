@@ -1,10 +1,11 @@
 package btclightclient
 
 import (
+	"testing"
+
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 	"gotest.tools/assert"
-	"testing"
 )
 
 type commonTestCaseData struct {
@@ -33,6 +34,12 @@ var HEADERS = []string{
 	"00000020f972e238a280d6a3f0eb7560deae346c29fdd0203722510e0a82f792f1020933a5f456f5967ce558ac2da01200814edd3b045f9f7f1a6f8235086260d3ea4a80e4b23c67ffff7f2000000000",
 	"00000020b27998bce45300e48a19d64f57fb219c82e7edc283da74b73eeb4125db49d51bee3a55f8afeef128522c5a0ef633840e098d5288d077eb9c1bd6a1e01bf333b1e4b23c67ffff7f2001000000",
 	"0000002018c821aeb4f94b3847dccc7946ff82a4d022a9e87162bc0601992b7dbaf12b432237b251c5f3473a3ece242cb340c6c7d69ec9db9579d57c38069341dfabcf98bdb43c67ffff7f2000000000",
+}
+
+type FinalizedTestCaseData struct {
+	Error     error
+	Height    int64
+	BlockHash string
 }
 
 func CommonTestCases() testCaseMap {
@@ -86,6 +93,51 @@ func TestInsertHeader(t *testing.T) {
 			assert.Error(t, lcErr, expectedErr.Error())
 		}
 
+	}
+
+	for testcase := range testCases {
+		t.Run(testcase, func(t *testing.T) {
+			run(t, testcase)
+		})
+	}
+}
+
+func TestLatestFinalizedBlock(t *testing.T) {
+	commonTestCase := CommonTestCases()
+	testCases := map[string]FinalizedTestCaseData{
+		"Append a fork":                      {nil, 11, "6393fcb4ba7189f914c2f74fad2bd0ef7743c867b4a81db458f9f9e506458fe7"},
+		"Create fork":                        {nil, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+		"Insert failed because fork too old": {ErrForkTooOld, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+		"Block doesn't belong to any fork!":  {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+	}
+
+	run := func(t *testing.T, testcase string) {
+		data := commonTestCase[testcase]
+
+		decodedHeader := make([]wire.BlockHeader, len(data.headers))
+		btcHeader, _ := BlockHeaderFromHex(data.header)
+		for id, str := range data.headers {
+			h, _ := BlockHeaderFromHex(str)
+			decodedHeader[id] = h
+		}
+		lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
+		lcErr := lc.InsertHeader(btcHeader)
+
+		err := lc.CleanUpFork()
+		assert.NilError(t, err)
+
+		expectedErr := testCases[testcase].Error
+		expectedFinalizedBlockHeight := testCases[testcase].Height
+		expectedFinalizedBlockHash := testCases[testcase].BlockHash
+
+		if expectedErr == nil {
+			assert.NilError(t, lcErr)
+		} else {
+			assert.Error(t, lcErr, expectedErr.Error())
+		}
+
+		assert.Assert(t, lc.LatestFinalizedBlockHeight() == expectedFinalizedBlockHeight)
+		assert.Assert(t, lc.LatestFinalizedBlockHash().String() == expectedFinalizedBlockHash)
 	}
 
 	for testcase := range testCases {
