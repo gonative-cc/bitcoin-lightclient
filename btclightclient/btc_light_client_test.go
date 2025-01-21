@@ -110,7 +110,7 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		"Block doesn't belong to any fork!":  {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 	}
 
-	run := func(t *testing.T, testcase string) {
+	run := func(t *testing.T, tc TestCase) {
 		data := commonTestCase[testcase]
 
 		decodedHeader := make([]wire.BlockHeader, len(data.headers))
