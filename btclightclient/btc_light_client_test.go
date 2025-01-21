@@ -139,9 +139,9 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		assert.Assert(t, lc.LatestFinalizedBlockHash().String() == expectedFinalizedBlockHash)
 	}
 
-	for testcase := range testCases {
-		t.Run(testcase, func(t *testing.T) {
-			run(t, testcase)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			run(t, tc)
 		})
 	}
 }
