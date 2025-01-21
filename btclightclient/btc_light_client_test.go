@@ -104,7 +104,12 @@ func TestInsertHeader(t *testing.T) {
 
 func TestLatestFinalizedBlock(t *testing.T) {
 	commonTestCase := CommonTestCases()
-	testCases := map[string]FinalizedTestCaseData{
+	type TestCase struct {
+		Error     error
+		Height    int64
+		BlockHash string
+	}
+	testCases := map[string]TestCase{
 		"Append a fork":                      {nil, 11, "6393fcb4ba7189f914c2f74fad2bd0ef7743c867b4a81db458f9f9e506458fe7"},
 		"Create fork":                        {nil, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 		"Insert failed because fork too old": {ErrForkTooOld, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
