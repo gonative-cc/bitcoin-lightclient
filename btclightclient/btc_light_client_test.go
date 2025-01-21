@@ -36,12 +36,6 @@ var HEADERS = []string{
 	"0000002018c821aeb4f94b3847dccc7946ff82a4d022a9e87162bc0601992b7dbaf12b432237b251c5f3473a3ece242cb340c6c7d69ec9db9579d57c38069341dfabcf98bdb43c67ffff7f2000000000",
 }
 
-type FinalizedTestCaseData struct {
-	Error     error
-	Height    int64
-	BlockHash string
-}
-
 func CommonTestCases() testCaseMap {
 	tcs := map[string]commonTestCaseData{
 		"Append a fork": {
