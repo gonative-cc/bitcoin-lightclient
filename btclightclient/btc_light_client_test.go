@@ -125,14 +125,10 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		err := lc.CleanUpFork()
 		assert.NilError(t, err)
 
-		expectedErr := testCases[testcase].Error
-		expectedFinalizedBlockHeight := testCases[testcase].Height
-		expectedFinalizedBlockHash := testCases[testcase].BlockHash
-
-		if expectedErr == nil {
+		if tc.Error == nil {
 			assert.NilError(t, lcErr)
 		} else {
-			assert.Error(t, lcErr, expectedErr.Error())
+			assert.ErrorType(t, lcErr, tc.Error)
 		}
 
 		assert.Equal(t, lc.LatestFinalizedBlockHeight(), tc.Height)
