@@ -135,8 +135,8 @@ func TestLatestFinalizedBlock(t *testing.T) {
 			assert.Error(t, lcErr, expectedErr.Error())
 		}
 
-		assert.Assert(t, lc.LatestFinalizedBlockHeight() == expectedFinalizedBlockHeight)
-		assert.Assert(t, lc.LatestFinalizedBlockHash().String() == expectedFinalizedBlockHash)
+		assert.Equal(t, lc.LatestFinalizedBlockHeight(), tc.Height)
+		assert.Equal(t, lc.LatestFinalizedBlockHash().String() == tc.BlockHash)
 	}
 
 	for name, tc := range testCases {
