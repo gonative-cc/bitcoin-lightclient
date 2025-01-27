@@ -59,6 +59,16 @@ func CommonTestCases() testCaseMap {
 	return tcs
 }
 
+func initLightClient(headers []string) *BTCLightClient {
+	decodedHeaders := make([]wire.BlockHeader, len(headers))
+	for id, str := range headers {
+		h, _ := BlockHeaderFromHex(str)
+		decodedHeaders[id] = h
+	}
+	lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeaders, 0)
+	return lc
+}
+
 func TestInsertHeader(t *testing.T) {
 	commonTestCase := CommonTestCases()
 	testCases := map[string]error{
@@ -71,13 +81,8 @@ func TestInsertHeader(t *testing.T) {
 	run := func(t *testing.T, testcase string) {
 		data := commonTestCase[testcase]
 
-		decodedHeader := make([]wire.BlockHeader, len(data.headers))
+		lc := initLightClient(data.headers)
 		btcHeader, _ := BlockHeaderFromHex(data.header)
-		for id, str := range data.headers {
-			h, _ := BlockHeaderFromHex(str)
-			decodedHeader[id] = h
-		}
-		lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
 		lcErr := lc.InsertHeader(btcHeader)
 
 		expectedErr := testCases[testcase]
@@ -113,13 +118,8 @@ func TestLatestFinalizedBlock(t *testing.T) {
 	run := func(t *testing.T, tc TestCase) {
 		data := commonTestCase[testcase]
 
-		decodedHeader := make([]wire.BlockHeader, len(data.headers))
+		lc := initLightClient(data.headers)
 		btcHeader, _ := BlockHeaderFromHex(data.header)
-		for id, str := range data.headers {
-			h, _ := BlockHeaderFromHex(str)
-			decodedHeader[id] = h
-		}
-		lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
 		lcErr := lc.InsertHeader(btcHeader)
 
 		err := lc.CleanUpFork()
@@ -146,12 +146,7 @@ func TestCleanup(t *testing.T) {
 	var err error
 
 	tcs := CommonTestCases()
-	decodedHeader := make([]wire.BlockHeader, len(HEADERS))
-	for id, str := range HEADERS {
-		h, _ := BlockHeaderFromHex(str)
-		decodedHeader[id] = h
-	}
-	lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
+	lc := initLightClient(HEADERS)
 
 	// test-case1
 	// b1 <-b2 <- b3  .... b9
