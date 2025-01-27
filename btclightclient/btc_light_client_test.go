@@ -121,7 +121,7 @@ func TestLatestFinalizedBlock(t *testing.T) {
 
 	run := func(t *testing.T, name string, tc TestCase) {
 		data := commonTestCase[name]
-		g
+
 		lc := initLightClient(data.headers)
 		btcHeader, _ := BlockHeaderFromHex(data.header)
 		lcErr := lc.InsertHeader(btcHeader)
