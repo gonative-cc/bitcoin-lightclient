@@ -115,8 +115,8 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		"Block doesn't belong to any fork!":  {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 	}
 
-	run := func(t *testing.T, tc TestCase) {
-		data := commonTestCase[testcase]
+	run := func(t *testing.T, name string, tc TestCase) {
+		data := commonTestCase[name]
 
 		lc := initLightClient(data.headers)
 		btcHeader, _ := BlockHeaderFromHex(data.header)
@@ -132,12 +132,12 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		}
 
 		assert.Equal(t, lc.LatestFinalizedBlockHeight(), tc.Height)
-		assert.Equal(t, lc.LatestFinalizedBlockHash().String() == tc.BlockHash)
+		assert.Equal(t, lc.LatestFinalizedBlockHash().String(), tc.BlockHash)
 	}
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			run(t, tc)
+			run(t, name, tc)
 		})
 	}
 }
