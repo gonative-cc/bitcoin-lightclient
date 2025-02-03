@@ -125,10 +125,8 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		lc := initLightClient(data.headers)
 		btcHeader, _ := BlockHeaderFromHex(data.header)
 		lcErr := lc.InsertHeader(btcHeader)
-
 		err := lc.CleanUpFork()
 		assert.NilError(t, err)
-
 		if tc.Error == nil {
 			assert.NilError(t, lcErr)
 		} else {
