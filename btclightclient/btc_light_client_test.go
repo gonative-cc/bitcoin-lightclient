@@ -1,10 +1,11 @@
 package btclightclient
 
 import (
+	"testing"
+
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 	"gotest.tools/assert"
-	"testing"
 )
 
 type commonTestCaseData struct {
@@ -49,7 +50,7 @@ func CommonTestCases() testCaseMap {
 			headers: HEADERS,
 			header:  "0000002006226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f91bf7fc009e51a44f6c7b063e64d80b36af5cb8bc9879b9dadc7eebec779a70b437f3c67ffff7f2001000000",
 		},
-		"Block doesn't belong to any fork!": {
+		"Unknown parent": {
 			headers: HEADERS,
 			header:  "0000002018c8213eb4f94b3847dccc7946ff82a4d022a9e87162bc0601992b7dbaf12b43b275a58e2107b29a5735d8c6bd63d674ef01d4596c78961f338e5a364693b03502b53c67ffff7f2000000000",
 		},
@@ -58,25 +59,31 @@ func CommonTestCases() testCaseMap {
 	return tcs
 }
 
+func initLightClient(t *testing.T, headers []string) *BTCLightClient {
+	decodedHeaders := make([]wire.BlockHeader, len(headers))
+	for id, str := range headers {
+		h, err := BlockHeaderFromHex(str)
+		assert.NilError(t, err)
+		decodedHeaders[id] = h
+	}
+	lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeaders, 0)
+	return lc
+}
+
 func TestInsertHeader(t *testing.T) {
 	commonTestCase := CommonTestCases()
 	testCases := map[string]error{
 		"Append a fork":                      nil,
 		"Create fork":                        nil,
 		"Insert failed because fork too old": ErrForkTooOld,
-		"Block doesn't belong to any fork!":  ErrParentBlockNotInChain,
+		"Unknown parent":                     ErrParentBlockNotInChain,
 	}
 
 	run := func(t *testing.T, testcase string) {
 		data := commonTestCase[testcase]
 
-		decodedHeader := make([]wire.BlockHeader, len(data.headers))
+		lc := initLightClient(t, data.headers)
 		btcHeader, _ := BlockHeaderFromHex(data.header)
-		for id, str := range data.headers {
-			h, _ := BlockHeaderFromHex(str)
-			decodedHeader[id] = h
-		}
-		lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
 		lcErr := lc.InsertHeader(btcHeader)
 
 		expectedErr := testCases[testcase]
@@ -95,16 +102,56 @@ func TestInsertHeader(t *testing.T) {
 	}
 }
 
+func TestLatestFinalizedBlock(t *testing.T) {
+	commonTestCase := CommonTestCases()
+	type TestCase struct {
+		Error     error
+		Height    int64
+		BlockHash string
+	}
+	testCases := map[string]TestCase{
+		// add new block to the longest chain, increasing finalised block height by 1
+		"Append a fork": {nil, 11, "6393fcb4ba7189f914c2f74fad2bd0ef7743c867b4a81db458f9f9e506458fe7"},
+		// add new block to a fork, keeping finalised block height same
+		"Create fork": {nil, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+		// fails new block addition, keeping finalised block height same
+		"Insert failed because fork too old": {ErrForkTooOld, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+		// no new block in forks, keeping finalised block height same
+		"Unknown parent": {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+	}
+
+	run := func(t *testing.T, name string, tc TestCase) {
+		data := commonTestCase[name]
+
+		lc := initLightClient(t, data.headers)
+		btcHeader, err := BlockHeaderFromHex(data.header)
+		assert.NilError(t, err)
+
+		lcErr := lc.InsertHeader(btcHeader)
+		err = lc.CleanUpFork()
+		assert.NilError(t, err)
+		if tc.Error == nil {
+			assert.NilError(t, lcErr)
+		} else {
+			assert.ErrorType(t, lcErr, tc.Error)
+		}
+
+		assert.Equal(t, lc.LatestFinalizedBlockHeight(), tc.Height)
+		assert.Equal(t, lc.LatestFinalizedBlockHash().String(), tc.BlockHash)
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			run(t, name, tc)
+		})
+	}
+}
+
 func TestCleanup(t *testing.T) {
 	var err error
 
 	tcs := CommonTestCases()
-	decodedHeader := make([]wire.BlockHeader, len(HEADERS))
-	for id, str := range HEADERS {
-		h, _ := BlockHeaderFromHex(str)
-		decodedHeader[id] = h
-	}
-	lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeader, 0)
+	lc := initLightClient(t, HEADERS)
 
 	// test-case1
 	// b1 <-b2 <- b3  .... b9
