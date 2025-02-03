@@ -111,7 +111,7 @@ func TestLatestFinalizedBlock(t *testing.T) {
 	testCases := map[string]TestCase{
 		// add new block to the longest chain, increasing finalised block height by 1
 		"Append a fork": {nil, 11, "6393fcb4ba7189f914c2f74fad2bd0ef7743c867b4a81db458f9f9e506458fe7"},
-		// adds new block to fork chain, keeping finalised block height same
+		// add new block to a fork, keeping finalised block height same
 		"Create fork": {nil, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 		// fails new block addition, keeping finalised block height same
 		"Insert failed because fork too old": {ErrForkTooOld, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
