@@ -109,7 +109,7 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		BlockHash string
 	}
 	testCases := map[string]TestCase{
-		// adds new block to longest chain, increasing finalised block height by 1
+		// add new block to the longest chain, increasing finalised block height by 1
 		"Append a fork": {nil, 11, "6393fcb4ba7189f914c2f74fad2bd0ef7743c867b4a81db458f9f9e506458fe7"},
 		// adds new block to fork chain, keeping finalised block height same
 		"Create fork": {nil, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
