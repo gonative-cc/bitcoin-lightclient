@@ -116,7 +116,7 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		// fails new block addition, keeping finalised block height same
 		"Insert failed because fork too old": {ErrForkTooOld, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 		// no new block in forks, keeping finalised block height same
-		"Block doesn't belong to any fork!": {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+		"unknown parent": {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 	}
 
 	run := func(t *testing.T, name string, tc TestCase) {
