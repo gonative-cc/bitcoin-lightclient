@@ -76,7 +76,7 @@ func TestInsertHeader(t *testing.T) {
 		"Append a fork":                      nil,
 		"Create fork":                        nil,
 		"Insert failed because fork too old": ErrForkTooOld,
-		"Block doesn't belong to any fork!":  ErrParentBlockNotInChain,
+		"Unknown parent":                     ErrParentBlockNotInChain,
 	}
 
 	run := func(t *testing.T, testcase string) {
