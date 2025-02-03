@@ -50,7 +50,7 @@ func CommonTestCases() testCaseMap {
 			headers: HEADERS,
 			header:  "0000002006226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f91bf7fc009e51a44f6c7b063e64d80b36af5cb8bc9879b9dadc7eebec779a70b437f3c67ffff7f2001000000",
 		},
-		"Block doesn't belong to any fork!": {
+		"Unknown parent": {
 			headers: HEADERS,
 			header:  "0000002018c8213eb4f94b3847dccc7946ff82a4d022a9e87162bc0601992b7dbaf12b43b275a58e2107b29a5735d8c6bd63d674ef01d4596c78961f338e5a364693b03502b53c67ffff7f2000000000",
 		},
@@ -59,10 +59,11 @@ func CommonTestCases() testCaseMap {
 	return tcs
 }
 
-func initLightClient(headers []string) *BTCLightClient {
+func initLightClient(t *testing.T, headers []string) *BTCLightClient {
 	decodedHeaders := make([]wire.BlockHeader, len(headers))
 	for id, str := range headers {
-		h, _ := BlockHeaderFromHex(str)
+		h, err := BlockHeaderFromHex(str)
+		assert.NilError(t, err)
 		decodedHeaders[id] = h
 	}
 	lc := NewBTCLightClientWithData(&chaincfg.RegressionNetParams, decodedHeaders, 0)
@@ -81,7 +82,7 @@ func TestInsertHeader(t *testing.T) {
 	run := func(t *testing.T, testcase string) {
 		data := commonTestCase[testcase]
 
-		lc := initLightClient(data.headers)
+		lc := initLightClient(t, data.headers)
 		btcHeader, _ := BlockHeaderFromHex(data.header)
 		lcErr := lc.InsertHeader(btcHeader)
 
@@ -116,16 +117,18 @@ func TestLatestFinalizedBlock(t *testing.T) {
 		// fails new block addition, keeping finalised block height same
 		"Insert failed because fork too old": {ErrForkTooOld, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 		// no new block in forks, keeping finalised block height same
-		"unknown parent": {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
+		"Unknown parent": {ErrParentBlockNotInChain, 10, "7a47c3a083add37394061eba8dbfb1fe2026d3fed6bd3d428b043b515bcb269e"},
 	}
 
 	run := func(t *testing.T, name string, tc TestCase) {
 		data := commonTestCase[name]
 
-		lc := initLightClient(data.headers)
-		btcHeader, _ := BlockHeaderFromHex(data.header)
+		lc := initLightClient(t, data.headers)
+		btcHeader, err := BlockHeaderFromHex(data.header)
+		assert.NilError(t, err)
+
 		lcErr := lc.InsertHeader(btcHeader)
-		err := lc.CleanUpFork()
+		err = lc.CleanUpFork()
 		assert.NilError(t, err)
 		if tc.Error == nil {
 			assert.NilError(t, lcErr)
@@ -148,7 +151,7 @@ func TestCleanup(t *testing.T) {
 	var err error
 
 	tcs := CommonTestCases()
-	lc := initLightClient(HEADERS)
+	lc := initLightClient(t, HEADERS)
 
 	// test-case1
 	// b1 <-b2 <- b3  .... b9
