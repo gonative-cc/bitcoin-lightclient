@@ -33,6 +33,9 @@ func GenerateBlock(
 			block.Header.PrevBlock = prevHash
 			block.Header.Nonce = uint32(nonce)
 			block.Header.MerkleRoot = blockHash // Simulated Merkle Root
+			for _, tx := range transactions {
+				block.Transactions = append(block.Transactions, tx.MsgTx())
+			}
 			return block, nil
 		}
 	}

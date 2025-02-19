@@ -1,29 +1,40 @@
 package btclightclient
 
 import (
+	"bytes"
+	"encoding/hex"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/btcsuite/btcd/wire"
 	"gotest.tools/assert"
 )
 
 func TestGenerateBlock(t *testing.T) {
 	tests := []struct {
-		name          string
-		transactions  []*btcutil.Tx
-		miner         string
-		previousHash  string
-		difficulty    int
-		expectedError error
+		name            string
+		transactionsRaw []string
+		miner           string
+		previousHash    string
+		difficulty      int
+		expectedError   error
 	}{
 		{
-			name:          "Empty transaction list",
-			transactions:  []*btcutil.Tx{},
-			previousHash:  "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-			miner:         "miner1",
-			difficulty:    1,
-			expectedError: nil,
+			name:            "Valid block with one transaction",
+			transactionsRaw: []string{"0100000001d95f1a3f947ba8f60df95e47147dd918446d74604a2829fc7f02aa40c1f7a0c8010000006b483045022100f3abbe1b0d622cc80a72f5760d78a21b33c2c65a82b37a7a76cd3a47b38e597e02207eab42fd194fa869d1b9a76e6e7a76d289bd2391c5c5a15c83e5b42d339f96da01210311b8ce3e832cc4cd22749587cb8a5cb1e053bd8691bfc9f80297bd50990bfddcffffffff0280d1f008000000001976a9144620b10b5d2cdde246fc82a94a5827ea0ee5426188ac40420f00000000001976a914ad5b5d5f9c69f5b05cfe08769c2675c0f7446a4a88ac00000000"},
+			miner:           "miner1",
+			difficulty:      1,
+			previousHash:    "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+			expectedError:   nil,
+		},
+		{
+			name:            "Empty transaction list",
+			transactionsRaw: []string{},
+			previousHash:    "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+			miner:           "miner1",
+			difficulty:      1,
+			expectedError:   nil,
 		},
 	}
 
@@ -31,7 +42,24 @@ func TestGenerateBlock(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			prevHash, _ := chainhash.NewHashFromStr(tt.previousHash)
 
-			block, err := GenerateBlock(*prevHash, tt.miner, tt.transactions, tt.difficulty)
+			transactions := make([]*btcutil.Tx, 0)
+			for _, txnRaw := range tt.transactionsRaw {
+				rawTxBytes, err := hex.DecodeString(txnRaw)
+				assert.NilError(t, err)
+
+				// Create an empty wire.MsgTx
+				msgTx := wire.NewMsgTx(wire.TxVersion)
+
+				// Deserialize the raw transaction into the MsgTx object
+				err = msgTx.Deserialize(bytes.NewReader(rawTxBytes))
+				assert.NilError(t, err)
+
+				// Convert wire.MsgTx to btcutil.Tx
+				txn := btcutil.NewTx(msgTx)
+				transactions = append(transactions, txn)
+			}
+
+			block, err := GenerateBlock(*prevHash, tt.miner, transactions, tt.difficulty)
 
 			if tt.expectedError != nil {
 				if err == nil {
@@ -47,8 +75,8 @@ func TestGenerateBlock(t *testing.T) {
 				t.Errorf("Expected previous hash %s, got %s", tt.previousHash, block.Header.PrevBlock.String())
 			}
 
-			if len(block.Transactions) != len(tt.transactions) {
-				t.Errorf("Expected %d transactions, got %d", len(tt.transactions), len(block.Transactions))
+			if len(block.Transactions) != len(transactions) {
+				t.Errorf("Expected %d transactions, got %d", len(transactions), len(block.Transactions))
 			}
 
 			if len(block.Header.BlockHash()) == 0 {
