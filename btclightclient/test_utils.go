@@ -13,7 +13,7 @@ import (
 func GenerateBlock(
 	prevHash chainhash.Hash,
 	miner string,
-	txns []*btcutil.Tx,
+	transactions []*btcutil.Tx,
 	difficulty int,
 ) (*wire.MsgBlock, error) {
 	block := &wire.MsgBlock{}
@@ -21,7 +21,7 @@ func GenerateBlock(
 
 	for nonce := 0; ; nonce++ {
 		txnStrings := ""
-		for _, tx := range txns {
+		for _, tx := range transactions {
 			txnStrings += tx.Hash().String()
 		}
 		hashInput := prevHash.String() + txnStrings + miner + strconv.Itoa(nonce)
