@@ -29,6 +29,17 @@ func TestGenerateBlock(t *testing.T) {
 			expectedError:   nil,
 		},
 		{
+			name: "Valid block with two transactions",
+			transactionsRaw: []string{
+				"0100000001d95f1a3f947ba8f60df95e47147dd918446d74604a2829fc7f02aa40c1f7a0c8010000006b483045022100f3abbe1b0d622cc80a72f5760d78a21b33c2c65a82b37a7a76cd3a47b38e597e02207eab42fd194fa869d1b9a76e6e7a76d289bd2391c5c5a15c83e5b42d339f96da01210311b8ce3e832cc4cd22749587cb8a5cb1e053bd8691bfc9f80297bd50990bfddcffffffff0280d1f008000000001976a9144620b10b5d2cdde246fc82a94a5827ea0ee5426188ac40420f00000000001976a914ad5b5d5f9c69f5b05cfe08769c2675c0f7446a4a88ac00000000",
+				"0100000001a3b2c1d4e5f67890abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef000000006a47304402207f2e3d1c0b9a8f7e6d5c4b3a291827161514131211100f0e0d0c0b0a0908070602205f4e3d2c1b0a9f8e7d6c5b4a392817161514131211100f0e0d0c0b0a09080706012102abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdffffffff0280d1f008000000001976a914abcdefabcdefabcdefabcdefabcdefabcdefabcdef88ac10270000000000001976a91489abcdef0123456789abcdef0123456789abcdef012345678988ac00000000",
+			},
+			miner:         "miner2",
+			difficulty:    1,
+			previousHash:  "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+			expectedError: nil,
+		},
+		{
 			name:            "Empty transaction list",
 			transactionsRaw: []string{},
 			previousHash:    "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
